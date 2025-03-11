@@ -1,6 +1,9 @@
 package bank.donghang.donghang_api.user.domain;
 
 import bank.donghang.donghang_api.common.entity.BaseEntity;
+import bank.donghang.donghang_api.user.domain.enums.UserStatus;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Column;
@@ -39,4 +42,8 @@ public class User extends BaseEntity {
 
     @Column(nullable = false)
     private String postNumber;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserStatus userStatus;
 }
