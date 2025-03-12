@@ -1,0 +1,11 @@
+== MemberController
+
+=== 내 정보 조회 (GET /api/v1/members/me)
+
+==== 요청
+
+include::{snippets}/member-controller-test/find_member_info/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/member-controller-test/find_member_info/http-response.adoc[]

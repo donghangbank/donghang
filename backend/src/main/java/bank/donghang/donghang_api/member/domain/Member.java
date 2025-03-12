@@ -47,4 +47,34 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private MemberStatus memberStatus;
+
+    public static Member of(
+            String name,
+            String email,
+            String phoneNumber,
+            LocalDateTime birthday,
+            String address,
+            String postNumber,
+            MemberStatus memberStatus
+    ) {
+        return new Member(name, email, phoneNumber, birthday, address, postNumber, memberStatus);
+    }
+
+    private Member(
+            String name,
+            String email,
+            String phoneNumber,
+            LocalDateTime birthday,
+            String address,
+            String postNumber,
+            MemberStatus memberStatus
+    ) {
+        this.name = name;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.birthday = birthday;
+        this.address = address;
+        this.postNumber = postNumber;
+        this.memberStatus = memberStatus;
+    }
 }
