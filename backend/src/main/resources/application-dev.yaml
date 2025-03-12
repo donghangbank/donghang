@@ -1,16 +1,11 @@
 spring:
-  h2:
-    console:
-      enabled: ${H2_CONSOLE_ENABLED}
-      path: ${H2_CONSOLE_PATH}
-
   datasource:
-    driver-class-name: ${H2_DATASOURCE_DRIVER}
-    url: ${H2_DATASOURCE_URL}
-    username: ${H2_DATASOURCE_USERNAME}
-    password: ${H2_DATASOURCE_PASSWORD}
+    driver-class-name: ${MYSQL_DATASOURCE_DRIVER}
+    url: ${MYSQL_DATASOURCE_URL}
+    username: ${MYSQL_DATASOURCE_USERNAME}
+    password: ${MYSQL_DATASOURCE_PASSWORD}
 
   jpa:
-    show-sql: ${H2_JPA_SHOW_SQL}
+    show-sql: ${MYSQL_JPA_SHOW_SQL}
     hibernate:
-      ddl-auto: ${H2_JPA_DDL_AUTO}
+      ddl-auto: ${MYSQL_JPA_DDL_AUTO}
