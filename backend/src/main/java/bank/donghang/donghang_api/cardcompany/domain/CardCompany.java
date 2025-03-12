@@ -22,5 +22,23 @@ public class CardCompany extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
-    private String logo_Url;
+    private String logoUrl;
+
+    public static CardCompany createCardCompany(
+            String name,
+            String logoUrl
+    ) {
+        return new CardCompany(
+                name,
+                logoUrl
+        );
+    }
+
+    private CardCompany(
+            String name,
+            String logoUrl
+    ) {
+        this.name = name;
+        this.logoUrl = logoUrl;
+    }
 }
