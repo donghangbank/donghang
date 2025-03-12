@@ -12,12 +12,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MemberService {
 
-    private final MemberRepository userRepository;
+    private final MemberRepository memberRepository;
 
-    public MemberDetailResponse findMember(Long userId) {
-        Member user = userRepository.findById(userId)
-                .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
+    public MemberDetailResponse findMember(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BadRequestException(ErrorCode.MEMBER_NOT_FOUND));
 
-        return MemberDetailResponse.from(user);
+        return MemberDetailResponse.from(member);
     }
 }

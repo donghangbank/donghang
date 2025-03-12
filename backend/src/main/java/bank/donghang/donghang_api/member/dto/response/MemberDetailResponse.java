@@ -10,13 +10,13 @@ public record MemberDetailResponse(
         String phoneNumber,
         MemberStatus memberStatus
 ) {
-    public static MemberDetailResponse from(Member user) {
+    public static MemberDetailResponse from(Member member) {
         return new MemberDetailResponse(
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.getPhoneNumber(),
-                user.getMemberStatus()
+                member.getId(),
+                member.getName(),
+                member.getEmail(),
+                member.getPhoneNumber(),
+                member.getMemberStatus()
         );
     }
 }
