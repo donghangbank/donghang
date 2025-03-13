@@ -48,7 +48,7 @@ public class CardCompanyController {
     @GetMapping
     public ResponseEntity<List<CardCompanySummaryResponse>> findAllCardCompanySummaries(){
 
-        List<CardCompanySummaryResponse> response = cardCompanyService.findAllCardCompanies();
+        List<CardCompanySummaryResponse> response = cardCompanyService.getAllCardCompanies();
 
         return ResponseEntity.ok().body(response);
     }

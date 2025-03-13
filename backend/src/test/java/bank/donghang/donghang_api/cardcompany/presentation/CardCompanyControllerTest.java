@@ -102,7 +102,7 @@ class CardCompanyControllerTest extends ControllerTest {
                 )
         );
 
-        given(cardCompanyService.findAllCardCompanies())
+        given(cardCompanyService.getAllCardCompanies())
                 .willReturn(expect);
 
         MvcResult result = mockMvc.perform(get("/api/v1/cardcompanies"))

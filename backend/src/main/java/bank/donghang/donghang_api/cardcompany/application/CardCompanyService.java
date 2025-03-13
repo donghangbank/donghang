@@ -32,7 +32,7 @@ public class CardCompanyService {
         return cardCompanyRepository.save(cardCompany).getId();
     }
 
-    public List<CardCompanySummaryResponse> findAllCardCompanies(){
+    public List<CardCompanySummaryResponse> getAllCardCompanies(){
 
         List<CardCompanySummaryResponse> response = cardCompanyRepository.findAllCardCompanySummaries();
 
