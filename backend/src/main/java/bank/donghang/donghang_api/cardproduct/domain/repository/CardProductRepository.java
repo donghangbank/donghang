@@ -1,10 +1,13 @@
 package bank.donghang.donghang_api.cardproduct.domain.repository;
 
 import bank.donghang.donghang_api.cardproduct.domain.CardProduct;
+import bank.donghang.donghang_api.cardproduct.domain.enums.CardProductType;
 import bank.donghang.donghang_api.cardproduct.dto.response.CardProductDetailResponse;
+import bank.donghang.donghang_api.cardproduct.dto.response.CardProductSummaryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -20,6 +23,16 @@ public class CardProductRepository{
 
     public CardProductDetailResponse findCardProductDetailById(Long id) {
         return cardProductJpaRepositoryCustomImpl.findCardProductDetailById(id);
+    }
+
+    public List<CardProductSummaryResponse> findCardProductSummaries(
+            CardProductType type,
+            String cardCompanyName
+    ) {
+        return cardProductJpaRepositoryCustomImpl.findCardProductSummaries(
+                type,
+                cardCompanyName
+        );
     }
 
     public boolean existsCardProduct(Long id) {

@@ -2,9 +2,11 @@ package bank.donghang.donghang_api.cardproduct.presentation;
 
 import bank.donghang.donghang_api.cardcompany.dto.request.CardCompanyRequest;
 import bank.donghang.donghang_api.cardproduct.application.CardProductService;
+import bank.donghang.donghang_api.cardproduct.domain.enums.CardProductType;
 import bank.donghang.donghang_api.cardproduct.dto.request.CardProductCreateRequest;
 import bank.donghang.donghang_api.cardproduct.dto.request.CardProductUpdateRequest;
 import bank.donghang.donghang_api.cardproduct.dto.response.CardProductDetailResponse;
+import bank.donghang.donghang_api.cardproduct.dto.response.CardProductSummaryResponse;
 import bank.donghang.donghang_api.s3.application.S3FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,11 +18,13 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -52,6 +56,19 @@ public class CardProductController {
     public ResponseEntity<CardProductDetailResponse> findCardProduct(@PathVariable(name = "cardProductId") Long cardProductId) {
 
         CardProductDetailResponse response = cardProductService.getCardProductDetail(cardProductId);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CardProductSummaryResponse>> getCardProductSummaries(
+            @RequestParam(name = "cardProductType", required = false) CardProductType cardProductType,
+            @RequestParam(name = "cardCompanyName", required = false) String cardCompanyName
+    ){
+        List<CardProductSummaryResponse> response = cardProductService.getCardProductSummaries(
+                cardProductType,
+                cardCompanyName
+        );
 
         return ResponseEntity.ok(response);
     }
