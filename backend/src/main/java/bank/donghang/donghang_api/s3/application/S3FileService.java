@@ -5,8 +5,10 @@ import bank.donghang.donghang_api.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
@@ -15,6 +17,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -55,12 +58,7 @@ public class S3FileService {
             String dirName
     ) {
         try {
-            String fileName =
-                    dirName
-                            + "/"
-                            + System.currentTimeMillis()
-                            + "-"
-                    + multipartFile.getOriginalFilename();
+            String fileName = createFileName(multipartFile.getOriginalFilename(), dirName);
 
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
@@ -104,6 +102,19 @@ public class S3FileService {
     }
 
     public String getFileUrl(String fileName) {
-        return "https://" + bucketName + ".s3.ap-northeast-2.amazonaws.com/\"+fileName";
+        return "https://" + bucketName + ".s3.ap-northeast-2.amazonaws.com/" + fileName;
+    }
+
+    private String createFileName(String fileName, String dirName) {
+        final String uuid = UUID.randomUUID().toString().replace("-", "");
+        final String extension = getFileExtension(fileName);
+        return dirName + "/" + uuid + extension;
+    }
+
+    private String getFileExtension(String fileName) {
+        if (fileName == null || !fileName.contains(".")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 형식의 파일입니다.");
+        }
+        return fileName.substring(fileName.lastIndexOf("."));
     }
 }
