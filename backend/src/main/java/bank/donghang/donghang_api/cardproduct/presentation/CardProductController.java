@@ -1,6 +1,5 @@
 package bank.donghang.donghang_api.cardproduct.presentation;
 
-import bank.donghang.donghang_api.cardcompany.dto.request.CardCompanyRequest;
 import bank.donghang.donghang_api.cardproduct.application.CardProductService;
 import bank.donghang.donghang_api.cardproduct.domain.enums.CardProductType;
 import bank.donghang.donghang_api.cardproduct.dto.request.CardProductCreateRequest;
