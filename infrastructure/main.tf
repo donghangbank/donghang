@@ -1,3 +1,7 @@
+module "ecr" {
+  source = "./Modules/ECR"
+}
+
 module "networing" {
   source                     = "./Modules/Networking"
   availability_zones         = var.availability_zones
