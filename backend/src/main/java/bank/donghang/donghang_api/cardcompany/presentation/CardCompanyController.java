@@ -1,7 +1,6 @@
 package bank.donghang.donghang_api.cardcompany.presentation;
 
 import bank.donghang.donghang_api.cardcompany.application.CardCompanyService;
-import bank.donghang.donghang_api.cardcompany.domain.CardCompany;
 import bank.donghang.donghang_api.cardcompany.dto.request.CardCompanyRequest;
 import bank.donghang.donghang_api.cardcompany.dto.response.CardCompanySummaryResponse;
 import bank.donghang.donghang_api.s3.application.S3FileService;
@@ -30,14 +29,17 @@ public class CardCompanyController {
     private final S3FileService s3FileService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CardCompany> createCardCompany(
+    public ResponseEntity<Void> createCardCompany(
             @RequestPart(value = "request") CardCompanyRequest request,
             @RequestPart(value = "image") MultipartFile image
     ) {
 
-        String logoUrl = s3FileService.uploadFileToS3(image, "logo");
+        String logoUrl = uploadImageToS3(image);
 
-        Long cardCompanyId = cardCompanyService.createCardCompany(request, logoUrl);
+        Long cardCompanyId = cardCompanyService.createCardCompany(
+                request,
+                logoUrl
+        );
 
         return ResponseEntity.created(URI.create("/api/v1/cardcompanies/" + cardCompanyId))
                 .build();
@@ -59,7 +61,7 @@ public class CardCompanyController {
     ) {
 
 
-        String newLogoUrl = (newLogo != null) ? s3FileService.uploadFileToS3(newLogo, "logo") : null;
+        String newLogoUrl = (newLogo != null) ? uploadImageToS3(newLogo) : null;
         cardCompanyService.updateCardCompany(
                 cardCompanyId,
                 newLogoUrl,
@@ -74,5 +76,9 @@ public class CardCompanyController {
         cardCompanyService.deleteCardCompany(cardCompanyId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    private String uploadImageToS3(MultipartFile image) {
+        return s3FileService.uploadFileToS3(image, "logo");
     }
 }

@@ -31,4 +31,30 @@ public class CardProduct extends BaseEntity {
     private String description;
 
     private String imageUrl;
+
+    public static CardProduct createCardProduct(
+            String name,
+            CardProductType type,
+            String description,
+            String imageUrl
+    ){
+        return new CardProduct(
+                name,
+                type,
+                description,
+                imageUrl
+        );
+    }
+
+    private CardProduct (
+            String name,
+            CardProductType type,
+            String description,
+            String imageUrl
+    ) {
+        this.name = name;
+        this.type = type;
+        this.description = description;
+        this.imageUrl = imageUrl;
+    }
 }

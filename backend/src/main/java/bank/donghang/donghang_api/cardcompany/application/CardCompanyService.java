@@ -6,9 +6,9 @@ import bank.donghang.donghang_api.cardcompany.dto.request.CardCompanyRequest;
 import bank.donghang.donghang_api.cardcompany.dto.response.CardCompanySummaryResponse;
 import bank.donghang.donghang_api.common.exception.BadRequestException;
 import bank.donghang.donghang_api.common.exception.ErrorCode;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
