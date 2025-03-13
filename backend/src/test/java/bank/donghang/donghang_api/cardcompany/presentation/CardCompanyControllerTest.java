@@ -2,8 +2,7 @@ package bank.donghang.donghang_api.cardcompany.presentation;
 
 
 import bank.donghang.donghang_api.cardcompany.application.CardCompanyService;
-import bank.donghang.donghang_api.cardcompany.dto.request.CardCompanyCreateRequest;
-import bank.donghang.donghang_api.cardcompany.dto.request.CardCompanyUpdateRequest;
+import bank.donghang.donghang_api.cardcompany.dto.request.CardCompanyRequest;
 import bank.donghang.donghang_api.cardcompany.dto.response.CardCompanySummaryResponse;
 import bank.donghang.donghang_api.common.controller.ControllerTest;
 import bank.donghang.donghang_api.s3.application.S3FileService;
@@ -25,7 +24,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.springframework.http.HttpMethod.PATCH;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -53,17 +54,17 @@ class CardCompanyControllerTest extends ControllerTest {
     public void create_card_company() throws Exception {
 
         String logoUrl = "https://test-bucket.s3.region.amazonaws.com/logo/test.jpg";
-        var request = new CardCompanyCreateRequest("삼성카드");
+        var request = new CardCompanyRequest("삼성카드");
 
         MockMultipartFile image = new MockMultipartFile(
-                "images",
+                "image",
                 "test.jpg",
                 "image/jpeg",
                 "test image content".getBytes()
         );
 
         MockMultipartFile requestPart = new MockMultipartFile(
-                "postCreateRequest",
+                "request",
                 "",
                 "application/json",
                 objectMapper.writeValueAsBytes(request)
@@ -120,22 +121,33 @@ class CardCompanyControllerTest extends ControllerTest {
     @Test
     @DisplayName("카드사를 수정할 수 있다.")
     public void can_update_card_company() throws Exception {
-        var request = new CardCompanyUpdateRequest(
-                "종하카드",
-                "www.test.com"
-        );
-
+        var request = new CardCompanyRequest("종하카드");
         Long cardCompanyId = 1L;
 
-        doNothing().when(cardCompanyService).updateCardCompany(any(),any());
+        MockMultipartFile image = new MockMultipartFile(
+                "image",
+                "logo.png",
+                MediaType.IMAGE_PNG_VALUE,
+                "dummy image content".getBytes()
+        );
 
-        mockMvc.perform(patch("/api/v1/cardcompanies/" + cardCompanyId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+        MockMultipartFile requestPart = new MockMultipartFile(
+                "request",
+                "",
+                MediaType.APPLICATION_JSON_VALUE,
+                objectMapper.writeValueAsBytes(request)
+        );
+
+        doNothing().when(cardCompanyService).updateCardCompany(any(), any(), any());
+
+        mockMvc.perform(multipart(PATCH,"/api/v1/cardcompanies/{cardCompanyId}", cardCompanyId)
+                        .file(image)
+                        .file(requestPart)
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andDo(print())
                 .andExpect(status().isNoContent());
 
-        verify(cardCompanyService).updateCardCompany(any(),any());
+        verify(cardCompanyService).updateCardCompany(any(), any(), any());
     }
 
     @Test

@@ -1,6 +1,6 @@
 package bank.donghang.donghang_api.cardcompany.dto.request;
 
-public record CardCompanyCreateRequest(
+public record CardCompanyRequest(
         String name
 ) {
 }

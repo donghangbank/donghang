@@ -2,8 +2,7 @@ package bank.donghang.donghang_api.cardcompany.application;
 
 import bank.donghang.donghang_api.cardcompany.domain.CardCompany;
 import bank.donghang.donghang_api.cardcompany.domain.repository.CardCompanyRepository;
-import bank.donghang.donghang_api.cardcompany.dto.request.CardCompanyCreateRequest;
-import bank.donghang.donghang_api.cardcompany.dto.request.CardCompanyUpdateRequest;
+import bank.donghang.donghang_api.cardcompany.dto.request.CardCompanyRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,7 +27,7 @@ public class CardCompanyServiceTest {
     @DisplayName("카드사를 생성할 수 있다.")
     public void can_create_card_company(){
 
-        var request = new CardCompanyCreateRequest(
+        var request = new CardCompanyRequest(
                 "삼성카드"
         );
 
