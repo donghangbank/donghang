@@ -1,5 +1,6 @@
 package bank.donghang.donghang_api.cardproduct.domain;
 
+import bank.donghang.donghang_api.cardproduct.domain.enums.CardDuration;
 import bank.donghang.donghang_api.cardproduct.domain.enums.CardProductType;
 import bank.donghang.donghang_api.common.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -32,17 +33,26 @@ public class CardProduct extends BaseEntity {
 
     private String imageUrl;
 
+    private Long cardCompanyId;
+
+    @Enumerated(EnumType.STRING)
+    private CardDuration duration;
+
     public static CardProduct createCardProduct(
             String name,
             CardProductType type,
             String description,
-            String imageUrl
+            String imageUrl,
+            CardDuration duration,
+            Long cardCompanyId
     ){
         return new CardProduct(
                 name,
                 type,
                 description,
-                imageUrl
+                imageUrl,
+                duration,
+                cardCompanyId
         );
     }
 
@@ -50,11 +60,15 @@ public class CardProduct extends BaseEntity {
             String name,
             CardProductType type,
             String description,
-            String imageUrl
+            String imageUrl,
+            CardDuration duration,
+            Long cardCompanyId
     ) {
         this.name = name;
         this.type = type;
         this.description = description;
         this.imageUrl = imageUrl;
+        this.duration = duration;
+        this.cardCompanyId = cardCompanyId;
     }
 }

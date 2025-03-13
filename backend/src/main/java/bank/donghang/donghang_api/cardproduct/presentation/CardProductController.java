@@ -2,10 +2,14 @@ package bank.donghang.donghang_api.cardproduct.presentation;
 
 import bank.donghang.donghang_api.cardproduct.application.CardProductService;
 import bank.donghang.donghang_api.cardproduct.dto.request.CardProductCreateRequest;
+import bank.donghang.donghang_api.cardproduct.dto.response.CardProductDetailResponse;
 import bank.donghang.donghang_api.s3.application.S3FileService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -17,6 +21,7 @@ import java.net.URI;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/cardproducts")
+@Slf4j
 public class CardProductController {
 
     private final CardProductService cardProductService;
@@ -37,6 +42,14 @@ public class CardProductController {
 
         return ResponseEntity.created(URI.create("/api/v1/cardproducts/" + cardProductId))
                 .build();
+    }
+
+    @GetMapping("/{cardProductId}")
+    public ResponseEntity<CardProductDetailResponse> findCardProduct(@PathVariable(name = "cardProductId") Long cardProductId) {
+
+        CardProductDetailResponse response = cardProductService.getCardProductDetail(cardProductId);
+
+        return ResponseEntity.ok(response);
     }
 
     private String uploadImageToS3(MultipartFile image) {
