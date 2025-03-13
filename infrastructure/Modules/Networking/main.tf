@@ -140,3 +140,24 @@ resource "aws_vpc_endpoint" "vpce_s3" {
     Name = "donghang-vpce-s3"
   }
 }
+
+locals {
+  vpce_ecr = toset([
+    "api",
+    "dkr"
+  ])
+}
+
+resource "aws_vpc_endpoint" "vpce_ecr" {
+  for_each            = local.vpce_ecr
+  vpc_id              = aws_vpc.vpc.id
+  vpc_endpoint_type   = "Interface"
+  service_name        = "com.amazonaws.${var.aws_region}.ecr.${each.key}"
+  private_dns_enabled = true
+  subnet_ids          = aws_subnet.private_subnets[*].id
+  # security_group_ids  = [var.sg_vpce_ecr_id]
+
+  tags = {
+    Name = "donghang-vpce-ecr-${each.key}"
+  }
+}
