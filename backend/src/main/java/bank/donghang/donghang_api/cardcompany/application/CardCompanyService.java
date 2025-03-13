@@ -34,4 +34,10 @@ public class CardCompanyService {
 
         return response;
     }
+
+    @Transactional
+    public void deleteCardCompany(Long id) {
+
+        cardCompanyRepository.deleteCardCompany(id);
+    }
 }
