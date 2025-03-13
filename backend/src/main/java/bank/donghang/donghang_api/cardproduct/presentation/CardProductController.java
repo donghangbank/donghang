@@ -74,6 +74,15 @@ public class CardProductController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/{cardProductId}")
+    public ResponseEntity<Void> deleteCardProduct(@PathVariable(name = "cardProductId") Long cardProductId) {
+
+        cardProductService.deleteCardProduct(cardProductId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+
     private String uploadImageToS3(MultipartFile image) {
         return s3FileService.uploadFileToS3(image, "cardproduct");
     }

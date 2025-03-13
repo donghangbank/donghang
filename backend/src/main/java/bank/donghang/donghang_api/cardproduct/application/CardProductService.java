@@ -63,6 +63,14 @@ public class CardProductService {
         );
     }
 
+    @Transactional
+    public void deleteCardProduct(Long id){
+
+        checkCardProductExistence(id);
+
+        cardProductRepository.deleteCardProduct(id);
+    }
+
     private void checkCardProductExistence(Long id) {
         if (!cardProductRepository.existsCardProduct(id)){
             throw new BadRequestException(ErrorCode.CARD_PRODUCT_NOT_FOUND);

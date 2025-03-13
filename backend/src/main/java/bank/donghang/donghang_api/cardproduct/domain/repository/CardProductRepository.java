@@ -29,4 +29,8 @@ public class CardProductRepository{
     public Optional<CardProduct> findCardProductById(Long id) {
         return cardProductJpaRepository.findById(id);
     }
+
+    public void deleteCardProduct(Long id) {
+        cardProductJpaRepository.deleteById(id);
+    }
 }
