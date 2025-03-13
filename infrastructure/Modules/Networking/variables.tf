@@ -2,6 +2,10 @@ variable "availability_zones" {
   type = list(string)
 }
 
+variable "aws_region" {
+  type = string
+}
+
 variable "database_subnet_cidr_block" {
   type = list(string)
 }

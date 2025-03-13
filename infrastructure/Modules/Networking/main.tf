@@ -129,3 +129,14 @@ resource "aws_route_table_association" "database_route_table_assoc" {
   subnet_id      = aws_subnet.database_subnets[count.index].id
   route_table_id = aws_route_table.database_route_table.id
 }
+
+resource "aws_vpc_endpoint" "vpce_s3" {
+  vpc_id            = aws_vpc.vpc.id
+  vpc_endpoint_type = "Gateway"
+  service_name      = "com.amazonaws.${var.aws_region}.s3"
+  route_table_ids   = [aws_route_table.private_route_table.id]
+
+  tags = {
+    Name = "donghang-vpce-s3"
+  }
+}
