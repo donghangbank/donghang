@@ -1,6 +1,6 @@
 package bank.donghang.donghang_api.cardcompany.dto.request;
 
-public record CardCompanyRequest(
+public record CardCompanyUpdateRequest(
         String name,
         String logoUrl
 ) {

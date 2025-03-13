@@ -2,9 +2,11 @@ package bank.donghang.donghang_api.cardcompany.presentation;
 
 
 import bank.donghang.donghang_api.cardcompany.application.CardCompanyService;
-import bank.donghang.donghang_api.cardcompany.dto.request.CardCompanyRequest;
+import bank.donghang.donghang_api.cardcompany.dto.request.CardCompanyCreateRequest;
+import bank.donghang.donghang_api.cardcompany.dto.request.CardCompanyUpdateRequest;
 import bank.donghang.donghang_api.cardcompany.dto.response.CardCompanySummaryResponse;
 import bank.donghang.donghang_api.common.controller.ControllerTest;
+import bank.donghang.donghang_api.s3.application.S3FileService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
@@ -13,17 +15,20 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -37,25 +42,40 @@ class CardCompanyControllerTest extends ControllerTest {
     @MockitoBean
     private CardCompanyService cardCompanyService;
 
+    @MockitoBean
+    private S3FileService s3FileService;
+
     @Autowired
     ObjectMapper objectMapper;
 
     @Test
     @DisplayName("카드 회사를 생성할 수 있다.")
     public void create_card_company() throws Exception {
-        Long cardCompanyId = 1L;
 
-        var request = new CardCompanyRequest(
-                "삼성카드",
-                "www.test.com"
+        String logoUrl = "https://test-bucket.s3.region.amazonaws.com/logo/test.jpg";
+        var request = new CardCompanyCreateRequest("삼성카드");
+
+        MockMultipartFile image = new MockMultipartFile(
+                "images",
+                "test.jpg",
+                "image/jpeg",
+                "test image content".getBytes()
         );
 
-        given(cardCompanyService.createCardCompany(any()))
-                .willReturn(1L);
+        MockMultipartFile requestPart = new MockMultipartFile(
+                "postCreateRequest",
+                "",
+                "application/json",
+                objectMapper.writeValueAsBytes(request)
+        );
 
-        mockMvc.perform(post("/api/v1/cardcompanies")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+        given(s3FileService.uploadFileToS3(any(), eq("logo"))).willReturn(logoUrl);
+        given(cardCompanyService.createCardCompany(any(), any())).willReturn(1L);
+
+        mockMvc.perform(multipart("/api/v1/cardcompanies")
+                        .file(requestPart)
+                        .file(image)
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andDo(print())
                 .andExpect(status().isCreated());
     }
@@ -100,7 +120,7 @@ class CardCompanyControllerTest extends ControllerTest {
     @Test
     @DisplayName("카드사를 수정할 수 있다.")
     public void can_update_card_company() throws Exception {
-        var request = new CardCompanyRequest(
+        var request = new CardCompanyUpdateRequest(
                 "종하카드",
                 "www.test.com"
         );

@@ -2,7 +2,8 @@ package bank.donghang.donghang_api.cardcompany.application;
 
 import bank.donghang.donghang_api.cardcompany.domain.CardCompany;
 import bank.donghang.donghang_api.cardcompany.domain.repository.CardCompanyRepository;
-import bank.donghang.donghang_api.cardcompany.dto.request.CardCompanyRequest;
+import bank.donghang.donghang_api.cardcompany.dto.request.CardCompanyCreateRequest;
+import bank.donghang.donghang_api.cardcompany.dto.request.CardCompanyUpdateRequest;
 import bank.donghang.donghang_api.cardcompany.dto.response.CardCompanySummaryResponse;
 import bank.donghang.donghang_api.common.exception.BadRequestException;
 import bank.donghang.donghang_api.common.exception.ErrorCode;
@@ -19,11 +20,14 @@ public class CardCompanyService {
     private final CardCompanyRepository cardCompanyRepository;
 
     @Transactional
-    public Long createCardCompany(CardCompanyRequest request) {
+    public Long createCardCompany(
+            CardCompanyCreateRequest request,
+            String logoUrl
+    ) {
 
         CardCompany cardCompany = CardCompany.createCardCompany(
                 request.name(),
-                request.logoUrl()
+                logoUrl
         );
 
         return cardCompanyRepository.save(cardCompany).getId();
@@ -39,7 +43,7 @@ public class CardCompanyService {
     @Transactional
     public void updateCardCompany(
             Long id,
-            CardCompanyRequest cardCompanyUpdateRequest
+            CardCompanyUpdateRequest cardCompanyUpdateRequest
     ){
         if (!cardCompanyRepository.existsCardCompany(id)){
             throw new BadRequestException(ErrorCode.CARD_COMPANY_NOT_FOUND);

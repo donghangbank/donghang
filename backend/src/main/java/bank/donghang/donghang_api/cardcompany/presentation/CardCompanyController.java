@@ -2,9 +2,12 @@ package bank.donghang.donghang_api.cardcompany.presentation;
 
 import bank.donghang.donghang_api.cardcompany.application.CardCompanyService;
 import bank.donghang.donghang_api.cardcompany.domain.CardCompany;
-import bank.donghang.donghang_api.cardcompany.dto.request.CardCompanyRequest;
+import bank.donghang.donghang_api.cardcompany.dto.request.CardCompanyCreateRequest;
+import bank.donghang.donghang_api.cardcompany.dto.request.CardCompanyUpdateRequest;
 import bank.donghang.donghang_api.cardcompany.dto.response.CardCompanySummaryResponse;
+import bank.donghang.donghang_api.s3.application.S3FileService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +16,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
 import java.util.List;
@@ -24,11 +29,17 @@ import java.util.List;
 public class CardCompanyController {
 
     private final CardCompanyService cardCompanyService;
+    private final S3FileService s3FileService;
 
-    @PostMapping
-    public ResponseEntity<CardCompany> createCardCompany(@RequestBody CardCompanyRequest request) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CardCompany> createCardCompany(
+            @RequestPart(value = "postCreateRequest") CardCompanyCreateRequest request,
+            @RequestPart(value = "image") MultipartFile image
+    ) {
 
-        Long cardCompanyId = cardCompanyService.createCardCompany(request);
+        String logoUrl = s3FileService.uploadFileToS3(image, "logo");
+
+        Long cardCompanyId = cardCompanyService.createCardCompany(request, logoUrl);
 
         return ResponseEntity.created(URI.create("/api/v1/cardcompanies/" + cardCompanyId))
                 .build();
@@ -45,7 +56,7 @@ public class CardCompanyController {
     @PatchMapping("/{cardCompanyId}")
     public ResponseEntity<Void> updateCardCompany(
             @PathVariable Long cardCompanyId,
-            @RequestBody CardCompanyRequest request
+            @RequestBody CardCompanyUpdateRequest request
     ) {
 
         cardCompanyService.updateCardCompany(
