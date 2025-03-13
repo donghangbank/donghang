@@ -1,14 +1,18 @@
 package bank.donghang.donghang_api.cardproduct.presentation;
 
+import bank.donghang.donghang_api.cardcompany.dto.request.CardCompanyRequest;
 import bank.donghang.donghang_api.cardproduct.application.CardProductService;
 import bank.donghang.donghang_api.cardproduct.dto.request.CardProductCreateRequest;
+import bank.donghang.donghang_api.cardproduct.dto.request.CardProductUpdateRequest;
 import bank.donghang.donghang_api.cardproduct.dto.response.CardProductDetailResponse;
 import bank.donghang.donghang_api.s3.application.S3FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,6 +54,24 @@ public class CardProductController {
         CardProductDetailResponse response = cardProductService.getCardProductDetail(cardProductId);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{cardProductId}")
+    public ResponseEntity<Void> updateCardProduct(
+            @PathVariable(name = "cardProductId") Long cardProductId,
+            @RequestPart(value = "request") CardProductUpdateRequest request,
+            @RequestPart(value = "image", required = false) MultipartFile newImage
+    ) {
+
+        String cardImageUrl = uploadImageToS3(newImage);
+
+        cardProductService.updateCardProduct(
+                cardProductId,
+                cardImageUrl,
+                request
+        );
+
+        return ResponseEntity.noContent().build();
     }
 
     private String uploadImageToS3(MultipartFile image) {

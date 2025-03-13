@@ -5,6 +5,8 @@ import bank.donghang.donghang_api.cardproduct.dto.response.CardProductDetailResp
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class CardProductRepository{
@@ -22,5 +24,9 @@ public class CardProductRepository{
 
     public boolean existsCardProduct(Long id) {
         return cardProductJpaRepository.existsById(id);
+    }
+
+    public Optional<CardProduct> findCardProductById(Long id) {
+        return cardProductJpaRepository.findById(id);
     }
 }

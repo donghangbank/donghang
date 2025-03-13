@@ -45,9 +45,8 @@ public class CardCompanyService {
             String newLogoUrl,
             CardCompanyRequest cardCompanyRequest
     ){
-        if (!cardCompanyRepository.existsCardCompany(id)){
-            throw new BadRequestException(ErrorCode.CARD_COMPANY_NOT_FOUND);
-        }
+
+        checkCardCompanyExistence(id);
 
         CardCompany cardCompany = cardCompanyRepository.findById(id)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.CARD_COMPANY_NOT_FOUND));
@@ -61,10 +60,14 @@ public class CardCompanyService {
     @Transactional
     public void deleteCardCompany(Long id) {
 
-        if (cardCompanyRepository.existsCardCompany(id)){
-            throw new BadRequestException(ErrorCode.CARD_COMPANY_NOT_FOUND);
-        }
+        checkCardCompanyExistence(id);
 
         cardCompanyRepository.deleteCardCompany(id);
+    }
+
+    private void checkCardCompanyExistence(Long id) {
+        if (!cardCompanyRepository.existsCardCompany(id)){
+            throw new BadRequestException(ErrorCode.CARD_COMPANY_NOT_FOUND);
+        }
     }
 }

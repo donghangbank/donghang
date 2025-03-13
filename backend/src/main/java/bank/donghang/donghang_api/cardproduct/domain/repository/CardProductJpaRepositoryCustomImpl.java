@@ -23,6 +23,7 @@ public class CardProductJpaRepositoryCustomImpl implements CardProductJpaReposit
                         cardProduct.id,
                         cardProduct.name,
                         cardProduct.type,
+                        cardProduct.imageUrl,
                         cardProduct.description,
                         cardCompany.name,
                         cardCompany.logoUrl,

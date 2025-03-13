@@ -1,5 +1,6 @@
 package bank.donghang.donghang_api.cardproduct.domain;
 
+import bank.donghang.donghang_api.cardcompany.domain.CardCompany;
 import bank.donghang.donghang_api.cardproduct.domain.enums.CardDuration;
 import bank.donghang.donghang_api.cardproduct.domain.enums.CardProductType;
 import bank.donghang.donghang_api.common.entity.BaseEntity;
@@ -54,6 +55,20 @@ public class CardProduct extends BaseEntity {
                 duration,
                 cardCompanyId
         );
+    }
+
+    public void updateCardCompany(
+            String name,
+            CardProductType type,
+            String description,
+            String imageUrl,
+            CardDuration duration
+    ) {
+        this.name = name;
+        this.type = type;
+        this.description = description;
+        this.imageUrl = imageUrl;
+        this.duration = duration;
     }
 
     private CardProduct (

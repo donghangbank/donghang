@@ -55,7 +55,7 @@ public class CardCompanyController {
 
     @PatchMapping(value = "/{cardCompanyId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> updateCardCompany(
-            @PathVariable Long cardCompanyId,
+            @PathVariable(name = "cardCompanyId") Long cardCompanyId,
             @RequestPart(value = "request") CardCompanyRequest request,
             @RequestPart(value = "image", required = false) MultipartFile newLogo
     ) {

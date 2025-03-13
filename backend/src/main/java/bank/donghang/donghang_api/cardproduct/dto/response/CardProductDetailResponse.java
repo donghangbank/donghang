@@ -7,6 +7,7 @@ public record CardProductDetailResponse(
         Long cardProductId,
         String cardProductName,
         CardProductType cardProductType,
+        String cardProductImageUrl,
         String description,
         String cardCompanyName,
         String cardCompanyLogoUrl,
