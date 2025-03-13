@@ -3,14 +3,17 @@ package bank.donghang.donghang_api.cardcompany.presentation;
 import bank.donghang.donghang_api.cardcompany.application.CardCompanyService;
 import bank.donghang.donghang_api.cardcompany.domain.CardCompany;
 import bank.donghang.donghang_api.cardcompany.dto.request.CardCompanyCreateRequest;
+import bank.donghang.donghang_api.cardcompany.dto.response.CardCompanySummaryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,5 +29,13 @@ public class CardCompanyController {
 
         return ResponseEntity.created(URI.create("/api/v1/cardcompanies/" + cardCompanyId))
                 .build();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CardCompanySummaryResponse>> findAllCardCompanySummaries(){
+
+        List<CardCompanySummaryResponse> response = cardCompanyService.findAllCardCompanies();
+
+        return ResponseEntity.ok().body(response);
     }
 }

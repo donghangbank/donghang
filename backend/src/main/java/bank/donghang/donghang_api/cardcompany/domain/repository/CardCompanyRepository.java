@@ -1,7 +1,24 @@
 package bank.donghang.donghang_api.cardcompany.domain.repository;
 
 import bank.donghang.donghang_api.cardcompany.domain.CardCompany;
-import org.springframework.data.jpa.repository.JpaRepository;
+import bank.donghang.donghang_api.cardcompany.dto.response.CardCompanySummaryResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
-public interface CardCompanyRepository extends JpaRepository<CardCompany, Long> {
+import java.util.List;
+
+@Repository
+@RequiredArgsConstructor
+public class CardCompanyRepository {
+
+    private final CardCompanyJpaRepository cardCompanyJpaRepository;
+    private final CardCompanyJpaRepositoryCustomImpl cardCompanyJpaRepositoryCustomImpl;
+
+    public List<CardCompanySummaryResponse> findAllCardCompanySummaries(){
+        return cardCompanyJpaRepositoryCustomImpl.findAllCardCompanySummaries();
+    }
+
+    public CardCompany save(CardCompany cardCompany) {
+        return cardCompanyJpaRepository.save(cardCompany);
+    }
 }
