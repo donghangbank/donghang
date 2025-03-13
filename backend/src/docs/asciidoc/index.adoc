@@ -6,4 +6,5 @@
 :seclinks:
 
 include::member-controller-test.adoc[]
+include::card-company-controller-test.adoc[]
 

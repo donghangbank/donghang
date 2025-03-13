@@ -1,6 +1,6 @@
 == MemberController
 
-=== 내 정보 조회 (GET /api/v1/members/me)
+=== 회원 정보 조회 (GET /api/v1/members/{memberId})
 
 ==== 요청
 

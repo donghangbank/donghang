@@ -1,0 +1,41 @@
+== MemberController
+
+=== 카드사 생성 (POST /api/v1/cardcompanies)
+
+==== 요청
+
+include::{snippets}/card-company-controller-test/create_card_company/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/card-company-controller-test/create_card_company/http-response.adoc[]
+
+=== 카드사 목록 조회 (GET /api/v1/cardcompanies)
+
+==== 요청
+
+include::{snippets}/card-company-controller-test/can_find_card_company_summaries/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/card-company-controller-test/can_find_card_company_summaries/http-response.adoc[]
+
+=== 카드사 수정 (PATCH /api/v1/cardcompanies/{cardCompanyId})
+
+==== 요청
+
+include::{snippets}/card-company-controller-test/can_update_card_company/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/card-company-controller-test/can_update_card_company/http-response.adoc[]
+
+=== 카드사 생성 (DELETE /api/v1/cardcompanies/{cardCompanyId})
+
+==== 요청
+
+include::{snippets}/card-company-controller-test/can_delete_card_company/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/card-company-controller-test/can_delete_card_company/http-response.adoc[]
