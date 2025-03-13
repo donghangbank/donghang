@@ -84,6 +84,7 @@ class CardCompanyControllerTest extends ControllerTest {
     @Test
     @DisplayName("카드 회사 목록을 조회할 수 있다.")
     public void can_find_card_company_summaries() throws Exception {
+
         var expect = List.of(
                 new CardCompanySummaryResponse(
                         1L,
@@ -121,8 +122,10 @@ class CardCompanyControllerTest extends ControllerTest {
     @Test
     @DisplayName("카드사를 수정할 수 있다.")
     public void can_update_card_company() throws Exception {
-        var request = new CardCompanyRequest("종하카드");
+
         Long cardCompanyId = 1L;
+
+        var request = new CardCompanyRequest("종하카드");
 
         MockMultipartFile image = new MockMultipartFile(
                 "image",

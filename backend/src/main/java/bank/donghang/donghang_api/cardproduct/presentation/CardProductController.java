@@ -52,7 +52,7 @@ public class CardProductController {
     }
 
     @GetMapping("/{cardProductId}")
-    public ResponseEntity<CardProductDetailResponse> findCardProduct(@PathVariable(name = "cardProductId") Long cardProductId) {
+    public ResponseEntity<CardProductDetailResponse> findCardProductDetail(@PathVariable(name = "cardProductId") Long cardProductId) {
 
         CardProductDetailResponse response = cardProductService.getCardProductDetail(cardProductId);
 

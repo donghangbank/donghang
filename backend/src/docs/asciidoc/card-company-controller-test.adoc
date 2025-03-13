@@ -1,4 +1,4 @@
-== MemberController
+== CardCompanyController
 
 === 카드사 생성 (POST /api/v1/cardcompanies)
 
