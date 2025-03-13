@@ -24,6 +24,14 @@ public class CardCompany extends BaseEntity {
 
     private String logoUrl;
 
+    public void updateCardCompany(
+            String name,
+            String logoUrl
+    ){
+        this.name = name;
+        this.logoUrl = logoUrl;
+    }
+
     public static CardCompany createCardCompany(
             String name,
             String logoUrl
