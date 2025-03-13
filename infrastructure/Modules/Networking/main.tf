@@ -21,11 +21,41 @@ resource "aws_subnet" "public_subnets" {
   }
 }
 
+resource "aws_subnet" "private_subnets" {
+  count             = 2
+  vpc_id            = aws_vpc.vpc.id
+  cidr_block        = var.private_subnet_cidr_block[count.index]
+  availability_zone = var.availability_zones[count.index]
+
+  tags = {
+    Name = "donghang-private-subnet${count.index + 1}"
+  }
+}
+
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc.id
 
   tags = {
     Name = "donghang-igw"
+  }
+}
+
+resource "aws_eip" "ngw_eip" {
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = {
+    Name = "donghang-ngw-eip"
+  }
+}
+
+resource "aws_nat_gateway" "ngw" {
+  allocation_id = aws_eip.ngw_eip.id
+  subnet_id     = aws_subnet.public_subnets[0].id
+
+  tags = {
+    Name = "donghang-ngw"
   }
 }
 
@@ -54,4 +84,23 @@ resource "aws_route_table_association" "public_route_table_assoc" {
   count          = 2
   subnet_id      = aws_subnet.public_subnets[count.index].id
   route_table_id = aws_route_table.public_route_table.id
+}
+
+resource "aws_route_table" "private_route_table" {
+  vpc_id = aws_vpc.vpc.id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.ngw.id
+  }
+
+  tags = {
+    Name = "donghang-private-route-table"
+  }
+}
+
+resource "aws_route_table_association" "private_route_table_assoc" {
+  count          = 2
+  subnet_id      = aws_subnet.private_subnets[count.index].id
+  route_table_id = aws_route_table.private_route_table.id
 }

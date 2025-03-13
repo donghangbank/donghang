@@ -1,8 +1,9 @@
 module "networing" {
-  source                   = "./Modules/Networking"
-  availability_zones       = var.availability_zones
-  public_subnet_cidr_block = var.public_subnet_cidr_block
-  vpc_cidr                 = var.vpc_cidr
+  source                    = "./Modules/Networking"
+  availability_zones        = var.availability_zones
+  private_subnet_cidr_block = var.private_subnet_cidr_block
+  public_subnet_cidr_block  = var.public_subnet_cidr_block
+  vpc_cidr                  = var.vpc_cidr
 }
 
 module "s3" {
