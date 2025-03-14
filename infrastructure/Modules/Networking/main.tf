@@ -155,7 +155,7 @@ resource "aws_vpc_endpoint" "vpce_ecr" {
   service_name        = "com.amazonaws.${var.aws_region}.ecr.${each.key}"
   private_dns_enabled = true
   subnet_ids          = aws_subnet.private_subnets[*].id
-  # security_group_ids  = [var.sg_vpce_ecr_id]
+  security_group_ids  = [var.sg_vpce_ecr_id]
 
   tags = {
     Name = "donghang-vpce-ecr-${each.key}"

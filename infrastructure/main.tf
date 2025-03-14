@@ -9,7 +9,16 @@ module "networing" {
   database_subnet_cidr_block = var.database_subnet_cidr_block
   private_subnet_cidr_block  = var.private_subnet_cidr_block
   public_subnet_cidr_block   = var.public_subnet_cidr_block
+  sg_vpce_ecr_id             = module.security_group.sg_vpce_ecr_id
   vpc_cidr                   = var.vpc_cidr
+}
+
+module "security_group" {
+  source                     = "./Modules/SecurityGroup"
+  database_subnet_cidr_block = var.database_subnet_cidr_block
+  private_subnet_cidr_block  = var.private_subnet_cidr_block
+  public_subnet_cidr_block   = var.public_subnet_cidr_block
+  vpc_id                     = module.networing.vpc_id
 }
 
 module "s3" {
