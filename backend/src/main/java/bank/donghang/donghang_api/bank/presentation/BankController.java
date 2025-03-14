@@ -68,7 +68,8 @@ public class BankController {
 
     @DeleteMapping("/{bankId}")
     public ResponseEntity<Void> deleteBank(@PathVariable(name = "bankId") Long bankId) {
-        return ResponseEntity.ok().build();
+        bankService.deleteBank(bankId);
+        return ResponseEntity.noContent().build();
     }
 
     private String uploadImageToS3(MultipartFile image) {

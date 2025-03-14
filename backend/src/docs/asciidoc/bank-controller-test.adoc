@@ -1,0 +1,41 @@
+== BankController
+
+=== 은행 생성 (POST /api/v1/banks)
+
+==== 요청
+
+include::{snippets}/bank-controller-test/create_card_company/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/bank-controller-test/create_card_company/http-response.adoc[]
+
+=== 은행 목록 조회 (GET /api/v1/banks)
+
+==== 요청
+
+include::{snippets}/bank-controller-test/can_find_all_banks/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/bank-controller-test/can_find_all_banks/http-response.adoc[]
+
+=== 은행 수정 (PATCH /api/v1/banks/{bankId})
+
+==== 요청
+
+include::{snippets}/bank-controller-test/can_update_bank/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/bank-controller-test/can_update_bank/http-response.adoc[]
+
+=== 은행 삭제 (DELETE /api/v1/banks/{bankId})
+
+==== 요청
+
+include::{snippets}/bank-controller-test/can_delete_bank/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/bank-controller-test/can_delete_bank/http-response.adoc[]

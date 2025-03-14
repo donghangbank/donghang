@@ -54,8 +54,8 @@ public class BankService {
     }
 
     @Transactional
-    public void deleteBank(Bank bank) {
-        bankRepository.delete(bank);
+    public void deleteBank(Long bankId) {
+        bankRepository.delete(bankId);
     }
 
     private void checkBankExistence(Long id) {

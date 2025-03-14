@@ -1,14 +1,16 @@
-package bank.donghang.donghang_api.cardcompany.presentation;
+package bank.donghang.donghang_api.bank.presentation;
 
 
-import bank.donghang.donghang_api.cardcompany.application.CardCompanyService;
+import bank.donghang.donghang_api.bank.application.BankService;
+import bank.donghang.donghang_api.bank.domain.Bank;
+import bank.donghang.donghang_api.bank.dto.request.BankRequest;
 import bank.donghang.donghang_api.cardcompany.dto.request.CardCompanyRequest;
-import bank.donghang.donghang_api.cardcompany.dto.response.CardCompanySummaryResponse;
 import bank.donghang.donghang_api.common.controller.ControllerTest;
 import bank.donghang.donghang_api.s3.application.S3FileService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,22 +26,19 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.HttpMethod.PATCH;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(CardCompanyController.class)
-class CardCompanyControllerTest extends ControllerTest {
+@WebMvcTest(BankController.class)
+class BankControllerTest extends ControllerTest {
 
     @MockitoBean
-    private CardCompanyService cardCompanyService;
+    private BankService bankService;
 
     @MockitoBean
     private S3FileService s3FileService;
@@ -48,7 +47,7 @@ class CardCompanyControllerTest extends ControllerTest {
     ObjectMapper objectMapper;
 
     @Test
-    @DisplayName("카드 회사를 생성할 수 있다.")
+    @DisplayName("은행을 생성할 수 있다.")
     public void create_card_company() throws Exception {
 
         String logoUrl = "https://test-bucket.s3.region.amazonaws.com/logo/test.jpg";
@@ -68,64 +67,68 @@ class CardCompanyControllerTest extends ControllerTest {
                 objectMapper.writeValueAsBytes(request)
         );
 
-        given(s3FileService.uploadFileToS3(any(), eq("logo")))
+        given(s3FileService.uploadFileToS3(any(), eq("bank")))
                 .willReturn(logoUrl);
-        given(cardCompanyService.createCardCompany(any(), any()))
+        given(bankService.createBank(any(), any()))
                 .willReturn(1L);
 
-        mockMvc.perform(multipart("/api/v1/cardcompanies")
+        mockMvc.perform(multipart("/api/v1/banks")
                         .file(requestPart)
                         .file(image)
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andDo(print())
                 .andExpect(status().isCreated());
+
     }
 
     @Test
-    @DisplayName("카드 회사 목록을 조회할 수 있다.")
-    public void can_find_card_company_summaries() throws Exception {
+    @DisplayName("은행 목록을 조회할 수 있다.")
+    public void can_find_all_banks() throws Exception {
 
         var expect = List.of(
-                new CardCompanySummaryResponse(
-                        1L,
-                        "삼성카드",
+                Bank.createBank(
+                        "삼성은행",
                         "www.test.com"
                 ),
-                new CardCompanySummaryResponse(
-                        2L,
-                        "신한카드",
+                Bank.createBank(
+                        "종하은행",
                         "www.test.com"
                 ),
-                new CardCompanySummaryResponse(
-                        3L,
-                        "국민카드",
+                Bank.createBank(
+                        "종우은행",
                         "www.test.com"
                 )
         );
 
-        given(cardCompanyService.getAllCardCompanies())
+        given(bankService.getAllBanks())
                 .willReturn(expect);
 
-        MvcResult result = mockMvc.perform(get("/api/v1/cardcompanies"))
+        MvcResult result = mockMvc.perform(get("/api/v1/banks"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();
 
         var response = objectMapper.readValue(
                 result.getResponse().getContentAsString(),
-                new TypeReference<List<CardCompanySummaryResponse>>() {}
+                new TypeReference<List<Bank>>() {}
         );
 
-        Assertions.assertThat(response).isEqualTo(expect);
+        Assertions.assertThat(response)
+                .extracting(Bank::getName, Bank::getLogoUrl)
+                .containsExactlyInAnyOrder(
+                        Tuple.tuple("삼성은행", "www.test.com"),
+                        Tuple.tuple("종하은행", "www.test.com"),
+                        Tuple.tuple("종우은행", "www.test.com")
+                );
     }
 
     @Test
-    @DisplayName("카드사를 수정할 수 있다.")
-    public void can_update_card_company() throws Exception {
+    @DisplayName("은행을 수정할 수 있다.")
+    public void can_update_bank() throws Exception {
 
-        Long cardCompanyId = 1L;
+        Long bankId = 1L;
 
-        var request = new CardCompanyRequest("종하카드");
+        var request = new BankRequest("종하은행");
 
         MockMultipartFile image = new MockMultipartFile(
                 "image",
@@ -141,29 +144,29 @@ class CardCompanyControllerTest extends ControllerTest {
                 objectMapper.writeValueAsBytes(request)
         );
 
-        doNothing().when(cardCompanyService).updateCardCompany(any(), any(), any());
+        doNothing().when(bankService).updateBank(any(), any(), any());
 
-        mockMvc.perform(multipart(PATCH,"/api/v1/cardcompanies/{cardCompanyId}", cardCompanyId)
+        mockMvc.perform(multipart(PATCH,"/api/v1/banks/{bankId}", bankId)
                         .file(image)
                         .file(requestPart)
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andDo(print())
                 .andExpect(status().isNoContent());
 
-        verify(cardCompanyService).updateCardCompany(any(), any(), any());
+        verify(bankService).updateBank(any(), any(), any());
     }
 
     @Test
-    @DisplayName("카드사를 삭제할 수 있다")
-    public void can_delete_card_company() throws Exception {
-        Long cardCompanyId = 1L;
+    @DisplayName("은행을 삭제할 수 있다")
+    public void can_delete_bank() throws Exception {
+        Long bankId = 1L;
 
-        doNothing().when(cardCompanyService).deleteCardCompany(any());
+        doNothing().when(bankService).deleteBank(any(Long.class));
 
-        mockMvc.perform(delete("/api/v1/cardcompanies/" + cardCompanyId))
+        mockMvc.perform(delete("/api/v1/banks/{bankId}", bankId))
                 .andDo(print())
                 .andExpect(status().isNoContent());
 
-        verify(cardCompanyService).deleteCardCompany(any());
+        verify(bankService).deleteBank(eq(bankId));
     }
 }

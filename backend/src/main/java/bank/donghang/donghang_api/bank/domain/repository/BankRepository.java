@@ -29,8 +29,8 @@ public class BankRepository {
         bankJpaRepository.save(bank);
     }
 
-    public void delete(Bank bank) {
-        bankJpaRepository.delete(bank);
+    public void delete(Long id) {
+        bankJpaRepository.deleteById(id);
     }
 
     public boolean exists(Long id) {
