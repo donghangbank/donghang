@@ -14,6 +14,8 @@ public enum ErrorCode {
     CARD_COMPANY_NOT_FOUND(3_000, "존재하지 않는 카드 회사입니다."),
 
     CARD_PRODUCT_NOT_FOUND(4_000, "존재하지 않는 카드 상품입니다"),
+
+    BANK_NOT_FOUND(5_000, "존재하지 않는 은행입니다.")
     ;
 
     private final int code;

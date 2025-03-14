@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -14,6 +15,10 @@ public class BankRepository {
 
     public Bank save(Bank bank) {
         return bankJpaRepository.save(bank);
+    }
+
+    public Optional<Bank> findById(Long id) {
+        return bankJpaRepository.findById(id);
     }
 
     public List<Bank> findAll() {
@@ -26,5 +31,9 @@ public class BankRepository {
 
     public void delete(Bank bank) {
         bankJpaRepository.delete(bank);
+    }
+
+    public boolean exists(Long id) {
+        return bankJpaRepository.existsById(id);
     }
 }
