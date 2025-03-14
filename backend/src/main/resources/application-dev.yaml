@@ -5,6 +5,12 @@ spring:
     username: ${MYSQL_DATASOURCE_USERNAME}
     password: ${MYSQL_DATASOURCE_PASSWORD}
 
+  data:
+    redis:
+      host: localhost
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PW}
+
   jpa:
     show-sql: ${MYSQL_JPA_SHOW_SQL}
     hibernate:
