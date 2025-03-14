@@ -53,6 +53,10 @@ dependencies {
 	implementation("software.amazon.awssdk.crt:aws-crt:0.33.2")
 	implementation("io.awspring.cloud:spring-cloud-aws-starter-s3:3.1.1")
 	implementation("software.amazon.awssdk:s3:2.29.18")
+
+	//redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.redisson:redisson-spring-boot-starter:3.27.0'
 }
 
 ext {
