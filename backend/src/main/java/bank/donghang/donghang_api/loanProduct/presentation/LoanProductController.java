@@ -2,8 +2,10 @@ package bank.donghang.donghang_api.loanProduct.presentation;
 
 import bank.donghang.donghang_api.loanProduct.application.LoanProductService;
 import bank.donghang.donghang_api.loanProduct.domain.LoanProduct;
+import bank.donghang.donghang_api.loanProduct.domain.enums.LoanType;
 import bank.donghang.donghang_api.loanProduct.dto.request.LoanProductCreateRequest;
 import bank.donghang.donghang_api.loanProduct.dto.response.LoanProductDetailResponse;
+import bank.donghang.donghang_api.loanProduct.dto.response.LoanProductSummaryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,9 +13,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,6 +39,14 @@ public class LoanProductController {
     public ResponseEntity<LoanProductDetailResponse> getLoanProductDetail(@PathVariable("loanProductId") Long loanProductId) {
 
         LoanProductDetailResponse response = loanProductService.getLoanProductDetail(loanProductId);
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<LoanProductSummaryResponse>> getAllLoanProducts(@RequestParam(required = false) LoanType loanType) {
+
+        List<LoanProductSummaryResponse> response = loanProductService.getLoanProductSummaries(loanType);
 
         return ResponseEntity.ok().body(response);
     }
