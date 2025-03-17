@@ -17,7 +17,11 @@ public enum ErrorCode {
 
     BANK_NOT_FOUND(5_000, "존재하지 않는 은행입니다."),
 
-    LOAN_PRODUCT_NOT_FOUND(6_000, "존재하지 않는 대출 상품입니다.")
+    LOAN_PRODUCT_NOT_FOUND(6_000, "존재하지 않는 대출 상품입니다."),
+
+    PRODUCT_NOT_FOUND(7_000, "존재하지 않는 상품입니다."),
+
+    PRODUCT_TYPE_NOT_FOUND(7_001, "존재하지 않는 상품 타입입니다.")
     ;
 
     private final int code;
