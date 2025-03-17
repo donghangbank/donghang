@@ -1,5 +1,6 @@
 plugins {
 	id 'java'
+	id 'checkstyle'
 	id 'org.springframework.boot' version '3.4.3'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'org.asciidoctor.jvm.convert' version '3.3.2'
@@ -97,6 +98,11 @@ tasks.named('compileJava') {
 
 tasks.compileJava {
 	options.annotationProcessorGeneratedSourcesDirectory = querydslDir
+}
+
+checkstyle {
+	maxWarnings = 0
+	toolVersion = '10.19.0'
 }
 
 sourceSets {
