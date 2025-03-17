@@ -1,7 +1,6 @@
 package bank.donghang.donghang_api.loanProduct.presentation;
 
 import bank.donghang.donghang_api.loanProduct.application.LoanProductService;
-import bank.donghang.donghang_api.loanProduct.domain.LoanProduct;
 import bank.donghang.donghang_api.loanProduct.domain.enums.LoanType;
 import bank.donghang.donghang_api.loanProduct.dto.request.LoanProductCreateRequest;
 import bank.donghang.donghang_api.loanProduct.dto.request.LoanProductUpdateRequest;
@@ -9,6 +8,7 @@ import bank.donghang.donghang_api.loanProduct.dto.response.LoanProductDetailResp
 import bank.donghang.donghang_api.loanProduct.dto.response.LoanProductSummaryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -64,6 +64,13 @@ public class LoanProductController {
                 request
         );
 
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("{loanProductId}")
+    public ResponseEntity<Void> deleteLoanProduct(@PathVariable("loanProductId") Long loanProductId) {
+
+        loanProductService.deleteLoanProduct(loanProductId);
         return ResponseEntity.noContent().build();
     }
 }

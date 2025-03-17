@@ -28,6 +28,10 @@ public class LoanProductRepository {
         return loanProductJpaRepository.getLoanProductSummaries(loanType);
     }
 
+    public void deleteLoanProduct(Long loanProductId) {
+        loanProductJpaRepository.deleteById(loanProductId);
+    }
+
     public boolean existsById(Long loanProductId) {
         return loanProductJpaRepository.existsById(loanProductId);
     }

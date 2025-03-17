@@ -73,6 +73,13 @@ public class LoanProductService {
         );
     }
 
+    @Transactional
+    public void deleteLoanProduct(Long id){
+
+        checkLoanProductExistence(id);
+        loanProductRepository.deleteLoanProduct(id);
+    }
+
     private void checkLoanProductExistence(Long id) {
         if (!loanProductRepository.existsById(id)) {
             throw new BadRequestException(ErrorCode.LOAN_PRODUCT_NOT_FOUND);
