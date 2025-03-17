@@ -14,8 +14,11 @@ module "networing" {
 }
 
 module "rds" {
-  source = "./Modules/RDS"
+  source           = "./Modules/RDS"
   database_subnets = module.networing.database_subnets
+  mysql_password   = var.mysql_password
+  mysql_username   = var.mysql_username
+  sg_mysql_id      = module.security_group.sg_mysql_id
 }
 
 module "s3" {

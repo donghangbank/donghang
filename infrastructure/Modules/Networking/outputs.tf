@@ -1,3 +1,7 @@
+output "database_subnets" {
+  value = aws_subnet.database_subnets[*].id
+}
+
 output "vpc_id" {
   value = aws_vpc.vpc.id
 }

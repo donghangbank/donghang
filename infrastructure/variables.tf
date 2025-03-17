@@ -14,6 +14,14 @@ variable "database_subnet_cidr_block" {
   type = list(string)
 }
 
+variable "mysql_password" {
+  type = string
+}
+
+variable "mysql_username" {
+  type = string
+}
+
 variable "private_subnet_cidr_block" {
   type = list(string)
 }
