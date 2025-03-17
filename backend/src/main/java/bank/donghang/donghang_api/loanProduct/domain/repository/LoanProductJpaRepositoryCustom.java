@@ -4,5 +4,5 @@ import bank.donghang.donghang_api.loanProduct.dto.response.LoanProductDetailResp
 
 public interface LoanProductJpaRepositoryCustom {
 
-    public LoanProductDetailResponse getLoanProductDetailResponse(Long loanProductId);
+    LoanProductDetailResponse getLoanProductDetailResponse(Long loanProductId);
 }

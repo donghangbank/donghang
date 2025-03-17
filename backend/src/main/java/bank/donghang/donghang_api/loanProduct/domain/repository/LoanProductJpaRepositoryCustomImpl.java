@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import static bank.donghang.donghang_api.loanProduct.domain.QLoanProduct.loanProduct;
+import static bank.donghang.donghang_api.bank.domain.QBank.bank;
 
 @Repository
 @RequiredArgsConstructor
@@ -22,9 +23,7 @@ public class LoanProductJpaRepositoryCustomImpl implements LoanProductJpaReposit
                         loanProduct.id,
                         loanProduct.bankId,
                         loanProduct.name,
-                        /* TODO:bank구현 후 조인 */
                         bank.name,
-                        bank.logoUrl,
                         loanProduct.period,
                         loanProduct.type,
                         loanProduct.minLoanBalance,
@@ -34,6 +33,9 @@ public class LoanProductJpaRepositoryCustomImpl implements LoanProductJpaReposit
                         loanProduct.repaymentMethod
                 ))
                 .from(loanProduct)
-                .leftJoin(ban)
+                .leftJoin(bank)
+                .on(loanProduct.bankId.eq(bank.id))
+                .where(loanProduct.id.eq(loanProductId))
+                .fetchOne();
     }
 }

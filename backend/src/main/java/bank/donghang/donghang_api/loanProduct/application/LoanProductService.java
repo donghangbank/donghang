@@ -1,5 +1,7 @@
 package bank.donghang.donghang_api.loanProduct.application;
 
+import bank.donghang.donghang_api.common.exception.BadRequestException;
+import bank.donghang.donghang_api.common.exception.ErrorCode;
 import bank.donghang.donghang_api.loanProduct.domain.LoanProduct;
 import bank.donghang.donghang_api.loanProduct.domain.repository.LoanProductRepository;
 import bank.donghang.donghang_api.loanProduct.dto.request.LoanProductCreateRequest;
@@ -35,5 +37,10 @@ public class LoanProductService {
 
     public LoanProductDetailResponse getLoanProductDetail(Long id){
 
+        if (!loanProductRepository.existsById(id)) {
+            throw new BadRequestException(ErrorCode.LOAN_PRODUCT_NOT_FOUND);
+        }
+
+        return loanProductRepository.getLoanProductDetail(id);
     }
 }
