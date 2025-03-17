@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static bank.donghang.donghang_api.cardcompany.domain.QCardCompany.cardCompany;
 import static bank.donghang.donghang_api.loanProduct.domain.QLoanProduct.loanProduct;
 import static bank.donghang.donghang_api.bank.domain.QBank.bank;
 

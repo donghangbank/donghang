@@ -6,6 +6,7 @@ import bank.donghang.donghang_api.loanProduct.domain.LoanProduct;
 import bank.donghang.donghang_api.loanProduct.domain.enums.LoanType;
 import bank.donghang.donghang_api.loanProduct.domain.repository.LoanProductRepository;
 import bank.donghang.donghang_api.loanProduct.dto.request.LoanProductCreateRequest;
+import bank.donghang.donghang_api.loanProduct.dto.request.LoanProductUpdateRequest;
 import bank.donghang.donghang_api.loanProduct.dto.response.LoanProductDetailResponse;
 import bank.donghang.donghang_api.loanProduct.dto.response.LoanProductSummaryResponse;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,7 @@ public class LoanProductService {
 
     public LoanProductDetailResponse getLoanProductDetail(Long id){
 
-        checkLoanProductExistenc(id);
+        checkLoanProductExistence(id);
 
         return loanProductRepository.getLoanProductDetail(id);
     }
@@ -50,7 +51,29 @@ public class LoanProductService {
         return loanProductRepository.getLoanProductSummaries(loanType);
     }
 
-    private void checkLoanProductExistenc(Long id) {
+    @Transactional
+    public void updateLoanProduct(
+            Long id,
+            LoanProductUpdateRequest request
+    ){
+
+        checkLoanProductExistence(id);
+
+        LoanProduct loanProduct = loanProductRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException(ErrorCode.LOAN_PRODUCT_NOT_FOUND));
+
+        loanProduct.updateLoanProduct(
+                request.ratingId(),
+                request.name(),
+                request.period(),
+                request.minLoanBalance(),
+                request.maxLoanBalance(),
+                request.interestRate(),
+                request.description()
+        );
+    }
+
+    private void checkLoanProductExistence(Long id) {
         if (!loanProductRepository.existsById(id)) {
             throw new BadRequestException(ErrorCode.LOAN_PRODUCT_NOT_FOUND);
         }

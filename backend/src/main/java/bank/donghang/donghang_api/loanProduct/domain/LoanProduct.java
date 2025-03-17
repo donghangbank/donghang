@@ -1,18 +1,19 @@
 package bank.donghang.donghang_api.loanProduct.domain;
 
 import bank.donghang.donghang_api.common.entity.BaseEntity;
+import bank.donghang.donghang_api.common.enums.Period;
 import bank.donghang.donghang_api.loanProduct.domain.enums.LoanType;
 import bank.donghang.donghang_api.loanProduct.domain.enums.RepaymentMethod;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.Period;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -32,25 +33,45 @@ public class LoanProduct extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
+    @Enumerated(EnumType.STRING)
     private Period period;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private LoanType type;
 
     @Column(nullable = false)
-    Integer minLoanBalance;
+    private Integer minLoanBalance;
 
     @Column(nullable = false)
-    Integer maxLoanBalance;
-
-    /* TODO: 이거는 따로 정하는게 좋을듯 */
-    @Column(nullable = false)
-    Double interestRate;
-
-    String description;
+    private Integer maxLoanBalance;
 
     @Column(nullable = false)
-    RepaymentMethod repaymentMethod;
+    private Double interestRate;
+
+    private String description;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RepaymentMethod repaymentMethod;
+
+    public void  updateLoanProduct(
+            Long ratingId,
+            String name,
+            Period period,
+            Integer minLoanBalance,
+            Integer maxLoanBalance,
+            Double interestRate,
+            String description
+    ){
+        this.ratingId = ratingId;
+        this.name = name;
+        this.period = period;
+        this.minLoanBalance = minLoanBalance;
+        this.maxLoanBalance = maxLoanBalance;
+        this.interestRate = interestRate;
+        this.description = description;
+    }
 
     public static LoanProduct createLoanProduct(
             Long bankId,
@@ -76,6 +97,24 @@ public class LoanProduct extends BaseEntity {
                 description,
                 repaymentMethod
         );
+    }
+
+    private LoanProduct(
+            Long ratingId,
+            String name,
+            Period period,
+            Integer minLoanBalance,
+            Integer maxLoanBalance,
+            Double interestRate,
+            String description
+    ) {
+        this.ratingId = ratingId;
+        this.name = name;
+        this.period = period;
+        this.minLoanBalance = minLoanBalance;
+        this.maxLoanBalance = maxLoanBalance;
+        this.interestRate = interestRate;
+        this.description = description;
     }
 
     private LoanProduct(

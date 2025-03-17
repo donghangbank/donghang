@@ -4,11 +4,13 @@ import bank.donghang.donghang_api.loanProduct.application.LoanProductService;
 import bank.donghang.donghang_api.loanProduct.domain.LoanProduct;
 import bank.donghang.donghang_api.loanProduct.domain.enums.LoanType;
 import bank.donghang.donghang_api.loanProduct.dto.request.LoanProductCreateRequest;
+import bank.donghang.donghang_api.loanProduct.dto.request.LoanProductUpdateRequest;
 import bank.donghang.donghang_api.loanProduct.dto.response.LoanProductDetailResponse;
 import bank.donghang.donghang_api.loanProduct.dto.response.LoanProductSummaryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,5 +51,19 @@ public class LoanProductController {
         List<LoanProductSummaryResponse> response = loanProductService.getLoanProductSummaries(loanType);
 
         return ResponseEntity.ok().body(response);
+    }
+
+    @PatchMapping("{loanProductId}")
+    public ResponseEntity<Void> updateLoanProduct(
+            @PathVariable("loanProductId") Long loanProductId,
+            @RequestBody LoanProductUpdateRequest request
+    ){
+
+        loanProductService.updateLoanProduct(
+                loanProductId,
+                request
+        );
+
+        return ResponseEntity.noContent().build();
     }
 }
