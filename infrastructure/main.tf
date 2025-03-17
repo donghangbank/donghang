@@ -13,6 +13,11 @@ module "networing" {
   vpc_cidr                   = var.vpc_cidr
 }
 
+module "rds" {
+  source = "./Modules/RDS"
+  database_subnets = module.networing.database_subnets
+}
+
 module "s3" {
   source     = "./Modules/S3"
   vpce_s3_id = module.networing.vpce_s3_id
