@@ -102,6 +102,8 @@ tasks.compileJava {
 
 checkstyle {
 	maxWarnings = 0
+	configFile = file('config/checkstyle/naver-checkstyle-rules.xml')
+	configProperties = ['checkstyle.suppressions.file': 'config/checkstyle/naver-checkstyle-suppressions.xml']
 	toolVersion = '10.19.0'
 }
 
