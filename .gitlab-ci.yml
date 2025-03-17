@@ -1,5 +1,6 @@
 stages:
   - check_infrastructure
+  - check_frontend
 
 check_infrastructure:
   stage: check_infrastructure
@@ -14,3 +15,23 @@ check_infrastructure:
     - terraform fmt -recursive -check
     - terraform validate
   allow_failure: false
+
+check_frontend:
+  stage: check_frontend
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      changes:
+        - frontend/**/*
+      when: always
+  image: node:22.14.0-alpine
+  cache:
+    paths:
+      - frontend/node_modules
+    key: $CI_PROJECT_NAME-frontend-cache
+  before_script:
+    - cd frontend
+    - npm ci
+  script:
+    - npm run lint
+    - npm run format
+
