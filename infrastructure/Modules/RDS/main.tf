@@ -19,8 +19,23 @@ resource "aws_db_instance" "db" {
   multi_az               = false
   db_subnet_group_name   = aws_db_subnet_group.dbsg.name
   vpc_security_group_ids = [var.sg_mysql_id]
+  parameter_group_name   = aws_db_parameter_group.db_params.name
 
   tags = {
     Name = "donghang-db"
+  }
+}
+
+resource "aws_db_parameter_group" "db_params" {
+  name   = "donghang-db-params"
+  family = "mysql8.0"
+
+  parameter {
+    name  = "time_zone"
+    value = "Asia/Seoul"
+  }
+
+  tags = {
+    Name = "donghang-db-params"
   }
 }
