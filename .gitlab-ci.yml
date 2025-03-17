@@ -1,0 +1,16 @@
+stages:
+  - check_infrastructure
+
+check_infrastructure:
+  stage: check_infrastructure
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      changes:
+        - infrastructure/**/*
+  image:
+    name: hashicorp/terraform:latest
+    entrypoint: [ "" ]
+  script:
+    - terraform fmt -recursive -check
+    - terraform validate
+  allow_failure: false
