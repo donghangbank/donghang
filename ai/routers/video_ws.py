@@ -3,6 +3,7 @@ import json
 import logging
 from utils.image_processing import *
 from utils.age_prediction_utils import *
+from utils.calling_detection_utils import *
 
 logger = logging.getLogger("logger")
 
@@ -27,8 +28,11 @@ async def websocket_endpoint(websocket: WebSocket):
                 continue
 
             predicted_age = predict_age(img)
+            calling_detection = detect_calling(img)
 
-            result = {"predicted_age": predicted_age}
+            result = {"predicted_age": predicted_age,
+                      "calling_detection":calling_detection}
             await websocket.send_text(json.dumps(result))
     except WebSocketDisconnect:
         logger.info("웹소켓 연결 종료")
+    
