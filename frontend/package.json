@@ -6,7 +6,8 @@
   "author": "donghang",
   "homepage": "https://electron-vite.org",
   "scripts": {
-    "format": "prettier --write .",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
     "lint": "eslint --cache .",
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
