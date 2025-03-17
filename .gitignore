@@ -1,5 +1,10 @@
 .DS_Store
 .vscode/
+!frontend/.vscode/
+frontend/.vscode/*
+!frontend/.vscode/extensions.json
+!frontend/.vscode/launch.json
+!frontend/.vscode/settings.json
 .idea/
 db/
 .env
