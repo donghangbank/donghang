@@ -1,9 +1,9 @@
-package bank.donghang.donghang_api.loanProduct.domain.repository;
+package bank.donghang.donghang_api.loanproduct.domain.repository;
 
-import bank.donghang.donghang_api.loanProduct.domain.LoanProduct;
-import bank.donghang.donghang_api.loanProduct.domain.enums.LoanType;
-import bank.donghang.donghang_api.loanProduct.dto.response.LoanProductDetailResponse;
-import bank.donghang.donghang_api.loanProduct.dto.response.LoanProductSummaryResponse;
+import bank.donghang.donghang_api.loanproduct.domain.LoanProduct;
+import bank.donghang.donghang_api.loanproduct.domain.enums.LoanType;
+import bank.donghang.donghang_api.loanproduct.dto.response.LoanProductDetailResponse;
+import bank.donghang.donghang_api.loanproduct.dto.response.LoanProductSummaryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

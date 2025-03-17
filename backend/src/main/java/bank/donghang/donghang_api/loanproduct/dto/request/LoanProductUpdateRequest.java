@@ -1,4 +1,4 @@
-package bank.donghang.donghang_api.loanProduct.dto.request;
+package bank.donghang.donghang_api.loanproduct.dto.request;
 
 import bank.donghang.donghang_api.common.enums.Period;
 

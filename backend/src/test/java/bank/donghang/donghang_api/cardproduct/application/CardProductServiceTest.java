@@ -85,8 +85,10 @@ class CardProductServiceTest {
                 CardDuration.YEAR
         );
 
-        given(cardProductRepository.existsCardProduct(cardProductId)).willReturn(true);
-        given(cardProductRepository.findCardProductDetailById(cardProductId)).willReturn(expectedResponse);
+        given(cardProductRepository.existsCardProduct(cardProductId))
+                .willReturn(true);
+        given(cardProductRepository.findCardProductDetailById(cardProductId))
+                .willReturn(expectedResponse);
 
         CardProductDetailResponse response = cardProductService.getCardProductDetail(cardProductId);
 

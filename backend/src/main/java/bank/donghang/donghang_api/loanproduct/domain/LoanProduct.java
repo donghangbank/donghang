@@ -1,9 +1,9 @@
-package bank.donghang.donghang_api.loanProduct.domain;
+package bank.donghang.donghang_api.loanproduct.domain;
 
 import bank.donghang.donghang_api.common.entity.BaseEntity;
 import bank.donghang.donghang_api.common.enums.Period;
-import bank.donghang.donghang_api.loanProduct.domain.enums.LoanType;
-import bank.donghang.donghang_api.loanProduct.domain.enums.RepaymentMethod;
+import bank.donghang.donghang_api.loanproduct.domain.enums.LoanType;
+import bank.donghang.donghang_api.loanproduct.domain.enums.RepaymentMethod;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

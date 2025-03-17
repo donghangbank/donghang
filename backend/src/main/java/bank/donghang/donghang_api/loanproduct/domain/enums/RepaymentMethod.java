@@ -1,4 +1,4 @@
-package bank.donghang.donghang_api.loanProduct.domain.enums;
+package bank.donghang.donghang_api.loanproduct.domain.enums;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

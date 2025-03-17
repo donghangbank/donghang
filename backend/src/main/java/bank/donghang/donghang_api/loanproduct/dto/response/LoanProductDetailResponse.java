@@ -1,8 +1,8 @@
-package bank.donghang.donghang_api.loanProduct.dto.response;
+package bank.donghang.donghang_api.loanproduct.dto.response;
 
 import bank.donghang.donghang_api.common.enums.Period;
-import bank.donghang.donghang_api.loanProduct.domain.enums.LoanType;
-import bank.donghang.donghang_api.loanProduct.domain.enums.RepaymentMethod;
+import bank.donghang.donghang_api.loanproduct.domain.enums.LoanType;
+import bank.donghang.donghang_api.loanproduct.domain.enums.RepaymentMethod;
 
 public record LoanProductDetailResponse(
         Long loanProductId,

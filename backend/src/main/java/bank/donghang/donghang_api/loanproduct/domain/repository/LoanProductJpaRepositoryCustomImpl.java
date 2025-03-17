@@ -1,8 +1,8 @@
-package bank.donghang.donghang_api.loanProduct.domain.repository;
+package bank.donghang.donghang_api.loanproduct.domain.repository;
 
-import bank.donghang.donghang_api.loanProduct.domain.enums.LoanType;
-import bank.donghang.donghang_api.loanProduct.dto.response.LoanProductDetailResponse;
-import bank.donghang.donghang_api.loanProduct.dto.response.LoanProductSummaryResponse;
+import bank.donghang.donghang_api.loanproduct.domain.enums.LoanType;
+import bank.donghang.donghang_api.loanproduct.dto.response.LoanProductDetailResponse;
+import bank.donghang.donghang_api.loanproduct.dto.response.LoanProductSummaryResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static bank.donghang.donghang_api.loanProduct.domain.QLoanProduct.loanProduct;
+import static bank.donghang.donghang_api.loanproduct.domain.QLoanProduct.loanProduct;
 import static bank.donghang.donghang_api.bank.domain.QBank.bank;
 
 @Repository

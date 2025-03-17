@@ -1,11 +1,11 @@
-package bank.donghang.donghang_api.loanProduct.presentation;
+package bank.donghang.donghang_api.loanproduct.presentation;
 
-import bank.donghang.donghang_api.loanProduct.application.LoanProductService;
-import bank.donghang.donghang_api.loanProduct.domain.enums.LoanType;
-import bank.donghang.donghang_api.loanProduct.dto.request.LoanProductCreateRequest;
-import bank.donghang.donghang_api.loanProduct.dto.request.LoanProductUpdateRequest;
-import bank.donghang.donghang_api.loanProduct.dto.response.LoanProductDetailResponse;
-import bank.donghang.donghang_api.loanProduct.dto.response.LoanProductSummaryResponse;
+import bank.donghang.donghang_api.loanproduct.application.LoanProductService;
+import bank.donghang.donghang_api.loanproduct.domain.enums.LoanType;
+import bank.donghang.donghang_api.loanproduct.dto.request.LoanProductCreateRequest;
+import bank.donghang.donghang_api.loanproduct.dto.request.LoanProductUpdateRequest;
+import bank.donghang.donghang_api.loanproduct.dto.response.LoanProductDetailResponse;
+import bank.donghang.donghang_api.loanproduct.dto.response.LoanProductSummaryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
