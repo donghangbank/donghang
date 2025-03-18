@@ -10,4 +10,3 @@ include::{snippets}/account-controller-test/register-account_success/http-reques
 
 include::{snippets}/account-controller-test/register-account_success/http-response.adoc[]
 
-==== 응답
