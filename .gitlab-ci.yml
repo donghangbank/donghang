@@ -1,6 +1,7 @@
 stages:
   - check_infrastructure
   - check_frontend
+  - build_backend
 
 check_infrastructure:
   stage: check_infrastructure
@@ -35,3 +36,22 @@ check_frontend:
     - npm run lint
     - npm run format
 
+build_backend:
+  stage: build_backend
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      changes:
+        - backend/**/*
+      when: always
+  image: amazoncorretto:17-alpine-jdk
+  cache:
+    paths:
+      - backend/.gradle/
+      - backend/build/
+    key: $CI_PROJECT_NAME-backend-cache
+  before_script:
+    - cd backend
+    - cp $BE_ENV_FILE dev.env
+  script:
+    - chmod +x ./gradlew
+    - ./gradlew build --build-cache -Dspring.profiles.active=dev
