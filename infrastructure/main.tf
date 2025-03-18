@@ -8,6 +8,10 @@ module "elasticache" {
   sg_valkey_id     = module.security_group.sg_valkey_id
 }
 
+module "iam" {
+  source = "./Modules/IAM"
+}
+
 module "networing" {
   source                     = "./Modules/Networking"
   availability_zones         = var.availability_zones
@@ -38,4 +42,11 @@ module "security_group" {
   private_subnet_cidr_block  = var.private_subnet_cidr_block
   public_subnet_cidr_block   = var.public_subnet_cidr_block
   vpc_id                     = module.networing.vpc_id
+}
+
+module "ssm" {
+  source                    = "./Modules/SSM"
+  database_subnets          = module.networing.database_subnets
+  sg_ssm_ec2_id             = module.security_group.sg_ssm_ec2_id
+  ssm_instance_profile_name = module.iam.ssm_instance_profile_name
 }
