@@ -5,6 +5,7 @@ module "ecr" {
 module "elasticache" {
   source           = "./Modules/ElastiCache"
   database_subnets = module.networing.database_subnets
+  sg_valkey_id     = module.security_group.sg_valkey_id
 }
 
 module "networing" {
