@@ -2,6 +2,11 @@ module "ecr" {
   source = "./Modules/ECR"
 }
 
+module "elasticache" {
+  source           = "./Modules/ElastiCache"
+  database_subnets = module.networing.database_subnets
+}
+
 module "networing" {
   source                     = "./Modules/Networking"
   availability_zones         = var.availability_zones
