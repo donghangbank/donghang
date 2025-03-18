@@ -52,6 +52,7 @@ public class Account {
 	private String password;
 
 	@Column(nullable = false, name = "account_status")
+	@Enumerated(EnumType.STRING)
 	private AccountStatus accountStatus;
 
 	@Column(nullable = false, name = "daily_transfer_limit")
@@ -59,9 +60,6 @@ public class Account {
 
 	@Column(nullable = false, name = "single_transfer_limit")
 	private Long singleTransferLimit;
-
-	@Column(nullable = false, name = "available_balance")
-	private Long availableBalance;
 
 	@Column(nullable = false, name = "account_balance")
 	private Long accountBalance;
@@ -71,4 +69,30 @@ public class Account {
 
 	@Column(name = "account_expiry_date")
 	private Date accountExpiryDate;
+
+	public void deposit(Long amount) {
+		if (amount < 0) {
+			throw new BadRequestException(ErrorCode.WRONG_AMOUNT_INPUT);
+		}
+
+		setBalance(amount, TransactionType.DEPOSIT);
+	}
+
+	public void withdraw(Long amount) {
+		if (amount < 0) {
+			throw new BadRequestException(ErrorCode.WRONG_AMOUNT_INPUT);
+		}
+
+		setBalance(amount, TransactionType.WITHDRAWAL);
+	}
+
+	private void setBalance(Long balance, TransactionType type) {
+		if (type == TransactionType.WITHDRAWAL) {
+			this.accountBalance = this.accountBalance - balance;
+		}
+
+		if (type == TransactionType.DEPOSIT) {
+			this.accountBalance = this.accountBalance + balance;
+		}
+	}
 }
