@@ -21,7 +21,6 @@ public record AccountRegisterRequest(
 			.accountStatus(AccountStatus.ACTIVE)
 			.dailyTransferLimit(100_000_000L)
 			.singleTransferLimit(10_000_000L)
-			.availableBalance(0L)
 			.accountBalance(0L)
 			.interestRate(interestRate)
 			.build();

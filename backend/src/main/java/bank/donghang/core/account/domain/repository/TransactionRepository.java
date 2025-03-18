@@ -2,7 +2,7 @@ package bank.donghang.core.account.domain.repository;
 
 import org.springframework.stereotype.Repository;
 
-import bank.donghang.donghang_api.account.domain.Transaction;
+import bank.donghang.core.account.domain.Transaction;
 import lombok.RequiredArgsConstructor;
 
 @Repository

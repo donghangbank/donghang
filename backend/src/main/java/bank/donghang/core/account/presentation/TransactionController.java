@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import bank.donghang.donghang_api.account.application.TransactionService;
-import bank.donghang.donghang_api.account.dto.request.TransactionRequest;
-import bank.donghang.donghang_api.account.dto.response.TransactionResponse;
+import bank.donghang.core.account.application.TransactionService;
+import bank.donghang.core.account.dto.request.TransactionRequest;
+import bank.donghang.core.account.dto.response.TransactionResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController

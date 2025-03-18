@@ -1,4 +1,4 @@
-package bank.donghang.donghang_api.account.dto.request;
+package bank.donghang.core.account.dto.request;
 
 public record TransactionRequest(
 	Long sendingAccountId,

@@ -1,8 +1,8 @@
 package bank.donghang.core.account.domain;
 
-import bank.donghang.donghang_api.account.domain.enums.TransactionStatus;
-import bank.donghang.donghang_api.account.domain.enums.TransactionType;
-import bank.donghang.donghang_api.common.entity.BaseEntity;
+import bank.donghang.core.account.domain.enums.TransactionStatus;
+import bank.donghang.core.account.domain.enums.TransactionType;
+import bank.donghang.core.common.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

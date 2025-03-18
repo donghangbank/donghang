@@ -2,17 +2,17 @@ package bank.donghang.core.account.application;
 
 import org.springframework.stereotype.Service;
 
-import bank.donghang.donghang_api.account.domain.Account;
-import bank.donghang.donghang_api.account.domain.Transaction;
-import bank.donghang.donghang_api.account.domain.enums.TransactionStatus;
-import bank.donghang.donghang_api.account.domain.enums.TransactionType;
-import bank.donghang.donghang_api.account.domain.repository.AccountRepository;
-import bank.donghang.donghang_api.account.domain.repository.TransactionRepository;
-import bank.donghang.donghang_api.account.dto.request.TransactionRequest;
-import bank.donghang.donghang_api.account.dto.response.TransactionResponse;
-import bank.donghang.donghang_api.common.annotation.DistributedLock;
-import bank.donghang.donghang_api.common.exception.BadRequestException;
-import bank.donghang.donghang_api.common.exception.ErrorCode;
+import bank.donghang.core.account.domain.Account;
+import bank.donghang.core.account.domain.Transaction;
+import bank.donghang.core.account.domain.enums.TransactionStatus;
+import bank.donghang.core.account.domain.enums.TransactionType;
+import bank.donghang.core.account.domain.repository.AccountRepository;
+import bank.donghang.core.account.domain.repository.TransactionRepository;
+import bank.donghang.core.account.dto.request.TransactionRequest;
+import bank.donghang.core.account.dto.response.TransactionResponse;
+import bank.donghang.core.common.annotation.DistributedLock;
+import bank.donghang.core.common.exception.BadRequestException;
+import bank.donghang.core.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 
 @Service

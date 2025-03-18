@@ -1,9 +1,9 @@
 package bank.donghang.core.account.dto.response;
 
-import bank.donghang.donghang_api.account.domain.Account;
-import bank.donghang.donghang_api.account.domain.Transaction;
-import bank.donghang.donghang_api.account.domain.enums.TransactionStatus;
-import bank.donghang.donghang_api.account.dto.request.TransactionRequest;
+import bank.donghang.core.account.domain.Account;
+import bank.donghang.core.account.domain.Transaction;
+import bank.donghang.core.account.domain.enums.TransactionStatus;
+import bank.donghang.core.account.dto.request.TransactionRequest;
 
 public record TransactionResponse(
 	Long sendingAccountId,

@@ -3,8 +3,13 @@ package bank.donghang.core.account.domain;
 import java.util.Date;
 
 import bank.donghang.core.account.domain.enums.AccountStatus;
+import bank.donghang.core.account.domain.enums.TransactionType;
+import bank.donghang.core.common.exception.BadRequestException;
+import bank.donghang.core.common.exception.ErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
