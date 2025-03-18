@@ -10,6 +10,7 @@ import bank.donghang.donghang_api.cardproduct.dto.response.CardProductSummaryRes
 import bank.donghang.donghang_api.common.exception.BadRequestException;
 import bank.donghang.donghang_api.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,78 +20,76 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CardProductService {
 
-    private final CardProductRepository cardProductRepository;
+	private final CardProductRepository cardProductRepository;
 
-    @Transactional
-    public Long createCardProduct(
-            CardProductCreateRequest request,
-            String imageUrl
-    ) {
+	public Long createCardProduct(
+		CardProductCreateRequest request,
+		String imageUrl
+	) {
 
-        CardProduct cardProduct = CardProduct.createCardProduct(
-                request.name(),
-                request.type(),
-                request.description(),
-                imageUrl,
-                request.duration(),
-                request.cardCompanyId()
-        );
+		CardProduct cardProduct = CardProduct.createCardProduct(
+			request.name(),
+			request.type(),
+			request.description(),
+			imageUrl,
+			request.duration(),
+			request.cardCompanyId()
+		);
 
-        return cardProductRepository.save(cardProduct).getId();
-    }
+		return cardProductRepository.save(cardProduct).getId();
+	}
 
-    public CardProductDetailResponse getCardProductDetail(Long id){
-        checkCardProductExistence(id);
+	public CardProductDetailResponse getCardProductDetail(Long id) {
+		checkCardProductExistence(id);
 
-        CardProductDetailResponse response = cardProductRepository.findCardProductDetailById(id);
+		CardProductDetailResponse response = cardProductRepository.findCardProductDetailById(id);
 
-        return response;
-    }
+		return response;
+	}
 
-    public List<CardProductSummaryResponse> getCardProductSummaries(
-            CardProductType type,
-            String cardCompanyName
-    ) {
+	public List<CardProductSummaryResponse> getCardProductSummaries(
+		CardProductType type,
+		String cardCompanyName
+	) {
 
-        List<CardProductSummaryResponse> response = cardProductRepository.findCardProductSummaries(
-                type,
-                cardCompanyName
-        );
+		List<CardProductSummaryResponse> response = cardProductRepository.findCardProductSummaries(
+			type,
+			cardCompanyName
+		);
 
-        return response;
-    }
+		return response;
+	}
 
-    @Transactional
-    public void updateCardProduct(
-            Long id,
-            String newImageUrl,
-            CardProductUpdateRequest request
-    ) {
-        checkCardProductExistence(id);
+	@Transactional
+	public void updateCardProduct(
+		Long id,
+		String newImageUrl,
+		CardProductUpdateRequest request
+	) {
+		checkCardProductExistence(id);
 
-        CardProduct cardProduct = cardProductRepository.findCardProductById(id)
-                .orElseThrow(()-> new BadRequestException(ErrorCode.CARD_PRODUCT_NOT_FOUND));
+		CardProduct cardProduct = cardProductRepository.findCardProductById(id)
+			.orElseThrow(() -> new BadRequestException(ErrorCode.CARD_PRODUCT_NOT_FOUND));
 
-        cardProduct.updateCardCompany(
-                request.name(),
-                request.type(),
-                request.description(),
-                newImageUrl,
-                request.duration()
-        );
-    }
+		cardProduct.updateCardCompany(
+			request.name(),
+			request.type(),
+			request.description(),
+			newImageUrl,
+			request.duration()
+		);
+	}
 
-    @Transactional
-    public void deleteCardProduct(Long id){
+	public void deleteCardProduct(Long id) {
 
-        checkCardProductExistence(id);
+		checkCardProductExistence(id);
 
-        cardProductRepository.deleteCardProduct(id);
-    }
+		cardProductRepository.deleteCardProduct(id);
+	}
 
-    private void checkCardProductExistence(Long id) {
-        if (!cardProductRepository.existsCardProduct(id)){
-            throw new BadRequestException(ErrorCode.CARD_PRODUCT_NOT_FOUND);
-        }
-    }
+	private void checkCardProductExistence(Long id) {
+		if (!cardProductRepository.existsCardProduct(id)) {
+			throw new BadRequestException(ErrorCode.CARD_PRODUCT_NOT_FOUND);
+		}
+	}
 }

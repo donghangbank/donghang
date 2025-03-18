@@ -7,6 +7,7 @@ import bank.donghang.donghang_api.cardcompany.dto.response.CardCompanySummaryRes
 import bank.donghang.donghang_api.common.exception.BadRequestException;
 import bank.donghang.donghang_api.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,58 +17,56 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CardCompanyService {
 
-    private final CardCompanyRepository cardCompanyRepository;
+	private final CardCompanyRepository cardCompanyRepository;
 
-    @Transactional
-    public Long createCardCompany(
-            CardCompanyRequest request,
-            String logoUrl
-    ) {
+	public Long createCardCompany(
+		CardCompanyRequest request,
+		String logoUrl
+	) {
 
-        CardCompany cardCompany = CardCompany.createCardCompany(
-                request.name(),
-                logoUrl
-        );
+		CardCompany cardCompany = CardCompany.createCardCompany(
+			request.name(),
+			logoUrl
+		);
 
-        return cardCompanyRepository.save(cardCompany).getId();
-    }
+		return cardCompanyRepository.save(cardCompany).getId();
+	}
 
-    public List<CardCompanySummaryResponse> getAllCardCompanies(){
+	public List<CardCompanySummaryResponse> getAllCardCompanies() {
 
-        List<CardCompanySummaryResponse> response = cardCompanyRepository.findAllCardCompanySummaries();
+		List<CardCompanySummaryResponse> response = cardCompanyRepository.findAllCardCompanySummaries();
 
-        return response;
-    }
+		return response;
+	}
 
-    @Transactional
-    public void updateCardCompany(
-            Long id,
-            String newLogoUrl,
-            CardCompanyRequest cardCompanyRequest
-    ){
+	@Transactional
+	public void updateCardCompany(
+		Long id,
+		String newLogoUrl,
+		CardCompanyRequest cardCompanyRequest
+	) {
 
-        checkCardCompanyExistence(id);
+		checkCardCompanyExistence(id);
 
-        CardCompany cardCompany = cardCompanyRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException(ErrorCode.CARD_COMPANY_NOT_FOUND));
+		CardCompany cardCompany = cardCompanyRepository.findById(id)
+			.orElseThrow(() -> new BadRequestException(ErrorCode.CARD_COMPANY_NOT_FOUND));
 
-        cardCompany.updateCardCompany(
-                cardCompanyRequest.name(),
-                newLogoUrl
-        );
-    }
+		cardCompany.updateCardCompany(
+			cardCompanyRequest.name(),
+			newLogoUrl
+		);
+	}
 
-    @Transactional
-    public void deleteCardCompany(Long id) {
+	public void deleteCardCompany(Long id) {
 
-        checkCardCompanyExistence(id);
+		checkCardCompanyExistence(id);
 
-        cardCompanyRepository.deleteCardCompany(id);
-    }
+		cardCompanyRepository.deleteCardCompany(id);
+	}
 
-    private void checkCardCompanyExistence(Long id) {
-        if (!cardCompanyRepository.existsCardCompany(id)){
-            throw new BadRequestException(ErrorCode.CARD_COMPANY_NOT_FOUND);
-        }
-    }
+	private void checkCardCompanyExistence(Long id) {
+		if (!cardCompanyRepository.existsCardCompany(id)) {
+			throw new BadRequestException(ErrorCode.CARD_COMPANY_NOT_FOUND);
+		}
+	}
 }

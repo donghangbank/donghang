@@ -6,6 +6,7 @@ import bank.donghang.donghang_api.bank.dto.request.BankRequest;
 import bank.donghang.donghang_api.common.exception.BadRequestException;
 import bank.donghang.donghang_api.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,52 +16,50 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BankService {
 
-    private final BankRepository bankRepository;
+	private final BankRepository bankRepository;
 
-    @Transactional
-    public Long createBank(
-            BankRequest request,
-            String logoUrl
-    ){
+	public Long createBank(
+		BankRequest request,
+		String logoUrl
+	) {
 
-        Bank bank = Bank.createBank(
-                request.name(),
-                logoUrl
-        );
+		Bank bank = Bank.createBank(
+			request.name(),
+			logoUrl
+		);
 
-        return bankRepository.save(bank).getId();
-    }
+		return bankRepository.save(bank).getId();
+	}
 
-    public List<Bank> getAllBanks() {
-        return bankRepository.findAll();
-    }
+	public List<Bank> getAllBanks() {
+		return bankRepository.findAll();
+	}
 
-    @Transactional
-    public void updateBank(
-            BankRequest request,
-            String logoUrl,
-            Long id
-    ){
+	@Transactional
+	public void updateBank(
+		BankRequest request,
+		String logoUrl,
+		Long id
+	) {
 
-        checkBankExistence(id);
+		checkBankExistence(id);
 
-        Bank bank = bankRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException(ErrorCode.BANK_NOT_FOUND));
+		Bank bank = bankRepository.findById(id)
+			.orElseThrow(() -> new BadRequestException(ErrorCode.BANK_NOT_FOUND));
 
-        bank = Bank.updateBank(
-                request.name(),
-                logoUrl
-        );
-    }
+		bank = Bank.updateBank(
+			request.name(),
+			logoUrl
+		);
+	}
 
-    @Transactional
-    public void deleteBank(Long bankId) {
-        bankRepository.delete(bankId);
-    }
+	public void deleteBank(Long bankId) {
+		bankRepository.delete(bankId);
+	}
 
-    private void checkBankExistence(Long id) {
-        if (!bankRepository.exists(id)){
-            throw new BadRequestException(ErrorCode.BANK_NOT_FOUND);
-        }
-    }
+	private void checkBankExistence(Long id) {
+		if (!bankRepository.exists(id)) {
+			throw new BadRequestException(ErrorCode.BANK_NOT_FOUND);
+		}
+	}
 }

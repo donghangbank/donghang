@@ -10,6 +10,7 @@ import bank.donghang.donghang_api.loanproduct.dto.request.LoanProductUpdateReque
 import bank.donghang.donghang_api.loanproduct.dto.response.LoanProductDetailResponse;
 import bank.donghang.donghang_api.loanproduct.dto.response.LoanProductSummaryResponse;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,70 +20,68 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LoanProductService {
 
-    private final LoanProductRepository loanProductRepository;
+	private final LoanProductRepository loanProductRepository;
 
-    @Transactional
-    public Long createLoanProduct(LoanProductCreateRequest request){
+	public Long createLoanProduct(LoanProductCreateRequest request) {
 
-        LoanProduct loanProduct = LoanProduct.createLoanProduct(
-                request.bankId(),
-                request.ratingId(),
-                request.name(),
-                request.period(),
-                request.type(),
-                request.minLoanBalance(),
-                request.maxLoanBalance(),
-                request.interestRate(),
-                request.description(),
-                request.repaymentMethod()
-        );
+		LoanProduct loanProduct = LoanProduct.createLoanProduct(
+			request.bankId(),
+			request.ratingId(),
+			request.name(),
+			request.period(),
+			request.type(),
+			request.minLoanBalance(),
+			request.maxLoanBalance(),
+			request.interestRate(),
+			request.description(),
+			request.repaymentMethod()
+		);
 
-        return loanProductRepository.save(loanProduct).getId();
-    }
+		return loanProductRepository.save(loanProduct).getId();
+	}
 
-    public LoanProductDetailResponse getLoanProductDetail(Long id){
+	public LoanProductDetailResponse getLoanProductDetail(Long id) {
 
-        checkLoanProductExistence(id);
+		checkLoanProductExistence(id);
 
-        return loanProductRepository.getLoanProductDetail(id);
-    }
+		return loanProductRepository.getLoanProductDetail(id);
+	}
 
-    public List<LoanProductSummaryResponse> getLoanProductSummaries(LoanType loanType){
-        return loanProductRepository.getLoanProductSummaries(loanType);
-    }
+	public List<LoanProductSummaryResponse> getLoanProductSummaries(LoanType loanType) {
+		return loanProductRepository.getLoanProductSummaries(loanType);
+	}
 
-    @Transactional
-    public void updateLoanProduct(
-            Long id,
-            LoanProductUpdateRequest request
-    ){
+	@Transactional
+	public void updateLoanProduct(
+		Long id,
+		LoanProductUpdateRequest request
+	) {
 
-        checkLoanProductExistence(id);
+		checkLoanProductExistence(id);
 
-        LoanProduct loanProduct = loanProductRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException(ErrorCode.LOAN_PRODUCT_NOT_FOUND));
+		LoanProduct loanProduct = loanProductRepository.findById(id)
+			.orElseThrow(() -> new BadRequestException(ErrorCode.LOAN_PRODUCT_NOT_FOUND));
 
-        loanProduct.updateLoanProduct(
-                request.ratingId(),
-                request.name(),
-                request.period(),
-                request.minLoanBalance(),
-                request.maxLoanBalance(),
-                request.interestRate(),
-                request.description()
-        );
-    }
+		loanProduct.updateLoanProduct(
+			request.ratingId(),
+			request.name(),
+			request.period(),
+			request.minLoanBalance(),
+			request.maxLoanBalance(),
+			request.interestRate(),
+			request.description()
+		);
+	}
 
-    @Transactional
-    public void deleteLoanProduct(Long id){
+	public void deleteLoanProduct(Long id) {
 
-        checkLoanProductExistence(id);
-        loanProductRepository.deleteLoanProduct(id);
-    }
+		checkLoanProductExistence(id);
+		loanProductRepository.deleteLoanProduct(id);
+	}
 
-    private void checkLoanProductExistence(Long id) {
-        if (!loanProductRepository.existsById(id)) {
-            throw new BadRequestException(ErrorCode.LOAN_PRODUCT_NOT_FOUND);
-        }
-    }
+	private void checkLoanProductExistence(Long id) {
+		if (!loanProductRepository.existsById(id)) {
+			throw new BadRequestException(ErrorCode.LOAN_PRODUCT_NOT_FOUND);
+		}
+	}
 }
