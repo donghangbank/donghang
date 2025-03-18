@@ -107,6 +107,9 @@ checkstyle {
 	toolVersion = '10.19.0'
 }
 
+checkstyleMain.source = fileTree('src/main/java')
+checkstyleTest.source = fileTree('src/test/java')
+
 sourceSets {
 	main {
 		java {
