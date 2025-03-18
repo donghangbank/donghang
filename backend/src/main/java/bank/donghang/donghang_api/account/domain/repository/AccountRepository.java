@@ -38,4 +38,8 @@ public class AccountRepository {
 
 		return nextNumber;
 	}
+
+	public Optional<Account> getAccount(Long accountId) {
+		return accountJPARepository.findById(accountId);
+	}
 }
