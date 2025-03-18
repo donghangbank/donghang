@@ -1,27 +1,9 @@
 import Versions from "./components/Versions";
 import electronLogo from "./assets/electron.svg";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { useRef } from "react";
-import * as THREE from "three";
+import { Canvas } from "@react-three/fiber";
+import { Avatar } from "./components/banker/Avatar";
 
-function Box(): JSX.Element {
-	const ref = useRef<THREE.Mesh>(null!);
-
-	useFrame(() => {
-		if (ref.current) {
-			ref.current.rotation.x += 0.01;
-			ref.current.rotation.y += 0.01;
-		}
-	});
-
-	return (
-		<mesh ref={ref}>
-			{/* eslint-disable react/no-unknown-property */}
-			<boxGeometry args={[2, 2, 2]} />
-			<meshStandardMaterial color="orange" />
-		</mesh>
-	);
-}
+/* eslint-disable react/no-unknown-property */
 
 function App(): JSX.Element {
 	const ipcHandle = (): void => window.electron.ipcRenderer.send("ping");
@@ -53,7 +35,7 @@ function App(): JSX.Element {
 			<Canvas style={{ width: "100%", height: "300px" }}>
 				<ambientLight />
 				<pointLight position={[5, 5, 5]} />
-				<Box />
+				<Avatar position={[0, -3, 3]} scale={2} />
 			</Canvas>
 		</>
 	);
