@@ -29,7 +29,7 @@ public class Transaction extends BaseEntity {
 	private Long amount;
 
 	@Column(nullable = false)
-	private Long sendingAccountId;
+	private Long accountId;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
@@ -46,14 +46,14 @@ public class Transaction extends BaseEntity {
 	public static Transaction createTransaction(
 		String description,
 		Long amount,
-		Long sendingAccountId,
+		Long accountId,
 		TransactionType type,
 		TransactionStatus status
 	) {
 		return new Transaction(
 			description,
 			amount,
-			sendingAccountId,
+			accountId,
 			type,
 			status
 		);
@@ -62,13 +62,13 @@ public class Transaction extends BaseEntity {
 	private Transaction(
 		String description,
 		Long amount,
-		Long sendingAccountId,
+		Long accountId,
 		TransactionType type,
 		TransactionStatus status
 	) {
 		this.description = description;
 		this.amount = amount;
-		this.sendingAccountId = sendingAccountId;
+		this.accountId = accountId;
 		this.type = type;
 		this.status = status;
 	}
