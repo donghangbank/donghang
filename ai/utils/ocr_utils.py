@@ -26,3 +26,24 @@ async def decode_image(file: UploadFile) -> np.ndarray:
         logger.error(f"이미지 디코딩 오류: {e}")
         return None
 
+def extract_name_id(image: Image):
+    """OCR을 통해 이름과 주민등록번호를 추출"""
+    ocr_results = reader.readtext(image)
+    name, id = "", ""
+    
+    for i in range(len(ocr_results)):
+        text = ocr_results[i][-2]
+        if "(" in text and text not in EXCLUDED_KEYWORDS and i > 0:
+            name = text.split(" ")[0]
+            break
+    
+    for item in ocr_results:
+        text = item[-2]
+        if "-" in text:
+            parts = text.split("-")
+            if len(parts) == 2 and len(parts[0]) == 6 and len(parts[1]) == 7:
+                if parts[0].isdigit() and parts[1].isdigit():
+                    id = text
+                    break
+    
+    return name, id
