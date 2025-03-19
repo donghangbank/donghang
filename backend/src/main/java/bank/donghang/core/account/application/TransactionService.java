@@ -64,6 +64,47 @@ public class TransactionService {
 		return response;
 	}
 
+	public TransactionResponse transferByAccountTest(TransactionRequest request) {
+
+		Account sendingAccount = accountRepository.getAccount(request.sendingAccountId())
+			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
+		Account receivingAccount = accountRepository.getAccount(request.receivingAccountId())
+			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
+
+		validateBalance(request, sendingAccount);
+
+		sendingAccount.withdraw(request.amount());
+		receivingAccount.deposit(request.amount());
+
+		Transaction senderTransaction = Transaction.createTransaction(
+			request.description(),
+			request.amount(),
+			sendingAccount.getAccountId(),
+			TransactionType.WITHDRAWAL,
+			TransactionStatus.COMPLETED
+		);
+
+		Transaction receipentTransaction = Transaction.createTransaction(
+			request.description(),
+			request.amount(),
+			receivingAccount.getAccountId(),
+			TransactionType.DEPOSIT,
+			TransactionStatus.COMPLETED
+		);
+
+		transactionRepository.saveTransaction(senderTransaction);
+		transactionRepository.saveTransaction(receipentTransaction);
+
+		TransactionResponse response = TransactionResponse.of(
+			request,
+			sendingAccount,
+			receivingAccount,
+			senderTransaction
+		);
+
+		return response;
+	}
+
 	private static void validateBalance(TransactionRequest request, Account sendingAccount) {
 		if (request.amount() > sendingAccount.getAccountBalance()) {
 			throw new BadRequestException(ErrorCode.NOT_ENOUGH_BALANCE);
