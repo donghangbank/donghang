@@ -1,3 +1,7 @@
+output "sg_external_alb_id" {
+  value = aws_security_group.sg_external_alb.id
+}
+
 output "sg_mysql_id" {
   value = aws_security_group.sg_mysql.id
 }

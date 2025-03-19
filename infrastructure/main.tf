@@ -1,3 +1,9 @@
+module "alb" {
+  source             = "./Modules/ALB"
+  public_subnets     = module.networing.public_subnets
+  sg_external_alb_id = module.security_group.sg_external_alb_id
+}
+
 module "ecr" {
   source = "./Modules/ECR"
 }
