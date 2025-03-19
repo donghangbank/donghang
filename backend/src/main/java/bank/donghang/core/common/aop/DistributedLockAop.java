@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class DistributedLockAop {
-	private static final String REDISSON_LOCK_PREFIX = "LOCK";
+	private static final String REDISSON_LOCK_PREFIX = "LOCK:";
 
 	private final RedissonClient redissonClient;
 	private final AopForTransaction aopForTransaction;
@@ -40,29 +40,21 @@ public class DistributedLockAop {
 		RLock rLock = redissonClient.getLock(key);
 
 		try {
-			boolean available = rLock.tryLock(
-				distributedLock.waitTime(),
-				distributedLock.leaseTime(),
-				distributedLock.timeUnit()
-			);
-			{
-				if (!available) {
-					return false;
-				}
+			log.info("Trying to acquire lock with key: {}", key);
+			rLock.lock(distributedLock.leaseTime(), distributedLock.timeUnit());
+			log.info("Successfully acquired lock with key: {}", key);
 
-				return aopForTransaction.proceed(joinPoint);
-			}
+			return aopForTransaction.proceed(joinPoint);
 		} catch (InterruptedException e) {
-			throw new InterruptedException();
+			Thread.currentThread().interrupt();
+			log.info("Interrupted while trying to acquire lock with key: {}", key);
+			throw new InterruptedException("Lock acquisition was interrupted");
 		} finally {
 			try {
 				rLock.unlock();
+				log.info("Released lock with key: {}", key);
 			} catch (IllegalMonitorStateException e) {
-				log.info(
-					"Redisson Lock Already UnLock {} {}",
-					method.getName(),
-					key
-				);
+				log.info("Redisson Lock Already Unlocked {} {}", method.getName(), key);
 			}
 		}
 	}
