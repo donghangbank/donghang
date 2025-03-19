@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-
+from routers import ocr, video_ws
 app = FastAPI()
 
 origins = [
@@ -16,6 +16,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(ocr.router)
+app.include_router(video_ws.router)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
