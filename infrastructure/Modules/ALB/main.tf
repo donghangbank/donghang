@@ -75,3 +75,40 @@ resource "aws_alb_target_group" "internal_alb_target_group" {
     Name = "donghang-internal-alb-tg"
   }
 }
+
+resource "aws_alb_listener" "external_alb_http_listener" {
+  load_balancer_arn = aws_alb.external_alb.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+
+  tags = {
+    Name = "donghang-external-alb-http-listener"
+  }
+}
+
+resource "aws_alb_listener" "external_alb_https_listener" {
+  load_balancer_arn = aws_alb.external_alb.arn
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  #   certificate_arn   = var.external_alb_certificate_arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_alb_target_group.external_alb_target_group.arn
+  }
+
+  tags = {
+    Name = "donghang-external-alb-https-listener"
+  }
+}
