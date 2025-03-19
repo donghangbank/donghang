@@ -24,7 +24,11 @@ public class TransactionService {
 	private final AccountRepository accountRepository;
 
 	@Transactional
-	@DistributedLock(key = "'TRANSACTION_' + #request.sendingAccountId + '_' + #request.receivingAccountId", waitTime = 5L, leaseTime = 10L)
+	@DistributedLock(
+		key = "'TRANSACTION_' + #request.sendingAccountId + '_' + #request.receivingAccountId",
+		waitTime = 5L,
+		leaseTime = 10L
+	)
 	public TransactionResponse transferByAccount(TransactionRequest request) {
 		Account sendingAccount = accountRepository.getAccount(request.sendingAccountId())
 			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));

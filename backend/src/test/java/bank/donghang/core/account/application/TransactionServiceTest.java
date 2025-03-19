@@ -1,5 +1,8 @@
 package bank.donghang.core.account.application;
 
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.*;
+
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -9,17 +12,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
-
 import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.account.domain.enums.AccountStatus;
 import bank.donghang.core.account.domain.repository.AccountRepository;
 import bank.donghang.core.account.domain.repository.TransactionRepository;
 import bank.donghang.core.account.dto.request.TransactionRequest;
 import bank.donghang.core.common.exception.BadRequestException;
-import bank.donghang.core.common.exception.ErrorCode;
 
 @ExtendWith(MockitoExtension.class)
 class TransactionServiceTest {
