@@ -18,6 +18,10 @@ variable "external_alb_health_check_path" {
   type = string
 }
 
+variable "internal_alb_health_check_path" {
+  type = string
+}
+
 variable "mysql_password" {
   type = string
 }

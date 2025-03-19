@@ -1,6 +1,7 @@
 module "alb" {
   source                         = "./Modules/ALB"
   external_alb_health_check_path = var.external_alb_health_check_path
+  internal_alb_health_check_path = var.internal_alb_health_check_path
   private_subnets                = module.networing.private_subnets
   public_subnets                 = module.networing.public_subnets
   sg_external_alb_id             = module.security_group.sg_external_alb_id

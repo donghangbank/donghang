@@ -2,6 +2,10 @@ variable "external_alb_health_check_path" {
   type = string
 }
 
+variable "internal_alb_health_check_path" {
+  type = string
+}
+
 variable "private_subnets" {
   type = list(string)
 }

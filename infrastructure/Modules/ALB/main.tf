@@ -50,3 +50,28 @@ resource "aws_alb_target_group" "external_alb_target_group" {
     Name = "donghang-external-alb-tg"
   }
 }
+
+resource "aws_alb_target_group" "internal_alb_target_group" {
+  name                 = "donghang-internal-alb-tg"
+  port                 = 8080
+  protocol             = "HTTP"
+  vpc_id               = var.vpc_id
+  target_type          = "ip"
+  deregistration_delay = 5
+
+  health_check {
+    path                = var.internal_alb_health_check_path
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 3
+    unhealthy_threshold = 2
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = {
+    Name = "donghang-internal-alb-tg"
+  }
+}
