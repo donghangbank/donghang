@@ -1,9 +1,11 @@
 module "alb" {
-  source             = "./Modules/ALB"
-  private_subnets    = module.networing.private_subnets
-  public_subnets     = module.networing.public_subnets
-  sg_external_alb_id = module.security_group.sg_external_alb_id
-  sg_internal_alb_id = module.security_group.sg_internal_alb_id
+  source                         = "./Modules/ALB"
+  external_alb_health_check_path = var.external_alb_health_check_path
+  private_subnets                = module.networing.private_subnets
+  public_subnets                 = module.networing.public_subnets
+  sg_external_alb_id             = module.security_group.sg_external_alb_id
+  sg_internal_alb_id             = module.security_group.sg_internal_alb_id
+  vpc_id                         = module.networing.vpc_id
 }
 
 module "ecr" {

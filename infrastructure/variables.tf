@@ -14,6 +14,10 @@ variable "database_subnet_cidr_block" {
   type = list(string)
 }
 
+variable "external_alb_health_check_path" {
+  type = string
+}
+
 variable "mysql_password" {
   type = string
 }
