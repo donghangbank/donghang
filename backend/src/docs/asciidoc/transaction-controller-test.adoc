@@ -1,0 +1,11 @@
+== TransactionController
+
+=== 계좌 이체 (POST /api/v1/transactions)
+
+==== 요청
+
+include::{snippets}/transaction-controller-test/transfer_by_account/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/transaction-controller-test/transfer_by_account/http-response.adoc[]

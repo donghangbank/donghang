@@ -10,4 +10,5 @@ include::card-company-controller-test.adoc[]
 include::card-product-controller-test.adoc[]
 include::bank-controller-test.adoc[]
 include::loan-product-controller-test.adoc[]
+include::transaction-controller-test.adoc[]
 
