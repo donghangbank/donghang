@@ -112,3 +112,18 @@ resource "aws_alb_listener" "external_alb_https_listener" {
     Name = "donghang-external-alb-https-listener"
   }
 }
+
+resource "aws_alb_listener" "internal_alb_http_listener" {
+  load_balancer_arn = aws_alb.internal_alb.arn
+  port              = 8080
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_alb_target_group.internal_alb_target_group.arn
+  }
+
+  tags = {
+    Name = "donghang-internal-alb-http-listener"
+  }
+}
