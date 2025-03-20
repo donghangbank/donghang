@@ -9,3 +9,23 @@ include::{snippets}/transaction-controller-test/transfer_by_account/http-request
 ==== 응답
 
 include::{snippets}/transaction-controller-test/transfer_by_account/http-response.adoc[]
+
+=== 계좌 출금 (POST /api/v1/transactions/withdrawal)
+
+==== 요청
+
+include::{snippets}/transaction-controller-test/withdrawal_by_account/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/transaction-controller-test/withdrawal_by_account/http-response.adoc[]
+
+=== 계좌 입금 (POST /api/v1/transactions/deposit)
+
+==== 요청
+
+include::{snippets}/transaction-controller-test/deposit_by_account/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/transaction-controller-test/deposit_by_account/http-response.adoc[]
