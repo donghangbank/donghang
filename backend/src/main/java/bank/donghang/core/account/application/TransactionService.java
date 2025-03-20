@@ -19,7 +19,6 @@ import bank.donghang.core.common.annotation.DistributedLock;
 import bank.donghang.core.common.annotation.SingleAccountLock;
 import bank.donghang.core.common.exception.BadRequestException;
 import bank.donghang.core.common.exception.ErrorCode;
-
 import lombok.RequiredArgsConstructor;
 
 @Service

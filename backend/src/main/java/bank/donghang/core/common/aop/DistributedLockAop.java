@@ -3,7 +3,6 @@ package bank.donghang.core.common.aop;
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
-import bank.donghang.core.account.dto.request.TransactionRequest;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -12,6 +11,7 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 
+import bank.donghang.core.account.dto.request.TransactionRequest;
 import bank.donghang.core.common.annotation.DistributedLock;
 import bank.donghang.core.common.annotation.SingleAccountLock;
 import bank.donghang.core.common.parser.CustomSpringExpressionLanguageParser;
@@ -31,12 +31,12 @@ public class DistributedLockAop {
 
 	@Around("@annotation(bank.donghang.core.common.annotation.DistributedLock)")
 	public Object lock(final ProceedingJoinPoint joinPoint) throws Throwable {
-		MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+		MethodSignature signature = (MethodSignature)joinPoint.getSignature();
 		Method method = signature.getMethod();
 		DistributedLock distributedLock = method.getAnnotation(DistributedLock.class);
 
 		Object[] args = joinPoint.getArgs();
-		TransactionRequest request = (TransactionRequest) args[0];
+		TransactionRequest request = (TransactionRequest)args[0];
 		long accountId1 = request.sendingAccountId();
 		long accountId2 = request.receivingAccountId();
 
@@ -56,7 +56,11 @@ public class DistributedLockAop {
 
 		try {
 			log.info("Trying to acquire locks for keys: {} and {}", key1, key2);
-			boolean isLockAcquired = multiLock.tryLock(distributedLock.waitTime(), distributedLock.leaseTime(), TimeUnit.SECONDS);
+			boolean isLockAcquired = multiLock.tryLock(
+				distributedLock.waitTime(),
+				distributedLock.leaseTime(),
+				TimeUnit.SECONDS
+			);
 			if (!isLockAcquired) {
 				throw new IllegalStateException("Unable to acquire locks for keys: " + key1 + ", " + key2);
 			}
@@ -81,14 +85,14 @@ public class DistributedLockAop {
 
 	@Around("@annotation(bank.donghang.core.common.annotation.SingleAccountLock)")
 	public Object singleLock(final ProceedingJoinPoint joinPoint) throws Throwable {
-		MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+		MethodSignature signature = (MethodSignature)joinPoint.getSignature();
 		Method method = signature.getMethod();
 		SingleAccountLock singleAccountLock = method.getAnnotation(SingleAccountLock.class);
 
 		String key = REDISSON_LOCK_PREFIX + CustomSpringExpressionLanguageParser.getDynamicValue(
-				signature.getParameterNames(),
-				joinPoint.getArgs(),
-				singleAccountLock.key()
+			signature.getParameterNames(),
+			joinPoint.getArgs(),
+			singleAccountLock.key()
 		);
 
 		log.info("Lock key: {}", key);
@@ -101,7 +105,11 @@ public class DistributedLockAop {
 
 		try {
 			log.info("Trying to acquire lock for key: {}", key);
-			boolean isLockAcquired = rLock.tryLock(singleAccountLock.waitTime(), singleAccountLock.leaseTime(), TimeUnit.SECONDS);
+			boolean isLockAcquired = rLock.tryLock(
+				singleAccountLock.waitTime(),
+				singleAccountLock.leaseTime(),
+				TimeUnit.SECONDS
+			);
 			if (!isLockAcquired) {
 				throw new IllegalStateException("Unable to acquire lock for key: " + key);
 			}
