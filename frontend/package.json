@@ -26,6 +26,7 @@
 		"@electron-toolkit/utils": "^4.0.0",
 		"@react-three/drei": "^10.0.4",
 		"@react-three/fiber": "^9.1.0",
+		"@react-three/postprocessing": "^3.0.4",
 		"electron-updater": "^6.3.9",
 		"three": "^0.174.0"
 	},
