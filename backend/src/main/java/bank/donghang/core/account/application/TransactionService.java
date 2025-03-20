@@ -52,9 +52,9 @@ public class TransactionService {
 			TransactionType.DEPOSIT
 		);
 
-		Account sendingAccount = accountRepository.getAccount(request.sendingAccountId())
+		Account sendingAccount = accountRepository.findAccountById(request.sendingAccountId())
 			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
-		Account receivingAccount = accountRepository.getAccount(request.receivingAccountId())
+		Account receivingAccount = accountRepository.findAccountById(request.receivingAccountId())
 			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
 
 		validateBalance(request.amount(), sendingAccount);
@@ -106,7 +106,7 @@ public class TransactionService {
 			TransactionType.DEPOSIT
 		);
 
-		Account account = accountRepository.getAccount(request.accountId())
+		Account account = accountRepository.findAccountById(request.accountId())
 			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
 
 		account.deposit(request.amount());
@@ -145,7 +145,7 @@ public class TransactionService {
 			TransactionType.WITHDRAWAL
 		);
 
-		Account account = accountRepository.getAccount(request.accountId())
+		Account account = accountRepository.findAccountById(request.accountId())
 			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
 
 		validateBalance(request.amount(), account);

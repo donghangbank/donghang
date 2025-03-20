@@ -54,7 +54,7 @@ class TransactionServiceTest {
 			.accountId(sendingAccountId)
 			.memberId(100L)
 			.accountProductId(200L)
-			.withdrawalAccountId("123-456-789")
+			.withdrawalAccountId(3L)
 			.accountTypeCode("SAVINGS")
 			.branchCode("001")
 			.accountNumber("1234567890")
@@ -71,7 +71,7 @@ class TransactionServiceTest {
 			.accountId(receivingAccountId)
 			.memberId(100L)
 			.accountProductId(200L)
-			.withdrawalAccountId("123-456-789")
+			.withdrawalAccountId(5L)
 			.accountTypeCode("SAVINGS")
 			.branchCode("001")
 			.accountNumber("1234567890")
@@ -84,16 +84,16 @@ class TransactionServiceTest {
 			.accountExpiryDate(new java.util.Date())
 			.build();
 
-		given(accountRepository.getAccount(sendingAccountId))
+		given(accountRepository.findAccountById(sendingAccountId))
 			.willReturn(Optional.of(sendingAccount));
-		given(accountRepository.getAccount(receivingAccountId))
+		given(accountRepository.findAccountById(receivingAccountId))
 			.willReturn(Optional.of(receivingAccount));
 
 		org.junit.jupiter.api.Assertions.assertThrows(BadRequestException.class, () -> {
 			transactionService.transferByAccount(request);
 		});
 
-		verify(accountRepository, times(1)).getAccount(sendingAccountId);
-		verify(accountRepository, times(1)).getAccount(receivingAccountId);
+		verify(accountRepository, times(1)).findAccountById(sendingAccountId);
+		verify(accountRepository, times(1)).findAccountById(receivingAccountId);
 	}
 }
