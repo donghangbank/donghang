@@ -3,6 +3,7 @@ package bank.donghang.core.account.application;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.*;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -45,7 +46,8 @@ class TransactionServiceTest {
 			sendingAccountId,
 			receivingAccountId,
 			amount,
-			"테스트 이체"
+			"테스트 이체",
+			LocalDateTime.of(2025, 3, 20, 10, 0, 0)
 		);
 
 		Account sendingAccount = Account.builder()

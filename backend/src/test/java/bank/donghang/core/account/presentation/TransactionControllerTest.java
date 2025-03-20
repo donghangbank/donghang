@@ -5,6 +5,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +51,8 @@ class TransactionControllerTest extends ControllerTest {
 			sendingAccountId,
 			receivingAccountId,
 			amount,
-			"테스트 이체"
+			"테스트 이체",
+			LocalDateTime.of(2025, 3, 20, 10, 0, 0)
 		);
 
 		var expect = new TransactionResponse(
@@ -81,7 +84,8 @@ class TransactionControllerTest extends ControllerTest {
 
 		var request = new DepositRequest(
 			accountId,
-			amount
+			amount,
+			LocalDateTime.of(2025, 3, 20, 10, 0, 0)
 		);
 
 		var expect = new DepositResponse(
@@ -111,7 +115,8 @@ class TransactionControllerTest extends ControllerTest {
 
 		var request = new WithdrawalRequest(
 			accountId,
-			amount
+			amount,
+			LocalDateTime.of(2025, 3, 20, 10, 0, 0)
 		);
 
 		var expect = new WithdrawalResponse(
