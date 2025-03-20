@@ -1,5 +1,7 @@
 package bank.donghang.core.account.application;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -72,10 +74,14 @@ public class AccountService {
 		payoutAccount.verifyPayoutAccount(depositAccountRegisterRequest.memberId());
 
 		String newAccountNumber = accountRepository.getNextAccountNumber("200", "001");
+		long subscriptionPeriod = accountProduct.getSubscriptionPeriod();
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.MONTH, (int)subscriptionPeriod);
+		Date expiryDate = calendar.getTime();
 
 		Account newDepositAccount = depositAccountRegisterRequest.toEntity(newAccountNumber,
 			accountProduct.getInterestRate(),
-			withdrawalAccount.getAccountId(), payoutAccount.getAccountId(), 0L);
+			withdrawalAccount.getAccountId(), payoutAccount.getAccountId(), 0L, expiryDate);
 
 		Account savedDepositAccount = accountRepository.saveAccount(newDepositAccount);
 
