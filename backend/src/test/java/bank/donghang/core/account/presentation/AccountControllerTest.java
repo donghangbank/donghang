@@ -18,7 +18,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import bank.donghang.core.account.application.AccountService;
-import bank.donghang.core.account.dto.request.AccountRegisterRequest;
+import bank.donghang.core.account.dto.request.DemandAccountRegisterRequest;
+import bank.donghang.core.account.dto.request.DepositAccountRegisterRequest;
 import bank.donghang.core.account.dto.response.AccountRegisterResponse;
 import bank.donghang.core.common.controller.ControllerTest;
 
@@ -32,30 +33,87 @@ class AccountControllerTest extends ControllerTest {
 	private AccountService accountService;
 
 	@Test
-	@DisplayName("계좌 등록 요청 성공 시, AccountRegisterResponse 반환")
-	void registerAccount_success() throws Exception {
-		// Arrange
+	@DisplayName("자유입출금 계좌 가입 요청 성공 시, AccountRegisterResponse 반환")
+	void registerDemandAccount_success() throws Exception {
 		Long memberId = 1L;
 		Long accountProductId = 2L;
 		String password = "password123";
-		AccountRegisterRequest request = new AccountRegisterRequest(memberId, accountProductId, password);
 
-		AccountRegisterResponse response = new AccountRegisterResponse("Savings Account", "WID123", "1000011234567890",
-			0L, 0.05, new Date(1680105600000L));
+		DemandAccountRegisterRequest request = new DemandAccountRegisterRequest(
+			memberId,
+			accountProductId,
+			password
+		);
 
-		Mockito.when(accountService.createAccount(any(AccountRegisterRequest.class))).thenReturn(response);
+		AccountRegisterResponse response = new AccountRegisterResponse(
+			"Savings Account",
+			null,
+			null,
+			"100001000001",
+			0L,
+			0.05,
+			new Date(1680105600000L)
+		);
 
-		// Act & Assert
-		mockMvc.perform(post("/api/v1/accounts").contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)))
+		Mockito.when(accountService.createDemandAccount(any(DemandAccountRegisterRequest.class)))
+			.thenReturn(response);
+
+		mockMvc.perform(
+				post("/api/v1/accounts/demands")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(request))
+			)
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.productName").value("Savings Account"))
-			.andExpect(jsonPath("$.withdrawalAccountId").value("WID123"))
-			.andExpect(jsonPath("$.accountNumber").value("1000011234567890"))
+			.andExpect(jsonPath("$.accountNumber").value("100001000001"))
 			.andExpect(jsonPath("$.accountBalance").value(0))
 			.andExpect(jsonPath("$.interestDate").value(0.05))
-			.andExpect(jsonPath("$.accountExpiryDate").exists())
+			.andDo(document("demand-account-register"));
+	}
 
-			.andDo(document("account-register"));
+	@Test
+	@DisplayName("예금 상품 가입 요청 성공 시, AccountRegisterResponse 반환")
+	void registerDepositAccount_success() throws Exception {
+		Long memberId = 1L;
+		Long accountProductId = 2L;
+		String password = "password123";
+		String withdrawalAccountNumber = "100001000123";
+		String payoutAccountNumber = "100001000456";
+		Long initialDepositAmount = 30_000L;
+
+		DepositAccountRegisterRequest request = new DepositAccountRegisterRequest(
+			memberId,
+			accountProductId,
+			password,
+			withdrawalAccountNumber,
+			payoutAccountNumber,
+			initialDepositAmount
+		);
+
+		AccountRegisterResponse response = new AccountRegisterResponse(
+			"Deposit Account",
+			withdrawalAccountNumber,
+			payoutAccountNumber,
+			"200001000001",
+			0L,
+			0.5,
+			new Date(1680105600000L)
+		);
+
+		Mockito.when(accountService.createDepositAccount(any(DepositAccountRegisterRequest.class)))
+			.thenReturn(response);
+
+		mockMvc.perform(
+				post("/api/v1/accounts/deposits")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(request))
+			)
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.productName").value("Deposit Account"))
+			.andExpect(jsonPath("$.accountNumber").value("200001000001"))
+			.andExpect(jsonPath("$.accountBalance").value(0))
+			.andExpect(jsonPath("$.interestDate").value(0.5))
+			.andExpect(jsonPath("$.accountExpiryDate").exists())
+			.andDo(document("deposit-account-register"));
 	}
 }

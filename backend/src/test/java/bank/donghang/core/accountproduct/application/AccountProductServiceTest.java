@@ -110,7 +110,7 @@ class AccountProductServiceTest {
 			() -> accountProductService.getAccountProductDetail(99L)
 		);
 		System.out.println(exception.getCode() + " : " + exception.getMessage());
-		assertThat(exception.getCode()).isEqualTo(ErrorCode.PRODUCT_NOT_FOUND.getCode());
+		assertThat(exception.getCode()).isEqualTo(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND.getCode());
 	}
 
 	@Test
