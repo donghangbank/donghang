@@ -24,6 +24,6 @@ public enum AccountProductType {
 				return type;
 			}
 		}
-		throw new BadRequestException(ErrorCode.PRODUCT_TYPE_NOT_FOUND);
+		throw new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_TYPE_NOT_FOUND);
 	}
 }

@@ -53,4 +53,8 @@ public class AccountProduct {
 	@Column(name = "max_subscription_balance")
 	private Long maxSubscriptionBalance;
 
+
+	public boolean isDepositProduct() {
+		return accountProductType == AccountProductType.DEPOSIT;
+	}
 }

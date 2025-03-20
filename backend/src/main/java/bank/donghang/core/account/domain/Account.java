@@ -42,7 +42,10 @@ public class Account {
 	private Long accountProductId;
 
 	@Column(name = "withdrawal_account_id")
-	private String withdrawalAccountId;
+	private Long withdrawalAccountId;
+
+	@Column(name = "maturity_payout_account_id")
+	private Long maturityPayoutAccountId;
 
 	@Column(nullable = false, name = "account_type_code")
 	private String accountTypeCode;
@@ -100,4 +103,53 @@ public class Account {
 			this.accountBalance = this.accountBalance + balance;
 		}
 	}
+
+	private boolean isOwner(Long memberId) {
+		return this.memberId.equals(memberId);
+	}
+
+	private boolean isActive() {
+		return this.accountStatus == AccountStatus.ACTIVE;
+	}
+
+	private boolean isDemandAccount() {
+		return this.accountTypeCode.equals("100");
+	}
+
+	private boolean isBalanceEnoughForDeposit(Long initialDepositAmount) {
+		return this.accountBalance >= initialDepositAmount;
+	}
+
+	public void verifyWithdrawalAccount(Long memeberId, Long initDepositAmount) {
+		if (!isOwner(memeberId)) {
+			throw new BadRequestException(ErrorCode.WITHDRAWAL_ACCOUNT_NOT_OWNED);
+		}
+
+		if (!isActive()) {
+			throw new BadRequestException(ErrorCode.WITHDRAWAL_ACCOUNT_IS_NOT_ACTIVE);
+		}
+
+		if (!isBalanceEnoughForDeposit(initDepositAmount)) {
+			throw new BadRequestException(ErrorCode.WITHDRAWAL_ACCOUNT_HAS_NOT_ENOUGH_BALANCE);
+		}
+
+		if (!isDemandAccount()) {
+			throw new BadRequestException(ErrorCode.WITHDRAWAL_ACCOUNT_IS_NOT_ELIGIBLE_FOR_WITHDRAWAL);
+		}
+	}
+
+	public void verifyPayoutAccount(Long memeberId) {
+		if (!isOwner(memeberId)) {
+			throw new BadRequestException(ErrorCode.MATURITY_PAYOUT_ACCOUNT_NOT_OWNED);
+		}
+
+		if (!isActive()) {
+			throw new BadRequestException(ErrorCode.MATURITY_ACCOUNT_IS_NOT_ACTIVE);
+		}
+
+		if (!isDemandAccount()) {
+			throw new BadRequestException(ErrorCode.MATURITY_ACCOUNT_IS_NOT_ELIGIBLE_FOR_PAYOUT);
+		}
+	}
+
 }

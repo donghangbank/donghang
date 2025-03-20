@@ -39,7 +39,16 @@ public class AccountRepository {
 		return nextNumber;
 	}
 
-	public Optional<Account> getAccount(Long accountId) {
+	public Optional<Account> findAccountById(Long accountId) {
 		return accountJpaRepository.findById(accountId);
+	}
+
+	public Optional<Account> findAccountByFullAccountNumber(String fullAccountNumber) {
+		String accountTypeCode = fullAccountNumber.substring(0, 3);
+		String branchCode = fullAccountNumber.substring(3, 6);
+		String accountNumber = fullAccountNumber.substring(6);
+
+		return accountJpaRepository.findByAccountTypeCodeAndBranchCodeAndAccountNumber(accountTypeCode, branchCode,
+			accountNumber);
 	}
 }

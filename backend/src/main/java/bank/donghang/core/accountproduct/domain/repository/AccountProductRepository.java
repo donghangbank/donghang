@@ -6,6 +6,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
 import bank.donghang.core.accountproduct.domain.AccountProduct;
+import bank.donghang.core.common.exception.BadRequestException;
+import bank.donghang.core.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 
 @Repository
@@ -23,5 +25,16 @@ public class AccountProductRepository {
 
 	public AccountProduct saveAccountProduct(AccountProduct accountProduct) {
 		return accountProductJpaRepository.save(accountProduct);
+	}
+
+	public AccountProduct getAccountProductByIdIfExist(Long id) {
+		Optional<AccountProduct> optAccountProduct = accountProductJpaRepository.findAccountProductByAccountProductId(
+			id);
+		if (optAccountProduct.isEmpty()) {
+			throw new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND);
+
+		}
+
+		return optAccountProduct.get();
 	}
 }

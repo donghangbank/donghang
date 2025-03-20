@@ -7,16 +7,19 @@ import bank.donghang.core.accountproduct.domain.AccountProduct;
 
 public record AccountRegisterResponse(
 	String productName,
-	String withdrawalAccountId,
+	String withdrawalAccountNumber,
+	String payoutAccountNumber,
 	String accountNumber,
 	Long accountBalance,
 	Double interestDate,
 	Date accountExpiryDate
 ) {
-	public static AccountRegisterResponse from(Account account, AccountProduct product) {
+	public static AccountRegisterResponse from(Account account, AccountProduct product, String withdrawalAccountNumber,
+		String payoutAccountNumber) {
 		return new AccountRegisterResponse(
 			product.getAccountProductName(),
-			account.getWithdrawalAccountId(),
+			withdrawalAccountNumber,
+			payoutAccountNumber,
 			account.getAccountTypeCode() + account.getBranchCode() + account.getAccountNumber(),
 			account.getAccountBalance(),
 			product.getInterestRate(),

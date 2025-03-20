@@ -37,7 +37,7 @@ public class AccountProductService {
 			return AccountProductDetail.from(accountProduct);
 		}
 
-		throw new BadRequestException(ErrorCode.PRODUCT_NOT_FOUND);
+		throw new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND);
 	}
 
 	public AccountProductSummary registerAccountProduct(
