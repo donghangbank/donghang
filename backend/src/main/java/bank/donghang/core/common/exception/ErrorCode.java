@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum ErrorCode {
 
 	INVALID_REQUEST(1_000, "유효하지 않은 요청입니다."),
+	DUPLICATE_REQUEST(1_001, "중복된 요청입니다."),
 
 	MEMBER_NOT_FOUND(2_000, "존재하지 않는 유저입니다."),
 
@@ -24,7 +25,8 @@ public enum ErrorCode {
 
 	ACCOUNT_NOT_FOUND(8_000, "존재하지 않는 계좌입니다."),
 	NOT_ENOUGH_BALANCE(8_001, "잔액이 부족합니다."),
-	WRONG_AMOUNT_INPUT(8_002, "잘못된 입금 수량입니다.");
+	WRONG_AMOUNT_INPUT(8_002, "잘못된 입금 수량입니다."),
+	;
 
 	private final int code;
 	private final String message;

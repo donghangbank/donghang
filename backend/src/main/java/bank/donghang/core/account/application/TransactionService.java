@@ -1,5 +1,7 @@
 package bank.donghang.core.account.application;
 
+import java.time.LocalDateTime;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +37,21 @@ public class TransactionService {
 		leaseTime = 3L
 	)
 	public TransactionResponse transferByAccount(TransactionRequest request) {
+
+		checkDuplicateRequest(
+			request.sendingAccountId(),
+			request.amount(),
+			request.sessionStartTime(),
+			TransactionType.WITHDRAWAL
+		);
+
+		checkDuplicateRequest(
+			request.receivingAccountId(),
+			request.amount(),
+			request.sessionStartTime(),
+			TransactionType.DEPOSIT
+		);
+
 		Account sendingAccount = accountRepository.getAccount(request.sendingAccountId())
 			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
 		Account receivingAccount = accountRepository.getAccount(request.receivingAccountId())
@@ -50,7 +67,8 @@ public class TransactionService {
 			request.amount(),
 			sendingAccount.getAccountId(),
 			TransactionType.WITHDRAWAL,
-			TransactionStatus.COMPLETED
+			TransactionStatus.COMPLETED,
+			request.sessionStartTime()
 		);
 
 		Transaction recipientTransaction = Transaction.createTransaction(
@@ -58,7 +76,8 @@ public class TransactionService {
 			request.amount(),
 			receivingAccount.getAccountId(),
 			TransactionType.DEPOSIT,
-			TransactionStatus.COMPLETED
+			TransactionStatus.COMPLETED,
+			request.sessionStartTime()
 		);
 
 		transactionRepository.saveTransaction(senderTransaction);
@@ -79,6 +98,14 @@ public class TransactionService {
 		leaseTime = 3L
 	)
 	public DepositResponse deposit(DepositRequest request) {
+
+		checkDuplicateRequest(
+			request.accountId(),
+			request.amount(),
+			request.sessionStartTime(),
+			TransactionType.DEPOSIT
+		);
+
 		Account account = accountRepository.getAccount(request.accountId())
 			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
 
@@ -89,7 +116,8 @@ public class TransactionService {
 			request.amount(),
 			request.accountId(),
 			TransactionType.DEPOSIT,
-			TransactionStatus.COMPLETED
+			TransactionStatus.COMPLETED,
+			request.sessionStartTime()
 		);
 
 		transactionRepository.saveTransaction(transaction);
@@ -109,6 +137,14 @@ public class TransactionService {
 		leaseTime = 3L
 	)
 	public WithdrawalResponse withdraw(WithdrawalRequest request) {
+
+		checkDuplicateRequest(
+			request.accountId(),
+			request.amount(),
+			request.sessionStartTime(),
+			TransactionType.WITHDRAWAL
+		);
+
 		Account account = accountRepository.getAccount(request.accountId())
 			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
 
@@ -121,7 +157,8 @@ public class TransactionService {
 			request.amount(),
 			request.accountId(),
 			TransactionType.WITHDRAWAL,
-			TransactionStatus.COMPLETED
+			TransactionStatus.COMPLETED,
+			request.sessionStartTime()
 		);
 
 		transactionRepository.saveTransaction(transaction);
@@ -137,6 +174,22 @@ public class TransactionService {
 	private void validateBalance(Long amount, Account account) {
 		if (amount.compareTo(account.getAccountBalance()) > 0) {
 			throw new BadRequestException(ErrorCode.NOT_ENOUGH_BALANCE);
+		}
+	}
+
+	private void checkDuplicateRequest(
+		Long accountId,
+		Long amount,
+		LocalDateTime sessionStartTime,
+		TransactionType type
+	) {
+		if (transactionRepository.existsByAccountIdAndAmountAndTypeAndSessionStartTime(
+			accountId,
+			amount,
+			sessionStartTime,
+			type
+		)) {
+			throw new BadRequestException(ErrorCode.DUPLICATE_REQUEST);
 		}
 	}
 }

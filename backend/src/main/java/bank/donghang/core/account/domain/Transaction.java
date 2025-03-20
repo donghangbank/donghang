@@ -1,5 +1,7 @@
 package bank.donghang.core.account.domain;
 
+import java.time.LocalDateTime;
+
 import bank.donghang.core.account.domain.enums.TransactionStatus;
 import bank.donghang.core.account.domain.enums.TransactionType;
 import bank.donghang.core.common.entity.BaseEntity;
@@ -39,6 +41,9 @@ public class Transaction extends BaseEntity {
 	@Column(nullable = false)
 	private TransactionStatus status;
 
+	@Column(nullable = false)
+	private LocalDateTime sessionStartTime;
+
 	public void complete() {
 		this.status = TransactionStatus.COMPLETED;
 	}
@@ -48,14 +53,16 @@ public class Transaction extends BaseEntity {
 		Long amount,
 		Long accountId,
 		TransactionType type,
-		TransactionStatus status
+		TransactionStatus status,
+		LocalDateTime sessionStartTime
 	) {
 		return new Transaction(
 			description,
 			amount,
 			accountId,
 			type,
-			status
+			status,
+			sessionStartTime
 		);
 	}
 
@@ -64,13 +71,15 @@ public class Transaction extends BaseEntity {
 		Long amount,
 		Long accountId,
 		TransactionType type,
-		TransactionStatus status
+		TransactionStatus status,
+		LocalDateTime sessionStartTime
 	) {
 		this.description = description;
 		this.amount = amount;
 		this.accountId = accountId;
 		this.type = type;
 		this.status = status;
+		this.sessionStartTime = sessionStartTime;
 	}
 
 }
