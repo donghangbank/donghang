@@ -19,7 +19,7 @@ public class AccountProductRepository {
 		return accountProductJpaRepository.findAll();
 	}
 
-	public Optional<AccountProduct> getAccountProductById(Long id) {
+	public AccountProduct getAccountProductById(Long id) {
 		return accountProductJpaRepository.findAccountProductByAccountProductId(id);
 	}
 
@@ -27,14 +27,7 @@ public class AccountProductRepository {
 		return accountProductJpaRepository.save(accountProduct);
 	}
 
-	public AccountProduct getAccountProductByIdIfExist(Long id) {
-		Optional<AccountProduct> optAccountProduct = accountProductJpaRepository.findAccountProductByAccountProductId(
-			id);
-		if (optAccountProduct.isEmpty()) {
-			throw new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND);
-
-		}
-
-		return optAccountProduct.get();
+	public boolean existsAccountProductById(Long id) {
+		return accountProductJpaRepository.existsAccountProductByAccountProductId(id);
 	}
 }

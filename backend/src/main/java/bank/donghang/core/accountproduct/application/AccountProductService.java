@@ -31,13 +31,12 @@ public class AccountProductService {
 	}
 
 	public AccountProductDetail getAccountProductDetail(Long id) {
-		Optional<AccountProduct> optAccountProduct = accountProductRepository.getAccountProductById(id);
-		if (optAccountProduct.isPresent()) {
-			AccountProduct accountProduct = optAccountProduct.get();
-			return AccountProductDetail.from(accountProduct);
+		if(!accountProductRepository.existsAccountProductById(id)) {
+			throw new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND);
 		}
 
-		throw new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND);
+		AccountProduct accountProduct = accountProductRepository.getAccountProductById(id);
+		return AccountProductDetail.from(accountProduct);
 	}
 
 	public AccountProductSummary registerAccountProduct(

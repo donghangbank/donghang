@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,7 +37,45 @@ class AccountProductServiceTest {
 	@DisplayName("계좌 상품 목록을 조회할 수 있다.")
 	void getAllAccountProducts_shouldReturnProductList() {
 		List<AccountProduct> mockProducts = List.of(
-			AccountProduct.builder()
+				AccountProduct.builder()
+						.accountProductId(1L)
+						.accountProductName("Saving Account")
+						.accountProductDescription("High Interest Savings")
+						.bankId(1L)
+						.interestRate(0.3)
+						.accountProductType(AccountProductType.DEMAND)
+						.subscriptionPeriod(null)
+						.rateDescription("기본 이율")
+						.minSubscriptionBalance(0L)
+						.maxSubscriptionBalance(0L)
+						.build(),
+				AccountProduct.builder()
+						.accountProductId(2L)
+						.accountProductName("Checking Account")
+						.accountProductDescription("Daily Transactions")
+						.bankId(1L)
+						.interestRate(0.2)
+						.accountProductType(AccountProductType.DEMAND)
+						.subscriptionPeriod(null)
+						.rateDescription("기본 이율")
+						.minSubscriptionBalance(0L)
+						.maxSubscriptionBalance(0L)
+						.build()
+		);
+
+		when(accountProductRepository.getAccountProducts()).thenReturn(mockProducts);
+
+		AccountProductListResponse response = accountProductService.getAllAccountProducts();
+
+		assertThat(response.products()).hasSize(2);
+		assertThat(response.products().get(0).accountProductName()).isEqualTo("Saving Account");
+		assertThat(response.products().get(1).accountProductName()).isEqualTo("Checking Account");
+	}
+
+	@Test
+	@DisplayName("특정 계좌 상품의 상세 정보를 가져올 수 있다.")
+	void getAccountProductDetail_shouldReturnDetail() {
+		AccountProduct mockProduct = AccountProduct.builder()
 				.accountProductId(1L)
 				.accountProductName("Saving Account")
 				.accountProductDescription("High Interest Savings")
@@ -49,54 +86,13 @@ class AccountProductServiceTest {
 				.rateDescription("기본 이율")
 				.minSubscriptionBalance(0L)
 				.maxSubscriptionBalance(0L)
-				.build(),
-			AccountProduct.builder()
-				.accountProductId(2L)
-				.accountProductName("Checking Account")
-				.accountProductDescription("Daily Transactions")
-				.bankId(1L)
-				.interestRate(0.2)
-				.accountProductType(AccountProductType.DEMAND)
-				.subscriptionPeriod(null)
-				.rateDescription("기본 이율")
-				.minSubscriptionBalance(0L)
-				.maxSubscriptionBalance(0L)
-				.build()
-		);
+				.build();
 
-		when(accountProductRepository.getAccountProducts()).thenReturn(mockProducts);
+		when(accountProductRepository.existsAccountProductById(1L)).thenReturn(true);
+		when(accountProductRepository.getAccountProductById(1L)).thenReturn(mockProduct);
 
-		AccountProductListResponse response = accountProductService.getAllAccountProducts();
-
-		// record 타입이므로 getter는 products()입니다.
-		assertThat(response.products()).hasSize(2);
-		assertThat(response.products().get(0).accountProductName()).isEqualTo("Saving Account");
-		assertThat(response.products().get(1).accountProductName()).isEqualTo("Checking Account");
-	}
-
-	@Test
-	@DisplayName("특정 계좌 상품의 상세 정보를 가져올 수 있다.")
-	void getAccountProductDetail_shouldReturnDetail() {
-		// given
-		AccountProduct mockProduct = AccountProduct.builder()
-			.accountProductId(1L)
-			.accountProductName("Saving Account")
-			.accountProductDescription("High Interest Savings")
-			.bankId(1L)
-			.interestRate(0.3)
-			.accountProductType(AccountProductType.DEMAND)
-			.subscriptionPeriod(null)
-			.rateDescription("기본 이율")
-			.minSubscriptionBalance(0L)
-			.maxSubscriptionBalance(0L)
-			.build();
-
-		when(accountProductRepository.getAccountProductById(1L)).thenReturn(Optional.of(mockProduct));
-
-		// when
 		AccountProductDetail result = accountProductService.getAccountProductDetail(1L);
 
-		// then
 		assertThat(result.productName()).isEqualTo("Saving Account");
 		assertThat(result.productDescription()).isEqualTo("High Interest Savings");
 	}
@@ -104,10 +100,11 @@ class AccountProductServiceTest {
 	@Test
 	@DisplayName("존재하지 않는 계좌 상품을 조회하면 예외가 발생해야 한다.")
 	void getAccountProductDetail_shouldThrowExceptionWhenNotFound() {
-		when(accountProductRepository.getAccountProductById(99L)).thenReturn(Optional.empty());
+		when(accountProductRepository.existsAccountProductById(99L)).thenReturn(false);
+
 		BadRequestException exception = assertThrows(
-			BadRequestException.class,
-			() -> accountProductService.getAccountProductDetail(99L)
+				BadRequestException.class,
+				() -> accountProductService.getAccountProductDetail(99L)
 		);
 		System.out.println(exception.getCode() + " : " + exception.getMessage());
 		assertThat(exception.getCode()).isEqualTo(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND.getCode());
@@ -117,15 +114,15 @@ class AccountProductServiceTest {
 	@DisplayName("계좌 상품을 생성할 수 있다.")
 	void registerAccountProduct_shouldCreateProduct() {
 		AccountProductCreationRequest request = new AccountProductCreationRequest(
-			"New Account",
-			"Special benefits",
-			1L,
-			0.1,
-			"Standard Rate",
-			1,
-			12L,
-			1000L,
-			100000L
+				"New Account",
+				"Special benefits",
+				1L,
+				0.1,
+				"Standard Rate",
+				1,
+				12L,
+				1000L,
+				100000L
 		);
 		AccountProduct savedProduct = request.toEntity();
 

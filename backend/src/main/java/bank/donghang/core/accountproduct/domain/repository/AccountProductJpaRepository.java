@@ -9,5 +9,6 @@ import bank.donghang.core.accountproduct.domain.AccountProduct;
 
 @Repository
 public interface AccountProductJpaRepository extends JpaRepository<AccountProduct, Long> {
-	public Optional<AccountProduct> findAccountProductByAccountProductId(Long productId);
+	AccountProduct findAccountProductByAccountProductId(Long productId);
+	boolean existsAccountProductByAccountProductId(Long productId);
 }
