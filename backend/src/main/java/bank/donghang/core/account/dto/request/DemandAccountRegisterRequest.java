@@ -3,7 +3,7 @@ package bank.donghang.core.account.dto.request;
 import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.account.domain.enums.AccountStatus;
 
-public record AccountRegisterRequest(
+public record DemandAccountRegisterRequest(
 	Long memberId,
 	Long accountProductId,
 	String password
