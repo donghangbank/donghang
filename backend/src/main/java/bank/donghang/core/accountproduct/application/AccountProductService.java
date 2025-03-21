@@ -1,7 +1,6 @@
 package bank.donghang.core.accountproduct.application;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -31,7 +30,7 @@ public class AccountProductService {
 	}
 
 	public AccountProductDetail getAccountProductDetail(Long id) {
-		if(!accountProductRepository.existsAccountProductById(id)) {
+		if (!accountProductRepository.existsAccountProductById(id)) {
 			throw new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND);
 		}
 

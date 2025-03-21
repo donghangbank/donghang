@@ -21,81 +21,82 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class AccountService {
-    private final AccountRepository accountRepository;
-    private final AccountProductRepository accountProductRepository;
+	private final AccountRepository accountRepository;
+	private final AccountProductRepository accountProductRepository;
 
-    @Transactional
-    public AccountRegisterResponse createDemandAccount(DemandAccountRegisterRequest demandAccountRegisterRequest) {
-        Long productId = demandAccountRegisterRequest.accountProductId();
+	@Transactional
+	public AccountRegisterResponse createDemandAccount(DemandAccountRegisterRequest demandAccountRegisterRequest) {
+		Long productId = demandAccountRegisterRequest.accountProductId();
 
-        if (!accountProductRepository.existsAccountProductById(productId)) {
-            throw new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND);
-        }
+		if (!accountProductRepository.existsAccountProductById(productId)) {
+			throw new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND);
+		}
 
-        AccountProduct accountProduct = accountProductRepository.getAccountProductById(productId);
+		AccountProduct accountProduct = accountProductRepository.getAccountProductById(productId);
 
-        // todo. 은행, 상품 별 accountTypeCode 매핑
-        String nextAccountNumber = accountRepository.getNextAccountNumber(
-                "100",
-                "001"
-        );
+		// todo. 은행, 상품 별 accountTypeCode 매핑
+		String nextAccountNumber = accountRepository.getNextAccountNumber(
+			"100",
+			"001"
+		);
 
-        Account account = demandAccountRegisterRequest.toEntity(
-                nextAccountNumber,
-                accountProduct.getInterestRate()
-        );
+		Account account = demandAccountRegisterRequest.toEntity(
+			nextAccountNumber,
+			accountProduct.getInterestRate()
+		);
 
-        Account savedAccount = accountRepository.saveAccount(account);
+		Account savedAccount = accountRepository.saveAccount(account);
 
-        return AccountRegisterResponse.from(savedAccount, accountProduct, null, null);
-    }
+		return AccountRegisterResponse.from(savedAccount, accountProduct, null, null);
+	}
 
-    @Transactional
-    public AccountRegisterResponse createDepositAccount(DepositAccountRegisterRequest depositAccountRegisterRequest) {
+	@Transactional
+	public AccountRegisterResponse createDepositAccount(DepositAccountRegisterRequest depositAccountRegisterRequest) {
 
-        if (!accountProductRepository.existsAccountProductById(depositAccountRegisterRequest.accountProductId())) {
-            throw new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND);
-        }
+		if (!accountProductRepository.existsAccountProductById(depositAccountRegisterRequest.accountProductId())) {
+			throw new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND);
+		}
 
-        AccountProduct accountProduct = accountProductRepository.getAccountProductById(depositAccountRegisterRequest.accountProductId());
+		AccountProduct accountProduct = accountProductRepository.getAccountProductById(
+			depositAccountRegisterRequest.accountProductId());
 
-        if (!accountProduct.isDepositProduct()) {
-            throw new BadRequestException(ErrorCode.WRONG_ACCOUNT_PRODUCT_TYPE);
-        }
+		if (!accountProduct.isDepositProduct()) {
+			throw new BadRequestException(ErrorCode.WRONG_ACCOUNT_PRODUCT_TYPE);
+		}
 
-        String withdrawalAccountNumber = depositAccountRegisterRequest.withdrawalAccountNumber();
-        String payoutAccountNumber = depositAccountRegisterRequest.payoutAccountNumber();
+		String withdrawalAccountNumber = depositAccountRegisterRequest.withdrawalAccountNumber();
+		String payoutAccountNumber = depositAccountRegisterRequest.payoutAccountNumber();
 
-        Optional<Account> optWithdrawalAccount = accountRepository.findAccountByFullAccountNumber(
-                withdrawalAccountNumber);
-        Optional<Account> optPayoutAccount = accountRepository.findAccountByFullAccountNumber(payoutAccountNumber);
+		Optional<Account> optWithdrawalAccount = accountRepository.findAccountByFullAccountNumber(
+			withdrawalAccountNumber);
+		Optional<Account> optPayoutAccount = accountRepository.findAccountByFullAccountNumber(payoutAccountNumber);
 
-        if (optWithdrawalAccount.isEmpty() || optPayoutAccount.isEmpty()) {
-            throw new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND);
-        }
+		if (optWithdrawalAccount.isEmpty() || optPayoutAccount.isEmpty()) {
+			throw new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND);
+		}
 
-        Account withdrawalAccount = optWithdrawalAccount.get();
-        Account payoutAccount = optPayoutAccount.get();
+		Account withdrawalAccount = optWithdrawalAccount.get();
+		Account payoutAccount = optPayoutAccount.get();
 
-        withdrawalAccount.verifyWithdrawalAccount(depositAccountRegisterRequest.memberId(),
-                depositAccountRegisterRequest.initDepositAmount());
-        payoutAccount.verifyPayoutAccount(depositAccountRegisterRequest.memberId());
+		withdrawalAccount.verifyWithdrawalAccount(depositAccountRegisterRequest.memberId(),
+			depositAccountRegisterRequest.initDepositAmount());
+		payoutAccount.verifyPayoutAccount(depositAccountRegisterRequest.memberId());
 
-        String newAccountNumber = accountRepository.getNextAccountNumber("200", "001");
-        long subscriptionPeriod = accountProduct.getSubscriptionPeriod();
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MONTH, (int) subscriptionPeriod);
-        Date expiryDate = calendar.getTime();
+		String newAccountNumber = accountRepository.getNextAccountNumber("200", "001");
+		long subscriptionPeriod = accountProduct.getSubscriptionPeriod();
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.MONTH, (int)subscriptionPeriod);
+		Date expiryDate = calendar.getTime();
 
-        Account newDepositAccount = depositAccountRegisterRequest.toEntity(newAccountNumber,
-                accountProduct.getInterestRate(),
-                withdrawalAccount.getAccountId(), payoutAccount.getAccountId(), 0L, expiryDate);
+		Account newDepositAccount = depositAccountRegisterRequest.toEntity(newAccountNumber,
+			accountProduct.getInterestRate(),
+			withdrawalAccount.getAccountId(), payoutAccount.getAccountId(), 0L, expiryDate);
 
-        Account savedDepositAccount = accountRepository.saveAccount(newDepositAccount);
+		Account savedDepositAccount = accountRepository.saveAccount(newDepositAccount);
 
-        // todo. withdrawal account에서 initialDepositAmount newDepositAccount로 송금
+		// todo. withdrawal account에서 initialDepositAmount newDepositAccount로 송금
 
-        return AccountRegisterResponse.from(savedDepositAccount, accountProduct, withdrawalAccountNumber,
-                payoutAccountNumber);
-    }
+		return AccountRegisterResponse.from(savedDepositAccount, accountProduct, withdrawalAccountNumber,
+			payoutAccountNumber);
+	}
 }
