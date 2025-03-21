@@ -40,24 +40,24 @@ class TransactionControllerTest extends ControllerTest {
 	@DisplayName("계좌간 이체를 한다.")
 	public void transfer_by_account() throws Exception {
 
-		Long sendingAccountId = 1L;
-		Long receivingAccountId = 2L;
+		String sendingAccountNumber = "1101101234567890";
+		String receivingAccountNumber = "1101100987654321";
 		Long sendingAccountBalance = 100L;
 		Long receivingAccountBalance = 200L;
 		Long amount = 100L;
 		Long transactionId = 1L;
 
 		var request = new TransactionRequest(
-			sendingAccountId,
-			receivingAccountId,
+			sendingAccountNumber,
+			receivingAccountNumber,
 			amount,
 			"테스트 이체",
 			LocalDateTime.of(2025, 3, 20, 10, 0, 0)
 		);
 
 		var expect = new TransactionResponse(
-			sendingAccountId,
-			receivingAccountBalance + amount,
+			sendingAccountNumber,
+			receivingAccountNumber,
 			sendingAccountBalance + amount,
 			amount,
 			TransactionStatus.COMPLETED,
@@ -78,18 +78,18 @@ class TransactionControllerTest extends ControllerTest {
 	@DisplayName("계좌에서 입금을 할 수 있다.")
 	public void deposit_by_account() throws Exception {
 
-		Long accountId = 1L;
+		String accountNumber = "1101101234567890";
 		Long amount = 100L;
 		Long accountBalance = 100L;
 
 		var request = new DepositRequest(
-			accountId,
+			accountNumber,
 			amount,
 			LocalDateTime.of(2025, 3, 20, 10, 0, 0)
 		);
 
 		var expect = new DepositResponse(
-			accountId,
+			accountNumber,
 			amount,
 			accountBalance,
 			TransactionType.DEPOSIT
@@ -109,21 +109,21 @@ class TransactionControllerTest extends ControllerTest {
 	@DisplayName("계좌에서 입금을 할 수 있다.")
 	public void withdrawal_by_account() throws Exception {
 
-		Long accountId = 1L;
+		String accountNumber = "1101101234567890";
 		Long amount = 100L;
 		Long accountBalance = 100L;
 
 		var request = new WithdrawalRequest(
-			accountId,
+			accountNumber,
 			amount,
 			LocalDateTime.of(2025, 3, 20, 10, 0, 0)
 		);
 
 		var expect = new WithdrawalResponse(
-			accountId,
+			accountNumber,
 			amount,
 			accountBalance,
-			TransactionType.WITHDRAWAL
+			TransactionType.DEPOSIT
 		);
 
 		given(transactionService.withdraw(any()))

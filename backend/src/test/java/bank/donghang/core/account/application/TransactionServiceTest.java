@@ -1,7 +1,6 @@
 package bank.donghang.core.account.application;
 
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -37,14 +36,17 @@ class TransactionServiceTest {
 	void can_not_transfer_by_account_if_there_is_not_enough_balance() {
 
 		Long sendingAccountId = 1L;
-		Long sendingBalance = 100L;
 		Long receivingAccountId = 2L;
-		Long receivingBalance = 100L;
-		Long amount = 200L;
+		String sendingAccountNumber = "1101101234567890";
+		String receivingAccountNumber = "1101100987654321";
+		Long sendingAccountBalance = 10L;
+		Long receivingAccountBalance = 200L;
+		Long amount = 100L;
+		Long transactionId = 1L;
 
 		var request = new TransactionRequest(
-			sendingAccountId,
-			receivingAccountId,
+			sendingAccountNumber,
+			receivingAccountNumber,
 			amount,
 			"테스트 이체",
 			LocalDateTime.of(2025, 3, 20, 10, 0, 0)
@@ -55,14 +57,14 @@ class TransactionServiceTest {
 			.memberId(100L)
 			.accountProductId(200L)
 			.withdrawalAccountId(3L)
-			.accountTypeCode("SAVINGS")
-			.branchCode("001")
+			.accountTypeCode("110")
+			.branchCode("110")
 			.accountNumber("1234567890")
 			.password("password123")
 			.accountStatus(AccountStatus.ACTIVE)
 			.dailyTransferLimit(10000L)
 			.singleTransferLimit(5000L)
-			.accountBalance(sendingBalance)
+			.accountBalance(sendingAccountBalance)
 			.interestRate(3.5)
 			.accountExpiryDate(new java.util.Date())
 			.build();
@@ -72,28 +74,28 @@ class TransactionServiceTest {
 			.memberId(100L)
 			.accountProductId(200L)
 			.withdrawalAccountId(5L)
-			.accountTypeCode("SAVINGS")
-			.branchCode("001")
-			.accountNumber("1234567890")
+			.accountTypeCode("110")
+			.branchCode("110")
+			.accountNumber("0987654321")
 			.password("password123")
 			.accountStatus(AccountStatus.ACTIVE)
 			.dailyTransferLimit(10000L)
 			.singleTransferLimit(5000L)
-			.accountBalance(receivingBalance)
+			.accountBalance(receivingAccountBalance)
 			.interestRate(3.5)
 			.accountExpiryDate(new java.util.Date())
 			.build();
 
-		given(accountRepository.findAccountById(sendingAccountId))
+		given(accountRepository.findAccountByFullAccountNumber(sendingAccountNumber))
 			.willReturn(Optional.of(sendingAccount));
-		given(accountRepository.findAccountById(receivingAccountId))
+		given(accountRepository.findAccountByFullAccountNumber(receivingAccountNumber))
 			.willReturn(Optional.of(receivingAccount));
 
 		org.junit.jupiter.api.Assertions.assertThrows(BadRequestException.class, () -> {
 			transactionService.transferByAccount(request);
 		});
 
-		verify(accountRepository, times(1)).findAccountById(sendingAccountId);
-		verify(accountRepository, times(1)).findAccountById(receivingAccountId);
+		verify(accountRepository, times(1)).findAccountByFullAccountNumber(sendingAccountNumber);
+		verify(accountRepository, times(1)).findAccountByFullAccountNumber(receivingAccountNumber);
 	}
 }
