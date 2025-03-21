@@ -38,24 +38,24 @@ public class TransactionService {
 	)
 	public TransactionResponse transferByAccount(TransactionRequest request) {
 
+		Account sendingAccount = accountRepository.findAccountByFullAccountNumber(request.sendingAccountNumber())
+			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
+		Account receivingAccount = accountRepository.findAccountByFullAccountNumber(request.receivingAccountNumber())
+			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
+
 		checkDuplicateRequest(
-			request.sendingAccountId(),
+			sendingAccount.getAccountId(),
 			request.amount(),
 			request.sessionStartTime(),
 			TransactionType.WITHDRAWAL
 		);
 
 		checkDuplicateRequest(
-			request.receivingAccountId(),
+			receivingAccount.getAccountId(),
 			request.amount(),
 			request.sessionStartTime(),
 			TransactionType.DEPOSIT
 		);
-
-		Account sendingAccount = accountRepository.findAccountById(request.sendingAccountId())
-			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
-		Account receivingAccount = accountRepository.findAccountById(request.receivingAccountId())
-			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
 
 		validateBalance(request.amount(), sendingAccount);
 
@@ -99,22 +99,22 @@ public class TransactionService {
 	)
 	public DepositResponse deposit(DepositRequest request) {
 
+		Account account = accountRepository.findAccountByFullAccountNumber(request.accountNumber())
+			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
+
 		checkDuplicateRequest(
-			request.accountId(),
+			account.getAccountId(),
 			request.amount(),
 			request.sessionStartTime(),
 			TransactionType.DEPOSIT
 		);
-
-		Account account = accountRepository.findAccountById(request.accountId())
-			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
 
 		account.deposit(request.amount());
 
 		Transaction transaction = Transaction.createTransaction(
 			"입금",
 			request.amount(),
-			request.accountId(),
+			account.getAccountId(),
 			TransactionType.DEPOSIT,
 			TransactionStatus.COMPLETED,
 			request.sessionStartTime()
@@ -138,15 +138,15 @@ public class TransactionService {
 	)
 	public WithdrawalResponse withdraw(WithdrawalRequest request) {
 
+		Account account = accountRepository.findAccountByFullAccountNumber(request.accountNumber())
+			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
+
 		checkDuplicateRequest(
-			request.accountId(),
+			account.getAccountId(),
 			request.amount(),
 			request.sessionStartTime(),
 			TransactionType.WITHDRAWAL
 		);
-
-		Account account = accountRepository.findAccountById(request.accountId())
-			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
 
 		validateBalance(request.amount(), account);
 
@@ -155,7 +155,7 @@ public class TransactionService {
 		Transaction transaction = Transaction.createTransaction(
 			"출금",
 			request.amount(),
-			request.accountId(),
+			account.getAccountId(),
 			TransactionType.WITHDRAWAL,
 			TransactionStatus.COMPLETED,
 			request.sessionStartTime()

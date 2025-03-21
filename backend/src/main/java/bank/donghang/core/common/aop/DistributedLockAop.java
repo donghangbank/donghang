@@ -11,6 +11,7 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 
+import bank.donghang.core.account.dto.request.DepositRequest;
 import bank.donghang.core.account.dto.request.TransactionRequest;
 import bank.donghang.core.common.annotation.DistributedLock;
 import bank.donghang.core.common.annotation.SingleAccountLock;
@@ -37,11 +38,11 @@ public class DistributedLockAop {
 
 		Object[] args = joinPoint.getArgs();
 		TransactionRequest request = (TransactionRequest)args[0];
-		long accountId1 = request.sendingAccountId();
-		long accountId2 = request.receivingAccountId();
+		String accountNumber1 = request.sendingAccountNumber();
+		String accountNumber2 = request.receivingAccountNumber();
 
-		String key1 = REDISSON_LOCK_PREFIX + Math.min(accountId1, accountId2);
-		String key2 = REDISSON_LOCK_PREFIX + Math.max(accountId1, accountId2);
+		String key1 = REDISSON_LOCK_PREFIX + accountNumber1;
+		String key2 = REDISSON_LOCK_PREFIX + accountNumber2;
 
 		log.info("Lock keys: key1={}, key2={}", key1, key2);
 
@@ -89,11 +90,11 @@ public class DistributedLockAop {
 		Method method = signature.getMethod();
 		SingleAccountLock singleAccountLock = method.getAnnotation(SingleAccountLock.class);
 
-		String key = REDISSON_LOCK_PREFIX + CustomSpringExpressionLanguageParser.getDynamicValue(
-			signature.getParameterNames(),
-			joinPoint.getArgs(),
-			singleAccountLock.key()
-		);
+		Object[] args = joinPoint.getArgs();
+		DepositRequest request = (DepositRequest)args[0];
+		String accountNumber = request.accountNumber();
+
+		String key = REDISSON_LOCK_PREFIX + accountNumber;
 
 		log.info("Lock key: {}", key);
 

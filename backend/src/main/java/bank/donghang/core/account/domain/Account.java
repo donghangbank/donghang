@@ -23,8 +23,14 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "account", uniqueConstraints = {
-	@UniqueConstraint(name = "uk_account_type_branch_number", columnNames = {"account_type_code", "branch_code",
-		"account_number"})})
+	@UniqueConstraint(
+		name = "uk_account_type_branch_number",
+		columnNames = {
+			"account_type_code",
+			"branch_code",
+			"account_number"
+		})
+})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter

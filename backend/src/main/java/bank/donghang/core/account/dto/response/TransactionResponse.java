@@ -6,8 +6,8 @@ import bank.donghang.core.account.domain.enums.TransactionStatus;
 import bank.donghang.core.account.dto.request.TransactionRequest;
 
 public record TransactionResponse(
-	Long sendingAccountId,
-	Long receivingAccountBalance,
+	String sendingAccountNumber,
+	String receivingAccountNumber,
 	Long sendingAccountBalance,
 	Long amount,
 	TransactionStatus status,
@@ -20,8 +20,8 @@ public record TransactionResponse(
 		Transaction transaction
 	) {
 		return new TransactionResponse(
-			sendingAccount.getAccountId(),
-			receivingAccount.getAccountId(),
+			sendingAccount.getAccountNumber(),
+			receivingAccount.getAccountNumber(),
 			sendingAccount.getAccountBalance(),
 			request.amount(),
 			transaction.getStatus(),

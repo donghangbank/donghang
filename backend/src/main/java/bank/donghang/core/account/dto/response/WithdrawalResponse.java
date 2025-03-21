@@ -5,7 +5,7 @@ import bank.donghang.core.account.domain.Transaction;
 import bank.donghang.core.account.domain.enums.TransactionType;
 
 public record WithdrawalResponse(
-	Long accountId,
+	String accountNumber,
 	Long amount,
 	Long balance,
 	TransactionType transactionType
@@ -15,7 +15,7 @@ public record WithdrawalResponse(
 		Transaction transaction
 	) {
 		return new WithdrawalResponse(
-			account.getAccountId(),
+			account.getAccountNumber(),
 			transaction.getAmount(),
 			account.getAccountBalance(),
 			TransactionType.WITHDRAWAL
