@@ -1,6 +1,7 @@
 module "acm" {
-  source      = "./Modules/ACM"
-  domain_name = var.domain_name
+  source          = "./Modules/ACM"
+  domain_name     = var.domain_name
+  route53_zone_id = var.route53_zone_id
 }
 
 module "alb" {
