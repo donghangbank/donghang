@@ -27,7 +27,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 logger.error("이미지 디코딩에 실패했습니다.")
                 continue
 
-            predicted_age = predict_age(img)+1 if face_recognition(img) else predicted_age = 0
+            predicted_age = predict_age(img) + 1 if face_recognition(img) else 0
             calling_detection = detect_calling(img)
 
             result = {"predicted_age": predicted_age,
