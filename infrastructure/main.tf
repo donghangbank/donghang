@@ -1,3 +1,8 @@
+module "acm" {
+  source      = "./Modules/ACM"
+  domain_name = var.domain_name
+}
+
 module "alb" {
   source                         = "./Modules/ALB"
   external_alb_health_check_path = var.external_alb_health_check_path
