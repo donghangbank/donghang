@@ -1,20 +1,26 @@
 package bank.donghang.core.account.presentation;
 
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDate;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MvcResult;
 
+import bank.donghang.core.account.dto.request.BalanceRequest;
+import bank.donghang.core.account.dto.response.BalanceResponse;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import bank.donghang.core.account.application.AccountService;
@@ -35,7 +41,7 @@ class AccountControllerTest extends ControllerTest {
 
 	@Test
 	@DisplayName("자유입출금 계좌 가입 요청 성공 시, AccountRegisterResponse 반환")
-	void registerDemandAccount_success() throws Exception {
+	void register_demand_account_success() throws Exception {
 		Long memberId = 1L;
 		Long accountProductId = 2L;
 		String password = "password123";
@@ -56,7 +62,7 @@ class AccountControllerTest extends ControllerTest {
 			LocalDate.of(2025, 3, 20)
 		);
 
-		Mockito.when(accountService.createDemandAccount(any(DemandAccountRegisterRequest.class)))
+		when(accountService.createDemandAccount(any(DemandAccountRegisterRequest.class)))
 			.thenReturn(response);
 
 		mockMvc.perform(
@@ -74,7 +80,7 @@ class AccountControllerTest extends ControllerTest {
 
 	@Test
 	@DisplayName("예금 상품 가입 요청 성공 시, AccountRegisterResponse 반환")
-	void registerDepositAccount_success() throws Exception {
+	void register_deposit_account_success() throws Exception {
 		Long memberId = 1L;
 		Long accountProductId = 2L;
 		String password = "password123";
@@ -101,7 +107,7 @@ class AccountControllerTest extends ControllerTest {
 			LocalDate.of(2025, 3, 20)
 		);
 
-		Mockito.when(accountService.createDepositAccount(any(DepositAccountRegisterRequest.class)))
+		when(accountService.createDepositAccount(any(DepositAccountRegisterRequest.class)))
 			.thenReturn(response);
 
 		mockMvc.perform(
@@ -164,5 +170,39 @@ class AccountControllerTest extends ControllerTest {
 			.andExpect(jsonPath("$.interestDate").value(5.0))
 			.andExpect(jsonPath("$.accountExpiryDate").exists())
 			.andDo(document("installment-account-register"));
+	}
+
+	@DisplayName("사용자는 계좌의 잔액을 조회할 수 있다.")
+	void can_get_account_balance() throws Exception {
+		Long balance = 1000L;
+
+		var request = new BalanceRequest(
+			"1101101234567890",
+			"1234"
+		);
+
+		var expect = new BalanceResponse(
+			"1101101234567890",
+			"삼성은행",
+			balance
+		);
+
+		given(accountService.getAccountBalance(any()))
+			.willReturn(expect);
+
+		MvcResult result = mockMvc.perform(post("/api/v1/accounts/balance")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andReturn();
+
+		var response = objectMapper.readValue(
+			result.getResponse().getContentAsString(),
+			new TypeReference<BalanceResponse>() {
+			}
+		);
+
+		Assertions.assertThat(response).usingRecursiveComparison().isEqualTo(expect);
 	}
 }

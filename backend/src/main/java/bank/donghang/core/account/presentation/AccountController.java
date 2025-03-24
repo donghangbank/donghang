@@ -1,7 +1,6 @@
 package bank.donghang.core.account.presentation;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,7 +41,7 @@ public class AccountController {
 		return ResponseEntity.ok(accountService.createInstallmentAccount(installmentAccountRegisterRequest));
 	}
 
-	@GetMapping("/balance")
+	@PostMapping("/balance")
 	public ResponseEntity<BalanceResponse> getAccountBalance(@RequestBody BalanceRequest request) {
 		return ResponseEntity.ok(accountService.getAccountBalance(request));
 	}

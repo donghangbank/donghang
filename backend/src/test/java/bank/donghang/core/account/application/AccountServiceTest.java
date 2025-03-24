@@ -2,6 +2,7 @@ package bank.donghang.core.account.application;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
@@ -9,6 +10,7 @@ import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Optional;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,10 +21,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.account.domain.InstallmentSchedule;
 import bank.donghang.core.account.domain.repository.AccountRepository;
+import bank.donghang.core.account.dto.request.BalanceRequest;
 import bank.donghang.core.account.dto.request.DemandAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.DepositAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.InstallmentAccountRegisterRequest;
 import bank.donghang.core.account.dto.response.AccountRegisterResponse;
+import bank.donghang.core.account.dto.response.BalanceResponse;
 import bank.donghang.core.accountproduct.domain.AccountProduct;
 import bank.donghang.core.accountproduct.domain.repository.AccountProductRepository;
 import bank.donghang.core.common.exception.BadRequestException;
@@ -586,5 +590,67 @@ class AccountServiceTest {
 		BadRequestException exception = assertThrows(BadRequestException.class,
 			() -> accountService.createInstallmentAccount(request));
 		assertEquals(ErrorCode.MATURITY_ACCOUNT_IS_NOT_ACTIVE.getCode(), exception.getCode());
+	}
+
+	@DisplayName("사용자는 잔액을 조회할 수 있다.")
+	void can_get_account_balance() {
+		Long balance = 1000L;
+		String accountNumber = "100001000002";
+		String password = "correctPassword";
+		String bankName = "삼성은행";
+
+		Account account = Account.builder()
+			.accountNumber(accountNumber)
+			.password(password)
+			.build();
+
+		BalanceResponse expectedResponse = new BalanceResponse(
+			accountNumber,
+			bankName,
+			balance
+		);
+
+		given(accountRepository.findAccountByFullAccountNumber(accountNumber))
+			.willReturn(Optional.of(account));
+
+		given(accountRepository.getAccountBalance(accountNumber))
+			.willReturn(expectedResponse);
+
+		BalanceRequest request = new BalanceRequest(accountNumber, password);
+
+		BalanceResponse actualResponse = accountService.getAccountBalance(request);
+
+		Assertions.assertThat(actualResponse).isNotNull();
+		Assertions.assertThat(actualResponse.accountNumber()).isEqualTo(accountNumber);
+		Assertions.assertThat(actualResponse.bankName()).isEqualTo(bankName);
+		Assertions.assertThat(actualResponse.balance()).isEqualTo(balance);
+
+		verify(accountRepository).findAccountByFullAccountNumber(accountNumber);
+		verify(accountRepository).getAccountBalance(accountNumber);
+	}
+
+	@Test
+	@DisplayName("비밀번호가 일치하지 않으면 예외가 발생한다.")
+	void should_throw_exception_when_password_is_incorrect() {
+		String accountNumber = "100001000002";
+		String correctPassword = "correctPassword";
+		String wrongPassword = "wrongPassword";
+
+		Account account = Account.builder()
+			.accountNumber(accountNumber)
+			.password(correctPassword)
+			.build();
+
+		given(accountRepository.findAccountByFullAccountNumber(accountNumber))
+			.willReturn(Optional.of(account));
+
+		BalanceRequest request = new BalanceRequest(accountNumber, wrongPassword);
+
+		Assertions.assertThatThrownBy(() -> accountService.getAccountBalance(request))
+			.isInstanceOf(BadRequestException.class)
+			.hasMessageContaining("비밀번호가 일치하지 않습니다");
+
+		verify(accountRepository).findAccountByFullAccountNumber(accountNumber);
+		verify(accountRepository, never()).getAccountBalance(any());
 	}
 }

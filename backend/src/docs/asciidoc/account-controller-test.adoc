@@ -29,3 +29,13 @@ include::{snippets}/account-controller-test/register-installment-account_success
 ==== 응답
 
 include::{snippets}/account-controller-test/register-installment-account_success/http-response.adoc[]
+
+=== 계좌 잔액 조회 (POST /api/v1/accounts/balance)
+
+==== 요청
+
+include::{snippets}/account-controller-test/can_get_account_balance/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/account-controller-test/can_get_account_balance/http-response.adoc[]

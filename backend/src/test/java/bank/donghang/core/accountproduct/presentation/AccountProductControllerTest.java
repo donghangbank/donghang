@@ -39,20 +39,32 @@ class AccountProductControllerTest extends ControllerTest {
 	@DisplayName("전체 상품 목록을 조회한다.")
 	public void get_products() throws Exception {
 		List<AccountProductSummary> summaries = List.of(
-			new AccountProductSummary(1L, "샘플 상품", 1L, 2.5, null, 0L, 0L, AccountProductType.DEMAND.name(),
-				AccountProductType.DEMAND.getCode()));
+			new AccountProductSummary(
+				1L,
+				"샘플 상품",
+				1L,
+				2.5,
+				null,
+				0L,
+				0L,
+				AccountProductType.DEMAND.name(),
+				AccountProductType.DEMAND.getCode())
+		);
 
 		AccountProductListResponse expected = AccountProductListResponse.from(summaries);
 
 		when(productService.getAllAccountProducts()).thenReturn(expected);
 
-		MvcResult result = mockMvc.perform(get("/api/v1/accountproducts").contentType(MediaType.APPLICATION_JSON))
+		MvcResult result = mockMvc.perform(get("/api/v1/accountproducts")
+				.contentType(MediaType.APPLICATION_JSON))
 			.andDo(print())
 			.andExpect(status().isOk())
 			.andReturn();
 
-		AccountProductListResponse response = objectMapper.readValue(result.getResponse().getContentAsString(),
-			AccountProductListResponse.class);
+		AccountProductListResponse response = objectMapper.readValue(
+			result.getResponse().getContentAsString(),
+			AccountProductListResponse.class
+		);
 
 		Assertions.assertThat(response).usingRecursiveComparison().isEqualTo(expected);
 	}
@@ -61,19 +73,32 @@ class AccountProductControllerTest extends ControllerTest {
 	@DisplayName("상품 상세 정보를 조회한다.")
 	public void get_product_detail() throws Exception {
 		Long productId = 1L;
-		AccountProductDetail expected = new AccountProductDetail(productId, "샘플 상품", "샘플 상품 설명", 2L, 2.5, "변동 금리",
-			"저축 상품", 100, 12L, 1000L, 100000L);
+		AccountProductDetail expected = new AccountProductDetail(
+			productId,
+			"샘플 상품",
+			"샘플 상품 설명",
+			2L,
+			2.5,
+			"변동 금리",
+			"저축 상품",
+			100,
+			12L,
+			1000L,
+			100000L
+		);
 
 		when(productService.getAccountProductDetail(productId)).thenReturn(expected);
 
-		MvcResult result = mockMvc.perform(
-				get("/api/v1/accountproducts/{productId}", productId).contentType(MediaType.APPLICATION_JSON))
+		MvcResult result = mockMvc.perform(get("/api/v1/accountproducts/{productId}", productId)
+				.contentType(MediaType.APPLICATION_JSON))
 			.andDo(print())
 			.andExpect(status().isOk())
 			.andReturn();
 
-		AccountProductDetail response = objectMapper.readValue(result.getResponse().getContentAsString(),
-			AccountProductDetail.class);
+		AccountProductDetail response = objectMapper.readValue(
+			result.getResponse().getContentAsString(),
+			AccountProductDetail.class
+		);
 
 		Assertions.assertThat(response).usingRecursiveComparison().isEqualTo(expected);
 	}
