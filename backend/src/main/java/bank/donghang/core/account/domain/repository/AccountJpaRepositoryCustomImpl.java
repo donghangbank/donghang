@@ -28,7 +28,7 @@ public class AccountJpaRepositoryCustomImpl implements AccountJpaRepositoryCusto
 				Projections.constructor(
 					BalanceResponse.class,
 					Expressions.stringTemplate(
-						"{0}{1}{2}",
+						"concat({0}, concat({1}, {2}))",
 						account.accountTypeCode,
 						account.branchCode,
 						account.accountNumber
