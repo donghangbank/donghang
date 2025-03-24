@@ -1,13 +1,16 @@
 package bank.donghang.core.account.application;
 
+import java.util.List;
 import java.util.Optional;
 import java.time.LocalDate;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import bank.donghang.core.account.domain.Account;
+import bank.donghang.core.account.domain.InstallmentSchedule;
 import bank.donghang.core.account.domain.repository.AccountRepository;
 import bank.donghang.core.account.dto.request.DemandAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.DepositAccountRegisterRequest;
@@ -122,13 +125,15 @@ public class AccountService {
 		);
 	}
 
-	private DepositInstallmentAccountData getDepositInstallmentAccountData(Long accountProductId, String withdrawalAccountNumber, String payoutAccountNumber) {
+	private DepositInstallmentAccountData getDepositInstallmentAccountData(Long accountProductId,
+		String withdrawalAccountNumber, String payoutAccountNumber) {
 		if (!accountProductRepository.existsAccountProductById(accountProductId)) {
 			throw new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND);
 		}
 		AccountProduct accountProduct = accountProductRepository.getAccountProductById(accountProductId);
 
-		Optional<Account> optWithdrawalAccount = accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber);
+		Optional<Account> optWithdrawalAccount = accountRepository.findAccountByFullAccountNumber(
+			withdrawalAccountNumber);
 		Optional<Account> optPayoutAccount = accountRepository.findAccountByFullAccountNumber(payoutAccountNumber);
 		if (optWithdrawalAccount.isEmpty() || optPayoutAccount.isEmpty()) {
 			throw new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND);
@@ -137,15 +142,27 @@ public class AccountService {
 		return new DepositInstallmentAccountData(accountProduct, optWithdrawalAccount.get(), optPayoutAccount.get());
 	}
 
-	private static class DepositInstallmentAccountData {
-		final AccountProduct accountProduct;
-		final Account withdrawalAccount;
-		final Account payoutAccount;
+	private record DepositInstallmentAccountData(AccountProduct accountProduct, Account withdrawalAccount,
+												 Account payoutAccount) {
+	}
 
-		public DepositInstallmentAccountData(AccountProduct accountProduct, Account withdrawalAccount, Account payoutAccount) {
-			this.accountProduct = accountProduct;
-			this.withdrawalAccount = withdrawalAccount;
-			this.payoutAccount = payoutAccount;
+	@Scheduled(cron = "0 0 0  * * *")
+	private void handleInstallmentAccountSchedule() {
+		LocalDate today = LocalDate.now();
+		List<InstallmentSchedule> installmentSchedules = accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(
+			today);
+		for (InstallmentSchedule installmentSchedule : installmentSchedules) {
+			long installmentAccountId = installmentSchedule.getInstallmentAccountId();
+			long withdrawalAccountId = installmentSchedule.getWithdrawalAccountId();
+			long installmentAmount = installmentSchedule.getInstallmentAmount();
+			try {
+				// todo. withdrawalAccountId -> installmentAccountId 로 installmentAmount 만큼 이체
+			} catch (BadRequestException e) {
+				if (e.getCode() == ErrorCode.NOT_ENOUGH_BALANCE.getCode()) {    // 잔액 부족
+					InstallmentSchedule newInstallmentSchedule = installmentSchedule.reassignInstallmentSchedule(today);
+					accountRepository.saveInstallmentSchedule(newInstallmentSchedule);
+				}
+			}
 		}
 	}
 }

@@ -1,6 +1,7 @@
 package bank.donghang.core.account.domain.repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
@@ -31,12 +32,20 @@ public class AccountRepository {
 				.withdrawalAccountId(savedAccount.getWithdrawalAccountId())
 				.installmentAmount(savedAccount.getMonthlyInstallmentAmount())
 				.installmentSequence(1)
-				.installmentStatus(InstallmentStatus.SCHEDULED.name())
+				.installmentStatus(InstallmentStatus.SCHEDULED)
 				.installmentScheduledDate(LocalDate.now().plusMonths(1))
 				.build();
 
 		installmentScheduleJpaRepository.save(installmentSchedule);
 		return savedAccount;
+	}
+
+	public void saveInstallmentSchedule(InstallmentSchedule installmentSchedule) {
+		installmentScheduleJpaRepository.save(installmentSchedule);
+	}
+
+	public List<InstallmentSchedule> findInstallmentScheduleByInstallmentDateAndScheduled(LocalDate today) {
+		return installmentScheduleJpaRepository.findInstallmentScheduleByInstallmentScheduledDateAndInstallmentStatus(today, InstallmentStatus.SCHEDULED);
 	}
 
 	/**
