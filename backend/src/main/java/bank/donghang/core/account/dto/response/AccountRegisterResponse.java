@@ -1,6 +1,6 @@
 package bank.donghang.core.account.dto.response;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.accountproduct.domain.AccountProduct;
@@ -12,7 +12,7 @@ public record AccountRegisterResponse(
 	String accountNumber,
 	Long accountBalance,
 	Double interestDate,
-	Date accountExpiryDate
+	LocalDate accountExpiryDate
 ) {
 	public static AccountRegisterResponse from(Account account, AccountProduct product, String withdrawalAccountNumber,
 		String payoutAccountNumber) {
