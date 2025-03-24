@@ -42,6 +42,14 @@ module "rds" {
   sg_mysql_id      = module.security_group.sg_mysql_id
 }
 
+module "route53" {
+  source                = "./Modules/Route53"
+  domain_name           = var.domain_name
+  external_alb_dns_name = module.alb.external_alb_dns_name
+  external_alb_zone_id  = module.alb.external_alb_zone_id
+  route53_zone_id       = var.route53_zone_id
+}
+
 module "s3" {
   source     = "./Modules/S3"
   vpce_s3_id = module.networing.vpce_s3_id

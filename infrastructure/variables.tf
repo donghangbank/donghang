@@ -14,6 +14,10 @@ variable "database_subnet_cidr_block" {
   type = list(string)
 }
 
+variable "domain_name" {
+  type = string
+}
+
 variable "external_alb_health_check_path" {
   type = string
 }
@@ -36,6 +40,10 @@ variable "private_subnet_cidr_block" {
 
 variable "public_subnet_cidr_block" {
   type = list(string)
+}
+
+variable "route53_zone_id" {
+  type = string
 }
 
 variable "vpc_cidr" {
