@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    driver-class-name: ${H2_DATASOURCE_DRIVER}
+    url: ${H2_DATASOURCE_URL}
+    username: ${H2_DATASOURCE_USERNAME}
+    password: ${H2_DATASOURCE_PASSWORD}
+    maximum-pool-size: ${H2_MAXIMUM_POOL_SIZE}
+    minimum-idle: ${H2_MINIMUM_IDLE}
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT:6379}
+
+  jpa:
+    show-sql: ${MYSQL_JPA_SHOW_SQL}
+    hibernate:
+      ddl-auto: ${MYSQL_JPA_DDL_AUTO}
+
+  cloud:
+    aws:
+      s3:
+        region: ${S3_REGION}
+        bucket: ${S3_BUCKET}
+      credentials:
+        access-key: ${S3_ACCESS_KEY}
+        secret-key: ${S3_SECRET_KEY}
