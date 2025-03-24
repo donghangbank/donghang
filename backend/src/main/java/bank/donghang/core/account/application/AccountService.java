@@ -14,10 +14,12 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.account.domain.InstallmentSchedule;
 import bank.donghang.core.account.domain.repository.AccountRepository;
+import bank.donghang.core.account.dto.request.BalanceRequest;
 import bank.donghang.core.account.dto.request.DemandAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.DepositAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.InstallmentAccountRegisterRequest;
 import bank.donghang.core.account.dto.response.AccountRegisterResponse;
+import bank.donghang.core.account.dto.response.BalanceResponse;
 import bank.donghang.core.accountproduct.domain.AccountProduct;
 import bank.donghang.core.accountproduct.domain.repository.AccountProductRepository;
 import bank.donghang.core.common.exception.BadRequestException;
@@ -171,6 +173,26 @@ public class AccountService {
 				accountRepository.saveInstallmentSchedule(newInstallmentSchedule);
 			}
 			throw e; // 개별 트랜잭션 내에서 실패 시 rollback을 위해 예외 재던짐
+		}
+	}
+
+	public BalanceResponse getAccountBalance(BalanceRequest request) {
+
+		Account account = accountRepository.findAccountByFullAccountNumber(request.accountNumber())
+			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
+
+		if (!account.getPassword().equals(request.password())) {
+			throw new BadRequestException(ErrorCode.PASSWORD_MISMATCH);
+		}
+
+		BalanceResponse response = accountRepository.getAccountBalance(request.accountNumber());
+
+		return response;
+	}
+
+	private void checkAccountExistenceByFullAccountNumber(String fullAccountNumber) {
+		if (!accountRepository.existsAccountByFullAccountNumber(fullAccountNumber)) {
+			throw new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND);
 		}
 	}
 }

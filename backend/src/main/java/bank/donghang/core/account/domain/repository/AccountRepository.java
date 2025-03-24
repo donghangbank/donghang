@@ -10,6 +10,7 @@ import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.account.domain.InstallmentSchedule;
 import bank.donghang.core.account.domain.enums.InstallmentStatus;
 import jakarta.transaction.Transactional;
+import bank.donghang.core.account.dto.response.BalanceResponse;
 import lombok.RequiredArgsConstructor;
 
 @Repository
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class AccountRepository {
 	private final AccountJpaRepository accountJpaRepository;
 	private final InstallmentScheduleJpaRepository installmentScheduleJpaRepository;
+	private final AccountJpaRepositoryCustomImpl accountJpaRepositoryCustomImpl;
 
 	@Transactional
 	public Account saveAccount(Account account) {
@@ -87,5 +89,29 @@ public class AccountRepository {
 
 	public void deleteAllAccounts() {
 		accountJpaRepository.deleteAll();
+	}
+
+	public BalanceResponse getAccountBalance(String fullAccountNumber) {
+		String accountTypeCode = fullAccountNumber.substring(0, 3);
+		String branchCode = fullAccountNumber.substring(3, 6);
+		String accountNumber = fullAccountNumber.substring(6);
+
+		return accountJpaRepositoryCustomImpl.getAccountBalance(
+			accountTypeCode,
+			branchCode,
+			accountNumber
+		);
+	}
+
+	public boolean existsAccountByFullAccountNumber(String fullAccountNumber) {
+		String accountTypeCode = fullAccountNumber.substring(0, 3);
+		String branchCode = fullAccountNumber.substring(3, 6);
+		String accountNumber = fullAccountNumber.substring(6);
+
+		return accountJpaRepository.existsByAccountTypeCodeAndBranchCodeAndAccountNumber(
+			accountTypeCode,
+			branchCode,
+			accountNumber
+		);
 	}
 }

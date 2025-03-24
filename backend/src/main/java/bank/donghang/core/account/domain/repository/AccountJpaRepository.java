@@ -14,6 +14,15 @@ public interface AccountJpaRepository extends JpaRepository<Account, Long> {
 		String branchCode
 	);
 
-	Optional<Account> findByAccountTypeCodeAndBranchCodeAndAccountNumber(String typeCode, String branchCode,
-		String accountCode);
+	Optional<Account> findByAccountTypeCodeAndBranchCodeAndAccountNumber(
+		String typeCode,
+		String branchCode,
+		String accountCode
+	);
+
+	boolean existsByAccountTypeCodeAndBranchCodeAndAccountNumber(
+		String accountTypeCode,
+		String branchCode,
+		String accountNumber
+	);
 }
