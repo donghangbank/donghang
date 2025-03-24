@@ -52,6 +52,7 @@ build_backend:
   before_script:
     - cd backend
     - cp $BE_ENV_FILE dev.env
+    - cp $BE_TEST_ENV_FILE test.env
   script:
     - chmod +x ./gradlew
     - ./gradlew build --build-cache -Dspring.profiles.active=dev
