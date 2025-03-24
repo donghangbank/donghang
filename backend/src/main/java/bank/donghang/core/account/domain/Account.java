@@ -78,6 +78,12 @@ public class Account {
 	@Column(nullable = false, name = "account_balance")
 	private Long accountBalance;
 
+	@Column(name = "monthly_installment_amount")
+	private Long monthlyInstallmentAmount;
+
+	@Column(name = "monthly_installment_day")
+	private Integer monthlyInstallmentDay;
+
 	@Column(nullable = false, name = "interest_rate")
 	private Double interestRate;
 

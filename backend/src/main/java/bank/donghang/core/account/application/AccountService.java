@@ -1,15 +1,17 @@
 package bank.donghang.core.account.application;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Optional;
+import java.time.LocalDate;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.account.domain.repository.AccountRepository;
 import bank.donghang.core.account.dto.request.DemandAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.DepositAccountRegisterRequest;
+import bank.donghang.core.account.dto.request.InstallmentAccountRegisterRequest;
 import bank.donghang.core.account.dto.response.AccountRegisterResponse;
 import bank.donghang.core.accountproduct.domain.AccountProduct;
 import bank.donghang.core.accountproduct.domain.repository.AccountProductRepository;
@@ -50,53 +52,100 @@ public class AccountService {
 		return AccountRegisterResponse.from(savedAccount, accountProduct, null, null);
 	}
 
-	@Transactional
-	public AccountRegisterResponse createDepositAccount(DepositAccountRegisterRequest depositAccountRegisterRequest) {
+	public AccountRegisterResponse createDepositAccount(DepositAccountRegisterRequest req) {
+		DepositInstallmentAccountData data = getDepositInstallmentAccountData(
+			req.accountProductId(), req.withdrawalAccountNumber(), req.payoutAccountNumber()
+		);
 
-		if (!accountProductRepository.existsAccountProductById(depositAccountRegisterRequest.accountProductId())) {
-			throw new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND);
-		}
-
-		AccountProduct accountProduct = accountProductRepository.getAccountProductById(
-			depositAccountRegisterRequest.accountProductId());
-
-		if (!accountProduct.isDepositProduct()) {
+		if (!data.accountProduct.isDepositProduct()) {
 			throw new BadRequestException(ErrorCode.WRONG_ACCOUNT_PRODUCT_TYPE);
 		}
 
-		String withdrawalAccountNumber = depositAccountRegisterRequest.withdrawalAccountNumber();
-		String payoutAccountNumber = depositAccountRegisterRequest.payoutAccountNumber();
+		data.withdrawalAccount.verifyWithdrawalAccount(req.memberId(), req.initDepositAmount());
+		data.payoutAccount.verifyPayoutAccount(req.memberId());
 
-		Optional<Account> optWithdrawalAccount = accountRepository.findAccountByFullAccountNumber(
-			withdrawalAccountNumber);
+		String newAccountNumber = accountRepository.getNextAccountNumber("200", "001");
+		LocalDate expiryDate = LocalDate.now().plusMonths(data.accountProduct.getSubscriptionPeriod());
+
+		Account newDepositAccount = req.toEntity(
+			newAccountNumber,
+			data.accountProduct.getInterestRate(),
+			data.withdrawalAccount.getAccountId(),
+			data.payoutAccount.getAccountId(),
+			0L,
+			expiryDate
+		);
+
+		Account savedDepositAccount = accountRepository.saveAccount(newDepositAccount);
+
+		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+			@Override
+			public void afterCommit() {
+				// todo. withdrawal 계좌에서 newDepositAccount로 송금 로직 추가
+			}
+		});
+
+		return AccountRegisterResponse.from(
+			savedDepositAccount,
+			data.accountProduct,
+			req.withdrawalAccountNumber(),
+			req.payoutAccountNumber()
+		);
+	}
+
+	public AccountRegisterResponse createInstallmentAccount(InstallmentAccountRegisterRequest req) {
+		DepositInstallmentAccountData data = getDepositInstallmentAccountData(
+			req.accountProductId(), req.withdrawalAccountNumber(), req.payoutAccountNumber()
+		);
+
+		data.withdrawalAccount.verifyWithdrawalAccount(req.memberId(), req.monthlyInstallmentAmount());
+		data.payoutAccount.verifyPayoutAccount(req.memberId());
+
+		String newAccountNumber = accountRepository.getNextAccountNumber("300", "001");
+		LocalDate expiryDate = LocalDate.now().plusMonths(data.accountProduct.getSubscriptionPeriod());
+
+		Account newInstallmentAccount = req.toEntity(
+			newAccountNumber,
+			data.accountProduct.getInterestRate(),
+			data.withdrawalAccount.getAccountId(),
+			data.payoutAccount.getAccountId(),
+			expiryDate
+		);
+
+		Account savedInstallmentAccount = accountRepository.saveInstallmentAccount(newInstallmentAccount);
+
+		return AccountRegisterResponse.from(
+			savedInstallmentAccount,
+			data.accountProduct,
+			req.withdrawalAccountNumber(),
+			req.payoutAccountNumber()
+		);
+	}
+
+	private DepositInstallmentAccountData getDepositInstallmentAccountData(Long accountProductId, String withdrawalAccountNumber, String payoutAccountNumber) {
+		if (!accountProductRepository.existsAccountProductById(accountProductId)) {
+			throw new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND);
+		}
+		AccountProduct accountProduct = accountProductRepository.getAccountProductById(accountProductId);
+
+		Optional<Account> optWithdrawalAccount = accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber);
 		Optional<Account> optPayoutAccount = accountRepository.findAccountByFullAccountNumber(payoutAccountNumber);
-
 		if (optWithdrawalAccount.isEmpty() || optPayoutAccount.isEmpty()) {
 			throw new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND);
 		}
 
-		Account withdrawalAccount = optWithdrawalAccount.get();
-		Account payoutAccount = optPayoutAccount.get();
+		return new DepositInstallmentAccountData(accountProduct, optWithdrawalAccount.get(), optPayoutAccount.get());
+	}
 
-		withdrawalAccount.verifyWithdrawalAccount(depositAccountRegisterRequest.memberId(),
-			depositAccountRegisterRequest.initDepositAmount());
-		payoutAccount.verifyPayoutAccount(depositAccountRegisterRequest.memberId());
+	private static class DepositInstallmentAccountData {
+		final AccountProduct accountProduct;
+		final Account withdrawalAccount;
+		final Account payoutAccount;
 
-		String newAccountNumber = accountRepository.getNextAccountNumber("200", "001");
-		long subscriptionPeriod = accountProduct.getSubscriptionPeriod();
-		Calendar calendar = Calendar.getInstance();
-		calendar.add(Calendar.MONTH, (int)subscriptionPeriod);
-		Date expiryDate = calendar.getTime();
-
-		Account newDepositAccount = depositAccountRegisterRequest.toEntity(newAccountNumber,
-			accountProduct.getInterestRate(),
-			withdrawalAccount.getAccountId(), payoutAccount.getAccountId(), 0L, expiryDate);
-
-		Account savedDepositAccount = accountRepository.saveAccount(newDepositAccount);
-
-		// todo. withdrawal account에서 initialDepositAmount newDepositAccount로 송금
-
-		return AccountRegisterResponse.from(savedDepositAccount, accountProduct, withdrawalAccountNumber,
-			payoutAccountNumber);
+		public DepositInstallmentAccountData(AccountProduct accountProduct, Account withdrawalAccount, Account payoutAccount) {
+			this.accountProduct = accountProduct;
+			this.withdrawalAccount = withdrawalAccount;
+			this.payoutAccount = payoutAccount;
+		}
 	}
 }

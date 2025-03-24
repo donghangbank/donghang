@@ -1,19 +1,42 @@
 package bank.donghang.core.account.domain.repository;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
 import bank.donghang.core.account.domain.Account;
+import bank.donghang.core.account.domain.InstallmentSchedule;
+import bank.donghang.core.account.domain.enums.InstallmentStatus;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
 public class AccountRepository {
 	private final AccountJpaRepository accountJpaRepository;
+	private final InstallmentScheduleJpaRepository installmentScheduleJpaRepository;
 
+	@Transactional
 	public Account saveAccount(Account account) {
 		return accountJpaRepository.save(account);
+	}
+
+	@Transactional
+	public Account saveInstallmentAccount(Account account) {
+		Account savedAccount = saveAccount(account);
+		InstallmentSchedule installmentSchedule =
+			InstallmentSchedule
+				.builder().installmentAccountId(savedAccount.getAccountId())
+				.withdrawalAccountId(savedAccount.getWithdrawalAccountId())
+				.installmentAmount(savedAccount.getMonthlyInstallmentAmount())
+				.installmentSequence(1)
+				.installmentStatus(InstallmentStatus.SCHEDULED.name())
+				.installmentScheduledDate(LocalDate.now().plusMonths(1))
+				.build();
+
+		installmentScheduleJpaRepository.save(installmentSchedule);
+		return savedAccount;
 	}
 
 	/**
