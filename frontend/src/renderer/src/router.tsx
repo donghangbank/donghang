@@ -1,5 +1,5 @@
 import { createHashRouter } from "react-router-dom";
-import App from "./App";
+import App from "./pages/App";
 import DepositPage from "./pages/deposit/DepositPage";
 
 const router = createHashRouter([
