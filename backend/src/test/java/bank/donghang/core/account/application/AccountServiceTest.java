@@ -4,8 +4,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -129,7 +130,10 @@ class AccountServiceTest {
 
 		Calendar calendar = Calendar.getInstance();
 		calendar.add(Calendar.MONTH, 12);
-		Date expiryDate = calendar.getTime();
+		LocalDate expiryDate = calendar.getTime()
+			.toInstant()
+			.atZone(ZoneId.systemDefault())
+			.toLocalDate();
 
 		Account depositAccount = mock(Account.class);
 		when(request.toEntity(
@@ -138,7 +142,7 @@ class AccountServiceTest {
 			eq(101L),
 			eq(202L),
 			eq(0L),            // 가입 시 잔액 0
-			any(Date.class)
+			any(LocalDate.class)
 		)).thenReturn(depositAccount);
 
 		when(accountRepository.saveAccount(depositAccount)).thenReturn(depositAccount);

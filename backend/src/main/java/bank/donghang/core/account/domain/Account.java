@@ -1,6 +1,6 @@
 package bank.donghang.core.account.domain;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import bank.donghang.core.account.domain.enums.AccountStatus;
 import bank.donghang.core.account.domain.enums.TransactionType;
@@ -82,7 +82,7 @@ public class Account {
 	private Double interestRate;
 
 	@Column(name = "account_expiry_date")
-	private Date accountExpiryDate;
+	private LocalDate accountExpiryDate;
 
 	public void deposit(Long amount) {
 		if (amount < 0) {

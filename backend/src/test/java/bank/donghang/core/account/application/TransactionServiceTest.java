@@ -2,6 +2,7 @@ package bank.donghang.core.account.application;
 
 import static org.mockito.BDDMockito.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -66,7 +67,7 @@ class TransactionServiceTest {
 			.singleTransferLimit(5000L)
 			.accountBalance(sendingAccountBalance)
 			.interestRate(3.5)
-			.accountExpiryDate(new java.util.Date())
+			.accountExpiryDate(LocalDate.of(2025, 3, 20))
 			.build();
 
 		Account receivingAccount = Account.builder()
@@ -83,7 +84,7 @@ class TransactionServiceTest {
 			.singleTransferLimit(5000L)
 			.accountBalance(receivingAccountBalance)
 			.interestRate(3.5)
-			.accountExpiryDate(new java.util.Date())
+			.accountExpiryDate(LocalDate.of(2025, 3, 20))
 			.build();
 
 		given(accountRepository.findAccountByFullAccountNumber(sendingAccountNumber))

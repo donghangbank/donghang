@@ -5,7 +5,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,7 +52,7 @@ class AccountControllerTest extends ControllerTest {
 			"100001000001",
 			0L,
 			0.05,
-			new Date(1680105600000L)
+			LocalDate.of(2025, 3, 20)
 		);
 
 		Mockito.when(accountService.createDemandAccount(any(DemandAccountRegisterRequest.class)))
@@ -97,7 +97,7 @@ class AccountControllerTest extends ControllerTest {
 			"200001000001",
 			0L,
 			0.5,
-			new Date(1680105600000L)
+			LocalDate.of(2025, 3, 20)
 		);
 
 		Mockito.when(accountService.createDepositAccount(any(DepositAccountRegisterRequest.class)))
