@@ -21,3 +21,9 @@ resource "aws_route53_record" "external_alb_route53_record" {
   records  = [each.value.resource_record_value]
   ttl      = 300
 }
+
+resource "aws_acm_certificate_validation" "external_alb_certificate_validation" {
+  provider                = aws.seoul
+  certificate_arn         = aws_acm_certificate.external_alb_certificate.arn
+  validation_record_fqdns = [for record in aws_route53_record.external_alb_route53_record : record.fqdn]
+}
