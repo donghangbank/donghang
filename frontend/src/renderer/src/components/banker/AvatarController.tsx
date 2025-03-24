@@ -1,26 +1,155 @@
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useFBX } from "@react-three/drei";
 import * as THREE from "three";
 import { Avatar } from "./Avatar";
 import idleAnimation from "@renderer/assets/models/avatar_idle.fbx?url";
+import walkAnimation from "@renderer/assets/models/avatar_walk.fbx?url";
+import bowAnimation from "@renderer/assets/models/avatar_bow.fbx?url";
+
+type AnimationType = "idle" | "walk" | "bow";
 
 export const AvatarController: React.FC = () => {
 	const avatarRef = useRef<THREE.Group>(null);
 	const mixerRef = useRef<THREE.AnimationMixer | null>(null);
+
+	const [currentAction, setCurrentAction] = useState<AnimationType>("idle");
+	const [isMoving, setIsMoving] = useState(false);
+
+	const [isOut, setIsOut] = useState(false);
+	const moveStartTime = useRef<number | null>(null);
+
 	const idleAnim = useFBX(idleAnimation);
+	const walkAnim = useFBX(walkAnimation);
+	const bowAnim = useFBX(bowAnimation);
+
+	const actionsRef = useRef<Record<AnimationType, THREE.AnimationAction | null>>({
+		idle: null,
+		walk: null,
+		bow: null
+	});
+
+	const fadeToAction = useCallback(
+		(name: AnimationType, repeat: boolean = true, duration = 0.3): void => {
+			if (!mixerRef.current) return;
+			const nextAction = actionsRef.current[name];
+			const current = actionsRef.current[currentAction];
+
+			if (!nextAction || !current || current === nextAction) return;
+
+			current.fadeOut(duration);
+			nextAction.reset().fadeIn(duration).play();
+
+			setCurrentAction(name);
+
+			if (!repeat) {
+				nextAction.clampWhenFinished = true;
+				nextAction.setLoop(THREE.LoopOnce, 1);
+
+				const onAnimationFinished = (e: THREE.Event & { action: THREE.AnimationAction }): void => {
+					if (e.action === nextAction) {
+						mixerRef.current?.removeEventListener("finished", onAnimationFinished);
+
+						const idle = actionsRef.current["idle"];
+						if (idle && idle !== nextAction) {
+							nextAction.fadeOut(duration);
+							idle.reset().fadeIn(duration).play();
+							setCurrentAction("idle");
+						}
+					}
+				};
+
+				mixerRef.current.addEventListener("finished", onAnimationFinished);
+			} else {
+				nextAction.setLoop(THREE.LoopRepeat, Infinity);
+				nextAction.clampWhenFinished = false;
+			}
+		},
+		[currentAction]
+	);
+
+	const rotateY = (angle: number): void => {
+		if (avatarRef.current) {
+			avatarRef.current.rotation.y += angle;
+		}
+	};
+
+	const startMovement = useCallback(
+		(direction: "out" | "back"): void => {
+			setIsMoving(true);
+			moveStartTime.current = performance.now();
+			fadeToAction("walk");
+
+			if (direction === "out") {
+				rotateY(-Math.PI / 2); // 오른쪽으로 90도 회전
+			} else {
+				rotateY(Math.PI); // 뒤돌기 (180도)
+			}
+		},
+		[fadeToAction]
+	);
+
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent): void => {
+			if (e.code === "KeyW" && !isMoving) {
+				const direction = isOut ? "back" : "out";
+				startMovement(direction);
+				return;
+			}
+
+			if (e.code === "KeyB" && !isMoving) {
+				fadeToAction("bow", false);
+				return;
+			}
+		};
+
+		window.addEventListener("keydown", handleKeyDown);
+		return (): void => {
+			window.removeEventListener("keydown", handleKeyDown);
+		};
+	}, [isOut, isMoving, startMovement, fadeToAction]);
 
 	useEffect(() => {
 		if (avatarRef.current) {
-			mixerRef.current = new THREE.AnimationMixer(avatarRef.current);
-			const action = mixerRef.current.clipAction(idleAnim.animations[0]);
-			action.play();
+			const mixer = new THREE.AnimationMixer(avatarRef.current);
+			mixerRef.current = mixer;
+
+			const idleAction = mixer.clipAction(idleAnim.animations[0]);
+			const walkAction = mixer.clipAction(walkAnim.animations[0]);
+			const bowAction = mixer.clipAction(bowAnim.animations[0]);
+
+			idleAction.play();
+
+			actionsRef.current.idle = idleAction;
+			actionsRef.current.walk = walkAction;
+			actionsRef.current.bow = bowAction;
 		}
-	}, [idleAnim]);
+	}, [idleAnim, walkAnim, bowAnim]);
 
 	useFrame((_, delta) => {
 		if (mixerRef.current) {
 			mixerRef.current.update(delta);
+		}
+
+		if (isMoving && avatarRef.current && moveStartTime.current) {
+			const elapsed = performance.now() - moveStartTime.current;
+
+			if (elapsed < 1500) {
+				const direction = new THREE.Vector3(0, 0, 1);
+				direction.applyQuaternion(avatarRef.current.quaternion);
+				direction.normalize().multiplyScalar(0.02);
+				avatarRef.current.position.add(direction);
+			} else {
+				setIsMoving(false);
+				moveStartTime.current = null;
+				fadeToAction("idle");
+
+				if (isOut) {
+					rotateY(-Math.PI / 2); // 되돌아온 뒤 오른쪽 90도 회전 (원래 방향)
+				}
+
+				setIsOut(!isOut); // 토글 상태 전환
+			}
 		}
 	});
 
