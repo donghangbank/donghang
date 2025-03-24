@@ -51,4 +51,8 @@ public class AccountRepository {
 		return accountJpaRepository.findByAccountTypeCodeAndBranchCodeAndAccountNumber(accountTypeCode, branchCode,
 			accountNumber);
 	}
+
+	public void deleteAllAccounts() {
+		accountJpaRepository.deleteAll();
+	}
 }

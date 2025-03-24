@@ -1,7 +1,6 @@
 package bank.donghang.core.common.aop;
 
 import java.lang.reflect.Method;
-import java.util.concurrent.TimeUnit;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -11,11 +10,9 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 
-import bank.donghang.core.account.dto.request.DepositRequest;
-import bank.donghang.core.account.dto.request.TransactionRequest;
 import bank.donghang.core.common.annotation.DistributedLock;
-import bank.donghang.core.common.annotation.SingleAccountLock;
-import bank.donghang.core.common.parser.CustomSpringExpressionLanguageParser;
+import bank.donghang.core.common.annotation.TransferDistributedLock;
+import bank.donghang.core.common.parser.CustomSpringELParser;
 import bank.donghang.core.common.wrapper.AopForTransaction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,99 +33,117 @@ public class DistributedLockAop {
 		Method method = signature.getMethod();
 		DistributedLock distributedLock = method.getAnnotation(DistributedLock.class);
 
-		Object[] args = joinPoint.getArgs();
-		TransactionRequest request = (TransactionRequest)args[0];
-		String accountNumber1 = request.sendingAccountNumber();
-		String accountNumber2 = request.receivingAccountNumber();
+		String key = REDISSON_LOCK_PREFIX + CustomSpringELParser.getDynamicValue(
+			signature.getParameterNames(),
+			joinPoint.getArgs(),
+			distributedLock.key()
+		);
+		log.info("Generated lock key: {}", key);
 
-		String key1 = REDISSON_LOCK_PREFIX + accountNumber1;
-		String key2 = REDISSON_LOCK_PREFIX + accountNumber2;
-
-		log.info("Lock keys: key1={}, key2={}", key1, key2);
-
-		RLock lock1 = redissonClient.getLock(key1);
-		RLock lock2 = redissonClient.getLock(key2);
-
-		if (lock1 == null || lock2 == null) {
-			throw new IllegalStateException("Failed to create locks. lock1=" + lock1 + ", lock2=" + lock2);
-		}
-
-		RLock multiLock = redissonClient.getMultiLock(lock1, lock2);
+		RLock rLock = redissonClient.getLock(key);
 
 		try {
-			log.info("Trying to acquire locks for keys: {} and {}", key1, key2);
-			boolean isLockAcquired = multiLock.tryLock(
+			boolean available = rLock.tryLock(
 				distributedLock.waitTime(),
 				distributedLock.leaseTime(),
-				TimeUnit.SECONDS
+				distributedLock.timeUnit()
 			);
-			if (!isLockAcquired) {
-				throw new IllegalStateException("Unable to acquire locks for keys: " + key1 + ", " + key2);
+			if (!available) {
+				log.warn("Lock not available for key: {}", key);
+				return false;
 			}
-			log.info("Successfully acquired locks for keys: {} and {}", key1, key2);
 
+			log.info("Lock acquired for key: {}", key);
 			return aopForTransaction.proceed(joinPoint);
 		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			log.error("Interrupted while trying to acquire locks for keys: {} and {}", key1, key2, e);
-			throw new InterruptedException("Lock acquisition was interrupted");
+			log.error("InterruptedException while acquiring lock for key: {}", key, e);
+			throw new InterruptedException();
 		} finally {
 			try {
-				if (multiLock != null) {
-					multiLock.unlock();
-					log.info("Released locks for keys: {} and {}", key1, key2);
-				}
+				rLock.unlock();
+				log.info("Lock released for key: {}", key);
 			} catch (IllegalMonitorStateException e) {
-				log.warn("Redisson Locks Already Unlocked {} {}", method.getName(), key1 + ", " + key2);
+				log.info("Redisson Lock Already UnLock {} {}", method.getName(), key);
 			}
 		}
 	}
 
-	@Around("@annotation(bank.donghang.core.common.annotation.SingleAccountLock)")
-	public Object singleLock(final ProceedingJoinPoint joinPoint) throws Throwable {
+	@Around("@annotation(bank.donghang.core.common.annotation.TransferDistributedLock)")
+	public Object lockTwoAccounts(final ProceedingJoinPoint joinPoint) throws Throwable {
 		MethodSignature signature = (MethodSignature)joinPoint.getSignature();
 		Method method = signature.getMethod();
-		SingleAccountLock singleAccountLock = method.getAnnotation(SingleAccountLock.class);
+		TransferDistributedLock distributedLock = method.getAnnotation(TransferDistributedLock.class);
 
-		Object[] args = joinPoint.getArgs();
-		DepositRequest request = (DepositRequest)args[0];
-		String accountNumber = request.accountNumber();
+		String key1 = REDISSON_LOCK_PREFIX + CustomSpringELParser.getDynamicValue(
+			signature.getParameterNames(),
+			joinPoint.getArgs(),
+			distributedLock.key1()
+		);
+		String key2 = REDISSON_LOCK_PREFIX + CustomSpringELParser.getDynamicValue(
+			signature.getParameterNames(),
+			joinPoint.getArgs(),
+			distributedLock.key2()
+		);
+		log.info("Generated lock key1: {}", key1);
+		log.info("Generated lock key2: {}", key2);
 
-		String key = REDISSON_LOCK_PREFIX + accountNumber;
-
-		log.info("Lock key: {}", key);
-
-		RLock rLock = redissonClient.getLock(key);
-
-		if (rLock == null) {
-			throw new IllegalStateException("Failed to create lock for key: " + key);
+		if (key1.compareTo(key2) > 0) {
+			String temp = key1;
+			key1 = key2;
+			key2 = temp;
 		}
 
+		RLock rLock1 = redissonClient.getLock(key1);
+		RLock rLock2 = redissonClient.getLock(key2);
+
+		boolean lock1Acquired = false;
+		boolean lock2Acquired = false;
+
 		try {
-			log.info("Trying to acquire lock for key: {}", key);
-			boolean isLockAcquired = rLock.tryLock(
-				singleAccountLock.waitTime(),
-				singleAccountLock.leaseTime(),
-				TimeUnit.SECONDS
+			lock1Acquired = rLock1.tryLock(
+				distributedLock.waitTime(),
+				distributedLock.leaseTime(),
+				distributedLock.timeUnit()
 			);
-			if (!isLockAcquired) {
-				throw new IllegalStateException("Unable to acquire lock for key: " + key);
+			if (!lock1Acquired) {
+				log.warn("Lock not available for key: {}", key1);
+				return false;
 			}
-			log.info("Successfully acquired lock for key: {}", key);
+
+			lock2Acquired = rLock2.tryLock(
+				distributedLock.waitTime(),
+				distributedLock.leaseTime(),
+				distributedLock.timeUnit()
+			);
+			if (!lock2Acquired) {
+				log.warn("Lock not available for key: {}", key2);
+				return false;
+			}
+
+			log.info("Lock acquired for key: {}", key1);
+			log.info("Lock acquired for key: {}", key2);
 
 			return aopForTransaction.proceed(joinPoint);
 		} catch (InterruptedException e) {
+			log.error("InterruptedException while acquiring lock for key: {}", key1, e);
 			Thread.currentThread().interrupt();
-			log.error("Interrupted while trying to acquire lock for key: {}", key, e);
-			throw new InterruptedException("Lock acquisition was interrupted");
+			throw new RuntimeException("Thread was interrupted while acquiring lock", e);
 		} finally {
-			try {
-				if (rLock != null && rLock.isHeldByCurrentThread()) {
-					rLock.unlock();
-					log.info("Released lock for key: {}", key);
+			if (lock2Acquired) {
+				try {
+					rLock2.unlock();
+					log.info("Lock released for key: {}", key2);
+				} catch (IllegalMonitorStateException e) {
+					log.info("Redisson Lock Already UnLock {} {}", method.getName(), key2);
 				}
-			} catch (IllegalMonitorStateException e) {
-				log.warn("Redisson Lock Already Unlocked {} {}", method.getName(), key);
+			}
+			if (lock1Acquired) {
+				try {
+					rLock1.unlock();
+					log.info("Lock released for key: {}", key1);
+				} catch (IllegalMonitorStateException e) {
+					log.info("Redisson Lock Already UnLock {} {}", method.getName(), key1);
+				}
 			}
 		}
 	}

@@ -18,23 +18,25 @@ import bank.donghang.core.account.dto.response.DepositResponse;
 import bank.donghang.core.account.dto.response.TransactionResponse;
 import bank.donghang.core.account.dto.response.WithdrawalResponse;
 import bank.donghang.core.common.annotation.DistributedLock;
-import bank.donghang.core.common.annotation.SingleAccountLock;
+import bank.donghang.core.common.annotation.TransferDistributedLock;
 import bank.donghang.core.common.exception.BadRequestException;
 import bank.donghang.core.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class TransactionService {
 
 	private final TransactionRepository transactionRepository;
 	private final AccountRepository accountRepository;
 
-	@Transactional
-	@DistributedLock(
-		key = "'TRANSACTION_' + #request.sendingAccountId + '_' + #request.receivingAccountId",
-		waitTime = 3L,
-		leaseTime = 3L
+	@TransferDistributedLock(
+		key1 = "#request.sendingAccountNumber",
+		key2 = "#request.receivingAccountNumber",
+		waitTime = 1000L,
+		leaseTime = 3000L
 	)
 	public TransactionResponse transferByAccount(TransactionRequest request) {
 
@@ -43,19 +45,19 @@ public class TransactionService {
 		Account receivingAccount = accountRepository.findAccountByFullAccountNumber(request.receivingAccountNumber())
 			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
 
-		checkDuplicateRequest(
-			sendingAccount.getAccountId(),
-			request.amount(),
-			request.sessionStartTime(),
-			TransactionType.WITHDRAWAL
-		);
-
-		checkDuplicateRequest(
-			receivingAccount.getAccountId(),
-			request.amount(),
-			request.sessionStartTime(),
-			TransactionType.DEPOSIT
-		);
+		// checkDuplicateRequest(
+		// 	sendingAccount.getAccountId(),
+		// 	request.amount(),
+		// 	request.sessionStartTime(),
+		// 	TransactionType.WITHDRAWAL
+		// );
+		//
+		// checkDuplicateRequest(
+		// 	receivingAccount.getAccountId(),
+		// 	request.amount(),
+		// 	request.sessionStartTime(),
+		// 	TransactionType.DEPOSIT
+		// );
 
 		validateBalance(request.amount(), sendingAccount);
 
@@ -91,23 +93,21 @@ public class TransactionService {
 		);
 	}
 
-	@Transactional
-	@SingleAccountLock(
-		key = "#request.accountId",
-		waitTime = 3L,
-		leaseTime = 3L
+	@DistributedLock(
+		key = "#request.accountNumber",
+		waitTime = 100L
 	)
 	public DepositResponse deposit(DepositRequest request) {
 
 		Account account = accountRepository.findAccountByFullAccountNumber(request.accountNumber())
 			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
 
-		checkDuplicateRequest(
-			account.getAccountId(),
-			request.amount(),
-			request.sessionStartTime(),
-			TransactionType.DEPOSIT
-		);
+		// checkDuplicateRequest(
+		// 	account.getAccountId(),
+		// 	request.amount(),
+		// 	request.sessionStartTime(),
+		// 	TransactionType.DEPOSIT
+		// );
 
 		account.deposit(request.amount());
 
@@ -130,23 +130,21 @@ public class TransactionService {
 		return response;
 	}
 
-	@Transactional
-	@SingleAccountLock(
-		key = "#request.accountId",
-		waitTime = 3L,
-		leaseTime = 3L
+	@DistributedLock(
+		key = "#request.accountNumber",
+		waitTime = 100L
 	)
 	public WithdrawalResponse withdraw(WithdrawalRequest request) {
 
 		Account account = accountRepository.findAccountByFullAccountNumber(request.accountNumber())
 			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
 
-		checkDuplicateRequest(
-			account.getAccountId(),
-			request.amount(),
-			request.sessionStartTime(),
-			TransactionType.WITHDRAWAL
-		);
+		// checkDuplicateRequest(
+		// 	account.getAccountId(),
+		// 	request.amount(),
+		// 	request.sessionStartTime(),
+		// 	TransactionType.WITHDRAWAL
+		// );
 
 		validateBalance(request.amount(), account);
 
