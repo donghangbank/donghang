@@ -36,11 +36,11 @@ class ConcurrentTransactionTest {
 	@Autowired
 	private AccountRepository accountRepository;
 
-	private final int THREAD_COUNT = 100;
-	private final Long INITIAL_BALANCE = 100L;
-	private final Long DEPOSIT_AMOUNT = 1L;
-	private final Long WITHDRAW_AMOUNT = 1L;
-	private final Long TRANSFER_AMOUNT = 1L;
+	private static final int THREAD_COUNT = 100;
+	private static final Long INITIAL_BALANCE = 100L;
+	private static final Long DEPOSIT_AMOUNT = 1L;
+	private static final Long WITHDRAW_AMOUNT = 1L;
+	private static final Long TRANSFER_AMOUNT = 1L;
 
 	private Long accountId1;
 	private Long accountId2;
@@ -191,5 +191,4 @@ class ConcurrentTransactionTest {
 
 		assertEquals(INITIAL_BALANCE - (THREAD_COUNT * DEPOSIT_AMOUNT), account.getAccountBalance());
 	}
-
 }

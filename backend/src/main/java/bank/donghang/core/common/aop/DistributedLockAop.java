@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 import bank.donghang.core.common.annotation.DistributedLock;
 import bank.donghang.core.common.annotation.TransferDistributedLock;
-import bank.donghang.core.common.parser.CustomSpringELParser;
+import bank.donghang.core.common.parser.CustomSpringExpressionLanguageParser;
 import bank.donghang.core.common.wrapper.AopForTransaction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ public class DistributedLockAop {
 		Method method = signature.getMethod();
 		DistributedLock distributedLock = method.getAnnotation(DistributedLock.class);
 
-		String key = REDISSON_LOCK_PREFIX + CustomSpringELParser.getDynamicValue(
+		String key = REDISSON_LOCK_PREFIX + CustomSpringExpressionLanguageParser.getDynamicValue(
 			signature.getParameterNames(),
 			joinPoint.getArgs(),
 			distributedLock.key()
@@ -74,12 +74,12 @@ public class DistributedLockAop {
 		Method method = signature.getMethod();
 		TransferDistributedLock distributedLock = method.getAnnotation(TransferDistributedLock.class);
 
-		String key1 = REDISSON_LOCK_PREFIX + CustomSpringELParser.getDynamicValue(
+		String key1 = REDISSON_LOCK_PREFIX + CustomSpringExpressionLanguageParser.getDynamicValue(
 			signature.getParameterNames(),
 			joinPoint.getArgs(),
 			distributedLock.key1()
 		);
-		String key2 = REDISSON_LOCK_PREFIX + CustomSpringELParser.getDynamicValue(
+		String key2 = REDISSON_LOCK_PREFIX + CustomSpringExpressionLanguageParser.getDynamicValue(
 			signature.getParameterNames(),
 			joinPoint.getArgs(),
 			distributedLock.key2()

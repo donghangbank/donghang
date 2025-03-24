@@ -4,8 +4,8 @@ import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
-public class CustomSpringELParser {
-	private CustomSpringELParser() {
+public class CustomSpringExpressionLanguageParser {
+	private CustomSpringExpressionLanguageParser() {
 	}
 
 	public static Object getDynamicValue(String[] parameterNames, Object[] args, String key) {
