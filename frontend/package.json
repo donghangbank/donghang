@@ -28,6 +28,7 @@
 		"@react-three/fiber": "^9.1.0",
 		"@react-three/postprocessing": "^3.0.4",
 		"electron-updater": "^6.3.9",
+		"react-router-dom": "^7.4.0",
 		"three": "^0.174.0"
 	},
 	"devDependencies": {
