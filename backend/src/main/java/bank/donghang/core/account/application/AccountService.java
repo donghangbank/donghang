@@ -6,6 +6,8 @@ import java.time.LocalDate;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -20,7 +22,6 @@ import bank.donghang.core.accountproduct.domain.AccountProduct;
 import bank.donghang.core.accountproduct.domain.repository.AccountProductRepository;
 import bank.donghang.core.common.exception.BadRequestException;
 import bank.donghang.core.common.exception.ErrorCode;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -146,23 +147,31 @@ public class AccountService {
 												 Account payoutAccount) {
 	}
 
-	@Scheduled(cron = "0 0 0  * * *")
+	@Scheduled(cron = "0 0 0 * * *")
 	private void handleInstallmentAccountSchedule() {
 		LocalDate today = LocalDate.now();
 		List<InstallmentSchedule> installmentSchedules = accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(
 			today);
+
 		for (InstallmentSchedule installmentSchedule : installmentSchedules) {
-			long installmentAccountId = installmentSchedule.getInstallmentAccountId();
-			long withdrawalAccountId = installmentSchedule.getWithdrawalAccountId();
-			long installmentAmount = installmentSchedule.getInstallmentAmount();
 			try {
-				// todo. withdrawalAccountId -> installmentAccountId 로 installmentAmount 만큼 이체
-			} catch (BadRequestException e) {
-				if (e.getCode() == ErrorCode.NOT_ENOUGH_BALANCE.getCode()) {    // 잔액 부족
-					InstallmentSchedule newInstallmentSchedule = installmentSchedule.reassignInstallmentSchedule(today);
-					accountRepository.saveInstallmentSchedule(newInstallmentSchedule);
-				}
+				processInstallment(installmentSchedule, today);
+			} catch (Exception e) {
+				// 실패한 건에 대해 로깅 및 추가 처리
 			}
+		}
+	}
+
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void processInstallment(InstallmentSchedule installmentSchedule, LocalDate today) {
+		try {
+			// todo: withdrawalAccountId -> installmentAccountId로 installmentAmount 만큼 이체 처리
+		} catch (BadRequestException e) {
+			if (e.getCode() == ErrorCode.NOT_ENOUGH_BALANCE.getCode()) { // 잔액 부족
+				InstallmentSchedule newInstallmentSchedule = installmentSchedule.reassignInstallmentSchedule(today);
+				accountRepository.saveInstallmentSchedule(newInstallmentSchedule);
+			}
+			throw e; // 개별 트랜잭션 내에서 실패 시 rollback을 위해 예외 재던짐
 		}
 	}
 }
