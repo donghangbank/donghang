@@ -30,7 +30,6 @@ public class AccountService {
 	private final AccountRepository accountRepository;
 	private final AccountProductRepository accountProductRepository;
 
-	@Transactional
 	public AccountRegisterResponse createDemandAccount(DemandAccountRegisterRequest demandAccountRegisterRequest) {
 		Long productId = demandAccountRegisterRequest.accountProductId();
 
