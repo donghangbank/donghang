@@ -235,3 +235,43 @@ resource "aws_autoscaling_group" "webserver_ecs_asg" {
     propagate_at_launch = true
   }
 }
+
+resource "aws_autoscaling_group" "appserver_ecs_asg" {
+  name                  = "donghang-appserver-ecs-asg"
+  max_size              = 3
+  min_size              = 1
+  desired_capacity      = 2
+  vpc_zone_identifier   = var.private_subnets
+  health_check_type     = "EC2"
+  protect_from_scale_in = true
+
+  enabled_metrics = [
+    "GroupMinSize",
+    "GroupMaxSize",
+    "GroupDesiredCapacity",
+    "GroupInServiceInstances",
+    "GroupPendingInstances",
+    "GroupStandbyInstances",
+    "GroupTerminatingInstances",
+    "GroupTotalInstances"
+  ]
+
+  launch_template {
+    id      = aws_launch_template.appserver_ecs_launch_template.id
+    version = "$Latest"
+  }
+
+  instance_refresh {
+    strategy = "Rolling"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tag {
+    key                 = "Name"
+    value               = "donghang-appserver-ecs-asg"
+    propagate_at_launch = true
+  }
+}
