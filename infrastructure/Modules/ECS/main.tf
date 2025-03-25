@@ -275,3 +275,28 @@ resource "aws_autoscaling_group" "appserver_ecs_asg" {
     propagate_at_launch = true
   }
 }
+
+resource "aws_ecs_capacity_provider" "webserver_capacity_provider" {
+  name = "donghang-webserver-capacity-provider"
+
+  auto_scaling_group_provider {
+    auto_scaling_group_arn         = aws_autoscaling_group.webserver_ecs_asg.arn
+    managed_termination_protection = "ENABLED"
+
+    managed_scaling {
+      maximum_scaling_step_size = 5
+      minimum_scaling_step_size = 1
+      status                    = "ENABLED"
+      target_capacity           = 100
+    }
+  }
+
+  tags = {
+    Name = "donghang-webserver-capacity-provider"
+  }
+}
+
+resource "aws_ecs_cluster_capacity_providers" "webserver_capacity_provider_association" {
+  cluster_name       = aws_ecs_cluster.webserver_ecs_cluster.name
+  capacity_providers = [aws_ecs_capacity_provider.webserver_capacity_provider.name]
+}
