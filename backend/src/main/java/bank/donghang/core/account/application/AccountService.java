@@ -178,21 +178,19 @@ public class AccountService {
 
 	public BalanceResponse getAccountBalance(BalanceRequest request) {
 
-		Account account = accountRepository.findAccountByFullAccountNumber(request.accountNumber())
-			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
-
-		if (!account.getPassword().equals(request.password())) {
-			throw new BadRequestException(ErrorCode.PASSWORD_MISMATCH);
-		}
+		validateAccountExistenceAndPassword(request.accountNumber(), request.password());
 
 		BalanceResponse response = accountRepository.getAccountBalance(request.accountNumber());
 
 		return response;
 	}
 
-	private void checkAccountExistenceByFullAccountNumber(String fullAccountNumber) {
-		if (!accountRepository.existsAccountByFullAccountNumber(fullAccountNumber)) {
-			throw new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND);
+	private void validateAccountExistenceAndPassword(String fullAccountNumber, String password) {
+		Account account = accountRepository.findAccountByFullAccountNumber(fullAccountNumber)
+			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
+
+		if (!account.getPassword().equals(password)) {
+			throw new BadRequestException(ErrorCode.PASSWORD_MISMATCH);
 		}
 	}
 }

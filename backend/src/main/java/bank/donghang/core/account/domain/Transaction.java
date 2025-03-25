@@ -31,6 +31,9 @@ public class Transaction extends BaseEntity {
 	private Long amount;
 
 	@Column(nullable = false)
+	private Long balance;
+
+	@Column(nullable = false)
 	private Long accountId;
 
 	@Enumerated(EnumType.STRING)
@@ -51,6 +54,7 @@ public class Transaction extends BaseEntity {
 	public static Transaction createTransaction(
 		String description,
 		Long amount,
+		Long balance,
 		Long accountId,
 		TransactionType type,
 		TransactionStatus status,
@@ -59,6 +63,7 @@ public class Transaction extends BaseEntity {
 		return new Transaction(
 			description,
 			amount,
+			balance,
 			accountId,
 			type,
 			status,
@@ -69,6 +74,7 @@ public class Transaction extends BaseEntity {
 	private Transaction(
 		String description,
 		Long amount,
+		Long balance,
 		Long accountId,
 		TransactionType type,
 		TransactionStatus status,
@@ -76,10 +82,10 @@ public class Transaction extends BaseEntity {
 	) {
 		this.description = description;
 		this.amount = amount;
+		this.balance = balance;
 		this.accountId = accountId;
 		this.type = type;
 		this.status = status;
 		this.sessionStartTime = sessionStartTime;
 	}
-
 }

@@ -53,16 +53,16 @@ public class Account {
 	@Column(name = "maturity_payout_account_id")
 	private Long maturityPayoutAccountId;
 
-	@Column(nullable = false, name = "account_type_code")
+	@Column(nullable = false, name = "account_type_code", length = 3)
 	private String accountTypeCode;
 
-	@Column(nullable = false, name = "branch_code")
+	@Column(nullable = false, name = "branch_code", length = 3)
 	private String branchCode;
 
-	@Column(nullable = false, name = "account_number")
+	@Column(nullable = false, name = "account_number", length = 8)
 	private String accountNumber;
 
-	@Column(nullable = false, name = "password")
+	@Column(nullable = false, name = "password", length = 4)
 	private String password;
 
 	@Column(nullable = false, name = "account_status")

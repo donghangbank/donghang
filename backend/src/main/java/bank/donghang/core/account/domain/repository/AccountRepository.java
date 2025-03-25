@@ -102,16 +102,4 @@ public class AccountRepository {
 			accountNumber
 		);
 	}
-
-	public boolean existsAccountByFullAccountNumber(String fullAccountNumber) {
-		String accountTypeCode = fullAccountNumber.substring(0, 3);
-		String branchCode = fullAccountNumber.substring(3, 6);
-		String accountNumber = fullAccountNumber.substring(6);
-
-		return accountJpaRepository.existsByAccountTypeCodeAndBranchCodeAndAccountNumber(
-			accountTypeCode,
-			branchCode,
-			accountNumber
-		);
-	}
 }

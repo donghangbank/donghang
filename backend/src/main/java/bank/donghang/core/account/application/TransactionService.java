@@ -3,7 +3,6 @@ package bank.donghang.core.account.application;
 import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.account.domain.Transaction;
@@ -12,13 +11,16 @@ import bank.donghang.core.account.domain.enums.TransactionType;
 import bank.donghang.core.account.domain.repository.AccountRepository;
 import bank.donghang.core.account.domain.repository.TransactionRepository;
 import bank.donghang.core.account.dto.request.DepositRequest;
+import bank.donghang.core.account.dto.request.TransactionHistoryRequest;
 import bank.donghang.core.account.dto.request.TransactionRequest;
 import bank.donghang.core.account.dto.request.WithdrawalRequest;
 import bank.donghang.core.account.dto.response.DepositResponse;
+import bank.donghang.core.account.dto.response.TransactionHistoryResponse;
 import bank.donghang.core.account.dto.response.TransactionResponse;
 import bank.donghang.core.account.dto.response.WithdrawalResponse;
 import bank.donghang.core.common.annotation.DistributedLock;
 import bank.donghang.core.common.annotation.TransferDistributedLock;
+import bank.donghang.core.common.dto.PageInfo;
 import bank.donghang.core.common.exception.BadRequestException;
 import bank.donghang.core.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -67,6 +69,7 @@ public class TransactionService {
 		Transaction senderTransaction = Transaction.createTransaction(
 			request.description(),
 			request.amount(),
+			sendingAccount.getAccountBalance(),
 			sendingAccount.getAccountId(),
 			TransactionType.WITHDRAWAL,
 			TransactionStatus.COMPLETED,
@@ -76,6 +79,7 @@ public class TransactionService {
 		Transaction recipientTransaction = Transaction.createTransaction(
 			request.description(),
 			request.amount(),
+			receivingAccount.getAccountBalance(),
 			receivingAccount.getAccountId(),
 			TransactionType.DEPOSIT,
 			TransactionStatus.COMPLETED,
@@ -114,6 +118,7 @@ public class TransactionService {
 		Transaction transaction = Transaction.createTransaction(
 			"입금",
 			request.amount(),
+			account.getAccountBalance(),
 			account.getAccountId(),
 			TransactionType.DEPOSIT,
 			TransactionStatus.COMPLETED,
@@ -154,6 +159,7 @@ public class TransactionService {
 			"출금",
 			request.amount(),
 			account.getAccountId(),
+			account.getAccountBalance(),
 			TransactionType.WITHDRAWAL,
 			TransactionStatus.COMPLETED,
 			request.sessionStartTime()
@@ -164,6 +170,20 @@ public class TransactionService {
 		WithdrawalResponse response = WithdrawalResponse.of(
 			account,
 			transaction
+		);
+
+		return response;
+	}
+
+	public PageInfo<TransactionHistoryResponse> getTransactionHistories(
+		TransactionHistoryRequest request,
+		String pageToken
+	) {
+		validateAccountExistenceAndPassword(request.accountNumber(), request.password());
+
+		PageInfo<TransactionHistoryResponse> response = transactionRepository.getTransactionHistoryByFullAccountNumber(
+			request.accountNumber(),
+			pageToken
 		);
 
 		return response;
@@ -188,6 +208,15 @@ public class TransactionService {
 			type
 		)) {
 			throw new BadRequestException(ErrorCode.DUPLICATE_REQUEST);
+		}
+	}
+
+	private void validateAccountExistenceAndPassword(String fullAccountNumber, String password) {
+		Account account = accountRepository.findAccountByFullAccountNumber(fullAccountNumber)
+			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
+
+		if (!account.getPassword().equals(password)) {
+			throw new BadRequestException(ErrorCode.PASSWORD_MISMATCH);
 		}
 	}
 }
