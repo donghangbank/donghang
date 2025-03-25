@@ -160,3 +160,28 @@ resource "aws_ecs_service" "appserver_ecs_service" {
     security_groups = [var.sg_appserver_ecs_id]
   }
 }
+
+data "aws_ssm_parameter" "ecs_ami" {
+  name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id"
+}
+
+resource "aws_launch_template" "webserver_ecs_launch_template" {
+  name                   = "donghang-webserver-ecs-launch-template"
+  image_id               = data.aws_ssm_parameter.ecs_ami.value
+  instance_type          = "t2.micro"
+  vpc_security_group_ids = [var.sg_webserver_ecs_id]
+
+  iam_instance_profile {
+    name = var.ecs_instance_profile_name
+  }
+
+  instance_market_options {
+    market_type = "spot"
+  }
+
+  user_data = base64encode(<<EOF
+#!/bin/bash
+echo ECS_CLUSTER=${aws_ecs_cluster.webserver_ecs_cluster.name} >> /etc/ecs/ecs.config
+EOF
+  )
+}

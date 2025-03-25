@@ -30,6 +30,7 @@ module "ecs" {
   asset_bucket_arn              = module.s3.asset_bucket_arn
   aws_region                    = var.aws_region
   ecr_repository_url            = module.ecr.ecr_repository_url
+  ecs_instance_profile_name     = module.iam.ecs_instance_profile_name
   ecs_task_execution_role_arn   = module.iam.ecs_task_execution_role_arn
   external_alb_target_group_arn = module.alb.external_alb_target_group_arn
   internal_alb_dns_name         = module.alb.internal_alb_dns_name
