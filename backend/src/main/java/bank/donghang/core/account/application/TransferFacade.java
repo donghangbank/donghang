@@ -1,8 +1,25 @@
 package bank.donghang.core.account.application;
 
-import bank.donghang.core.account.domain.TransferCommand;
-import bank.donghang.core.account.dto.response.TransactionResponse;
+import java.time.LocalDateTime;
 
-public interface TransferFacade {
-	void transfer(TransferCommand command);
+import org.springframework.stereotype.Service;
+
+import bank.donghang.core.account.domain.Account;
+import bank.donghang.core.account.domain.TransferCommand;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class TransferFacade {
+	TransactionService transactionService;
+
+	@Transactional
+	public void transfer(TransferCommand command) {
+		Account sendingAccount = command.sendingAccount();
+		Account receivingAccount = command.receivingAccount();
+		String description = command.description();
+		long amount = command.amount();
+		transactionService.transfer(sendingAccount, receivingAccount, description, amount, LocalDateTime.now());
+	}
 }
