@@ -14,9 +14,10 @@ vectorstore = FAISS.load_local("../faiss", embeddings_model, allow_dangerous_des
 
 async def predict_action(text: str):
     """ 텍스트 기반 FAISS을 통한 행동 예측 """
-    result = vectorstore.similarity_search(text, k=1)
-    if result:
+    result = vectorstore.similarity_search_with_score(text, k=1)
+    similarity_score = result[0][1]
+    if similarity_score<0.12:
         return {
-            "predicted_action": result[0].metadata["answer"]
+            "predicted_action": result[0][0].metadata["answer"]
         }
-    return {"predicted_action": "예측된 행동 없음"}
+    return {"predicted_action": "etc"}
