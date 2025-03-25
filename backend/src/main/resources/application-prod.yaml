@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    driver-class-name: ${MYSQL_DATASOURCE_DRIVER}
+    url: ${MYSQL_DATASOURCE_URL}
+    username: ${MYSQL_DATASOURCE_USERNAME}
+    password: ${MYSQL_DATASOURCE_PASSWORD}
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT:6379}
+
+  jpa:
+    show-sql: ${MYSQL_JPA_SHOW_SQL}
+    hibernate:
+      ddl-auto: ${MYSQL_JPA_DDL_AUTO}
+
+  cloud:
+    aws:
+      s3:
+        region: ${S3_REGION:test}
+        bucket: ${S3_BUCKET:test}
+      credentials:
+        access-key: ${S3_ACCESS_KEY:test}
+        secret-key: ${S3_SECRET_KEY:test}
