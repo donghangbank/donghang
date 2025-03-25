@@ -25,9 +25,17 @@ public class CardProductJpaRepositoryCustomImpl implements CardProductJpaReposit
 	@Override
 	public CardProductDetailResponse findCardProductDetailById(Long id) {
 		return queryFactory.select(
-				Projections.constructor(CardProductDetailResponse.class, cardProduct.id, cardProduct.name,
-					cardProduct.type, cardProduct.imageUrl, cardProduct.description, cardCompany.name,
-					cardCompany.logoUrl, cardProduct.duration))
+				Projections.constructor(
+					CardProductDetailResponse.class,
+					cardProduct.id,
+					cardProduct.name,
+					cardProduct.type,
+					cardProduct.imageUrl,
+					cardProduct.description,
+					cardCompany.name,
+					cardCompany.logoUrl,
+					cardProduct.duration
+				))
 			.from(cardProduct)
 			.leftJoin(cardCompany)
 			.on(cardProduct.cardCompanyId.eq(cardCompany.id))
@@ -38,8 +46,15 @@ public class CardProductJpaRepositoryCustomImpl implements CardProductJpaReposit
 	@Override
 	public List<CardProductSummaryResponse> findCardProductSummaries(CardProductType type, String cardCompanyName) {
 		return queryFactory.select(
-				Projections.constructor(CardProductSummaryResponse.class, cardProduct.id, cardProduct.name,
-					cardProduct.imageUrl, cardProduct.type, cardCompany.name, cardCompany.logoUrl))
+				Projections.constructor(
+					CardProductSummaryResponse.class,
+					cardProduct.id,
+					cardProduct.name,
+					cardProduct.imageUrl,
+					cardProduct.type,
+					cardCompany.name,
+					cardCompany.logoUrl
+				))
 			.from(cardProduct)
 			.leftJoin(cardCompany)
 			.on(cardProduct.cardCompanyId.eq(cardCompany.id))

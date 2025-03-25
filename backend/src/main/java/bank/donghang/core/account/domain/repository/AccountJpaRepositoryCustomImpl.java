@@ -6,10 +6,11 @@ import static bank.donghang.core.bank.domain.QBank.*;
 
 import org.springframework.stereotype.Repository;
 
-import bank.donghang.core.account.dto.response.BalanceResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+
+import bank.donghang.core.account.dto.response.BalanceResponse;
 import lombok.RequiredArgsConstructor;
 
 @Repository
