@@ -30,8 +30,20 @@ variable "internal_alb_dns_name" {
   type = string
 }
 
+variable "internal_alb_target_group_arn" {
+  type = string
+}
+
+variable "private_subnets" {
+  type = list(string)
+}
+
 variable "public_subnets" {
   type = list(string)
+}
+
+variable "sg_appserver_ecs_id" {
+  type = string
 }
 
 variable "sg_webserver_ecs_id" {

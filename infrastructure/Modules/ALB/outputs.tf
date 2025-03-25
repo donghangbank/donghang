@@ -17,3 +17,7 @@ output "external_alb_zone_id" {
 output "internal_alb_dns_name" {
   value = aws_alb.internal_alb.dns_name
 }
+
+output "internal_alb_target_group_arn" {
+  value = aws_alb_target_group.internal_alb_target_group.arn
+}

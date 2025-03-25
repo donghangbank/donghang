@@ -33,7 +33,10 @@ module "ecs" {
   ecs_task_execution_role_arn   = module.iam.ecs_task_execution_role_arn
   external_alb_target_group_arn = module.alb.external_alb_target_group_arn
   internal_alb_dns_name         = module.alb.internal_alb_dns_name
+  internal_alb_target_group_arn = module.alb.internal_alb_target_group_arn
+  private_subnets               = module.networing.private_subnets
   public_subnets                = module.networing.public_subnets
+  sg_appserver_ecs_id           = module.security_group.sg_appserver_ecs_id
   sg_webserver_ecs_id           = module.security_group.sg_webserver_ecs_id
   webserver_ecs_task_role_arn   = module.iam.webserver_ecs_task_role_arn
   webserver_log_group_name      = module.cloudwatch.webserver_log_group_name
