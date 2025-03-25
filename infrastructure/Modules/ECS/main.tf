@@ -120,3 +120,23 @@ resource "aws_ecs_task_definition" "appserver_ecs_task_definition" {
     Name = "donghang-appserver-ecs-task"
   }
 }
+
+resource "aws_ecs_service" "webserver_ecs_service" {
+  name                               = "donghang-webserver-service"
+  cluster                            = aws_ecs_cluster.webserver_ecs_cluster.id
+  task_definition                    = aws_ecs_task_definition.webserver_ecs_task_definition.arn
+  desired_count                      = 2
+  deployment_minimum_healthy_percent = 50
+  deployment_maximum_percent         = 100
+
+  load_balancer {
+    target_group_arn = var.external_alb_target_group_arn
+    container_port   = 80
+    container_name   = "webserver-container"
+  }
+
+  network_configuration {
+    subnets         = var.public_subnets
+    security_groups = [var.sg_webserver_ecs_id]
+  }
+}

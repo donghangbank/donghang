@@ -22,7 +22,19 @@ variable "ecs_task_execution_role_arn" {
   type = string
 }
 
+variable "external_alb_target_group_arn" {
+  type = string
+}
+
 variable "internal_alb_dns_name" {
+  type = string
+}
+
+variable "public_subnets" {
+  type = list(string)
+}
+
+variable "sg_webserver_ecs_id" {
   type = string
 }
 
