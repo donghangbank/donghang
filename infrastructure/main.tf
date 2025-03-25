@@ -15,12 +15,21 @@ module "alb" {
   vpc_id                         = module.networing.vpc_id
 }
 
+module "cloudwatch" {
+  source = "./Modules/CloudWatch"
+}
+
 module "ecr" {
   source = "./Modules/ECR"
 }
 
 module "ecs" {
-  source = "./Modules/ECS"
+  source                      = "./Modules/ECS"
+  aws_region                  = var.aws_region
+  ecs_task_execution_role_arn = module.iam.ecs_task_execution_role_arn
+  internal_alb_dns_name       = module.alb.internal_alb_dns_name
+  webserver_ecs_task_role_arn = module.iam.webserver_ecs_task_role_arn
+  webserver_log_group_name    = module.cloudwatch.webserver_log_group_name
 }
 
 module "elasticache" {
