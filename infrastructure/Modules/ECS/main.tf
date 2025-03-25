@@ -206,3 +206,32 @@ echo ECS_CLUSTER=${aws_ecs_cluster.appserver_ecs_cluster.name} >> /etc/ecs/ecs.c
 EOF
   )
 }
+
+resource "aws_autoscaling_group" "webserver_ecs_asg" {
+  name                  = "donghang-webserver-ecs-asg"
+  max_size              = 3
+  min_size              = 1
+  desired_capacity      = 2
+  vpc_zone_identifier   = var.public_subnets
+  health_check_type     = "EC2"
+  protect_from_scale_in = true
+
+  launch_template {
+    id      = aws_launch_template.webserver_ecs_launch_template.id
+    version = "$Latest"
+  }
+
+  instance_refresh {
+    strategy = "Rolling"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tag {
+    key                 = "Name"
+    value               = "donghang-webserver-ecs-asg"
+    propagate_at_launch = true
+  }
+}
