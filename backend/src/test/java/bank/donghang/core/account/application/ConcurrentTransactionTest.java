@@ -58,8 +58,8 @@ class ConcurrentTransactionTest {
 			.accountProductId(101L)
 			.accountTypeCode("110")
 			.branchCode("110")
-			.accountNumber("1234567890")
-			.password("password123")
+			.accountNumber("12345678")
+			.password("1234")
 			.accountStatus(AccountStatus.ACTIVE)
 			.dailyTransferLimit(1_000_000L)
 			.singleTransferLimit(500_000L)
@@ -73,8 +73,8 @@ class ConcurrentTransactionTest {
 			.accountProductId(102L)
 			.accountTypeCode("110")
 			.branchCode("110")
-			.accountNumber("0987654321")
-			.password("password456")
+			.accountNumber("87654321")
+			.password("1234")
 			.accountStatus(AccountStatus.ACTIVE)
 			.dailyTransferLimit(1_000_000L)
 			.singleTransferLimit(500_000L)
@@ -89,8 +89,8 @@ class ConcurrentTransactionTest {
 		accountId1 = account1.getAccountId();
 		accountId2 = account2.getAccountId();
 
-		accountNumber1 = "1101101234567890";
-		accountNumber2 = "1101100987654321";
+		accountNumber1 = "11011012345678";
+		accountNumber2 = "11011087654321";
 	}
 
 	@Test
