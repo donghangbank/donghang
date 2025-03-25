@@ -49,20 +49,16 @@ class AccountServiceTest {
 
 		AccountProduct accountProduct = mock(AccountProduct.class);
 		doReturn(0.05).when(accountProduct).getInterestRate();
-		when(accountProductRepository.getAccountProductById(productId))
-			.thenReturn(accountProduct);
+		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
 		when(accountProductRepository.existsAccountProductById(productId)).thenReturn(true);
 
 		String nextAccountNumber = "000001";
-		when(accountRepository.getNextAccountNumber("100", "001"))
-			.thenReturn(nextAccountNumber);
+		when(accountRepository.getNextAccountNumber("100", "001")).thenReturn(nextAccountNumber);
 
 		Account account = mock(Account.class);
-		when(request.toEntity(nextAccountNumber, accountProduct.getInterestRate()))
-			.thenReturn(account);
+		when(request.toEntity(nextAccountNumber, accountProduct.getInterestRate())).thenReturn(account);
 
-		when(accountRepository.saveAccount(account))
-			.thenReturn(account);
+		when(accountRepository.saveAccount(account)).thenReturn(account);
 
 		AccountRegisterResponse response = accountService.createDemandAccount(request);
 
@@ -76,15 +72,14 @@ class AccountServiceTest {
 	@DisplayName("존재하지 않는 계좌 상품으로 계좌 생성을 시도하면 에러가 발생한다. (Demand 계좌)")
 	void createDemandAccount_shouldThrowExceptionWhenAccountProductNotExist() {
 		Long productId = 2000L;
-		DemandAccountRegisterRequest request = new DemandAccountRegisterRequest(1L, productId, "password123");
+		DemandAccountRegisterRequest request
+			= new DemandAccountRegisterRequest(1L, productId, "password123");
 
-		when(accountProductRepository.existsAccountProductById(productId))
-			.thenThrow(new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND));
+		when(accountProductRepository.existsAccountProductById(productId)).thenThrow(
+			new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND));
 
-		BadRequestException exception = assertThrows(
-			BadRequestException.class,
-			() -> accountService.createDemandAccount(request)
-		);
+		BadRequestException exception = assertThrows(BadRequestException.class,
+			() -> accountService.createDemandAccount(request));
 		assertEquals(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND.getCode(), exception.getCode());
 		verify(accountProductRepository).existsAccountProductById(productId);
 	}
@@ -115,27 +110,23 @@ class AccountServiceTest {
 		Account withdrawalAccount = mock(Account.class);
 		Account payoutAccount = mock(Account.class);
 
-		when(accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber))
-			.thenReturn(Optional.of(withdrawalAccount));
-		when(accountRepository.findAccountByFullAccountNumber(payoutAccountNumber))
-			.thenReturn(Optional.of(payoutAccount));
+		when(accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber)).thenReturn(
+			Optional.of(withdrawalAccount));
+		when(accountRepository.findAccountByFullAccountNumber(payoutAccountNumber)).thenReturn(
+			Optional.of(payoutAccount));
 
 		doNothing().when(withdrawalAccount).verifyWithdrawalAccount(memberId, 5000L);
 		doNothing().when(payoutAccount).verifyPayoutAccount(memberId);
 
 		String newDepositAccountNumber = "200001000010"; // 새 예금 계좌번호
-		when(accountRepository.getNextAccountNumber("200", "001"))
-			.thenReturn(newDepositAccountNumber);
+		when(accountRepository.getNextAccountNumber("200", "001")).thenReturn(newDepositAccountNumber);
 
 		when(withdrawalAccount.getAccountId()).thenReturn(101L);
 		when(payoutAccount.getAccountId()).thenReturn(202L);
 
 		Calendar calendar = Calendar.getInstance();
 		calendar.add(Calendar.MONTH, 12);
-		LocalDate expiryDate = calendar.getTime()
-			.toInstant()
-			.atZone(ZoneId.systemDefault())
-			.toLocalDate();
+		LocalDate expiryDate = calendar.getTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
 		Account depositAccount = mock(Account.class);
 		when(request.toEntity(
@@ -144,8 +135,7 @@ class AccountServiceTest {
 			eq(101L),
 			eq(202L),
 			eq(0L),            // 가입 시 잔액 0
-			any(LocalDate.class)
-		)).thenReturn(depositAccount);
+			any(LocalDate.class))).thenReturn(depositAccount);
 
 		when(accountRepository.saveAccount(depositAccount)).thenReturn(depositAccount);
 
@@ -167,15 +157,12 @@ class AccountServiceTest {
 		when(accountProductRepository.existsAccountProductById(productId)).thenReturn(true);
 		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
 
-		when(accountRepository.findAccountByFullAccountNumber("100001000002"))
-			.thenReturn(Optional.empty());
-		when(accountRepository.findAccountByFullAccountNumber("100001000003"))
-			.thenReturn(Optional.of(mock(Account.class)));
+		when(accountRepository.findAccountByFullAccountNumber("100001000002")).thenReturn(Optional.empty());
+		when(accountRepository.findAccountByFullAccountNumber("100001000003")).thenReturn(
+			Optional.of(mock(Account.class)));
 
-		BadRequestException ex = assertThrows(
-			BadRequestException.class,
-			() -> accountService.createDepositAccount(request)
-		);
+		BadRequestException ex = assertThrows(BadRequestException.class,
+			() -> accountService.createDepositAccount(request));
 		assertEquals(ErrorCode.ACCOUNT_NOT_FOUND.getCode(), ex.getCode());
 	}
 
@@ -197,18 +184,16 @@ class AccountServiceTest {
 		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
 
 		Account withdrawalAccount = mock(Account.class);
-		when(accountRepository.findAccountByFullAccountNumber("100001000002"))
-			.thenReturn(Optional.of(withdrawalAccount));
+		when(accountRepository.findAccountByFullAccountNumber("100001000002")).thenReturn(
+			Optional.of(withdrawalAccount));
 		lenient().when(accountRepository.findAccountByFullAccountNumber("100001000003"))
 			.thenReturn(Optional.of(mock(Account.class)));
 
-		doThrow(new BadRequestException(ErrorCode.WITHDRAWAL_ACCOUNT_NOT_OWNED))
-			.when(withdrawalAccount).verifyWithdrawalAccount(memberId, 5000L);
+		doThrow(new BadRequestException(ErrorCode.WITHDRAWAL_ACCOUNT_NOT_OWNED)).when(withdrawalAccount)
+			.verifyWithdrawalAccount(memberId, 5000L);
 
-		BadRequestException ex = assertThrows(
-			BadRequestException.class,
-			() -> accountService.createDepositAccount(request)
-		);
+		BadRequestException ex = assertThrows(BadRequestException.class,
+			() -> accountService.createDepositAccount(request));
 		assertEquals(ErrorCode.WITHDRAWAL_ACCOUNT_NOT_OWNED.getCode(), ex.getCode());
 	}
 
@@ -230,18 +215,16 @@ class AccountServiceTest {
 		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
 
 		Account withdrawalAccount = mock(Account.class);
-		when(accountRepository.findAccountByFullAccountNumber("100001000002"))
-			.thenReturn(Optional.of(withdrawalAccount));
+		when(accountRepository.findAccountByFullAccountNumber("100001000002")).thenReturn(
+			Optional.of(withdrawalAccount));
 		lenient().when(accountRepository.findAccountByFullAccountNumber("100001000003"))
 			.thenReturn(Optional.of(mock(Account.class)));
 
-		doThrow(new BadRequestException(ErrorCode.WITHDRAWAL_ACCOUNT_IS_NOT_ACTIVE))
-			.when(withdrawalAccount).verifyWithdrawalAccount(memberId, 5000L);
+		doThrow(new BadRequestException(ErrorCode.WITHDRAWAL_ACCOUNT_IS_NOT_ACTIVE)).when(withdrawalAccount)
+			.verifyWithdrawalAccount(memberId, 5000L);
 
-		BadRequestException ex = assertThrows(
-			BadRequestException.class,
-			() -> accountService.createDepositAccount(request)
-		);
+		BadRequestException ex = assertThrows(BadRequestException.class,
+			() -> accountService.createDepositAccount(request));
 		assertEquals(ErrorCode.WITHDRAWAL_ACCOUNT_IS_NOT_ACTIVE.getCode(), ex.getCode());
 	}
 
@@ -263,18 +246,16 @@ class AccountServiceTest {
 		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
 
 		Account withdrawalAccount = mock(Account.class);
-		when(accountRepository.findAccountByFullAccountNumber("100001000002"))
-			.thenReturn(Optional.of(withdrawalAccount));
+		when(accountRepository.findAccountByFullAccountNumber("100001000002")).thenReturn(
+			Optional.of(withdrawalAccount));
 		lenient().when(accountRepository.findAccountByFullAccountNumber("100001000003"))
 			.thenReturn(Optional.of(mock(Account.class)));
 
-		doThrow(new BadRequestException(ErrorCode.WITHDRAWAL_ACCOUNT_HAS_NOT_ENOUGH_BALANCE))
-			.when(withdrawalAccount).verifyWithdrawalAccount(memberId, 50_000_000L);
+		doThrow(new BadRequestException(ErrorCode.WITHDRAWAL_ACCOUNT_HAS_NOT_ENOUGH_BALANCE)).when(withdrawalAccount)
+			.verifyWithdrawalAccount(memberId, 50_000_000L);
 
-		BadRequestException ex = assertThrows(
-			BadRequestException.class,
-			() -> accountService.createDepositAccount(request)
-		);
+		BadRequestException ex = assertThrows(BadRequestException.class,
+			() -> accountService.createDepositAccount(request));
 		assertEquals(ErrorCode.WITHDRAWAL_ACCOUNT_HAS_NOT_ENOUGH_BALANCE.getCode(), ex.getCode());
 	}
 
@@ -291,15 +272,12 @@ class AccountServiceTest {
 		when(accountProductRepository.existsAccountProductById(productId)).thenReturn(true);
 		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
 
-		when(accountRepository.findAccountByFullAccountNumber("100001000002"))
-			.thenReturn(Optional.of(mock(Account.class)));
-		when(accountRepository.findAccountByFullAccountNumber("100001000003"))
-			.thenReturn(Optional.empty());
+		when(accountRepository.findAccountByFullAccountNumber("100001000002")).thenReturn(
+			Optional.of(mock(Account.class)));
+		when(accountRepository.findAccountByFullAccountNumber("100001000003")).thenReturn(Optional.empty());
 
-		BadRequestException ex = assertThrows(
-			BadRequestException.class,
-			() -> accountService.createDepositAccount(request)
-		);
+		BadRequestException ex = assertThrows(BadRequestException.class,
+			() -> accountService.createDepositAccount(request));
 		assertEquals(ErrorCode.ACCOUNT_NOT_FOUND.getCode(), ex.getCode());
 	}
 
@@ -320,20 +298,17 @@ class AccountServiceTest {
 		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
 
 		Account withdrawalAccount = mock(Account.class);
-		when(accountRepository.findAccountByFullAccountNumber("100001000002"))
-			.thenReturn(Optional.of(withdrawalAccount));
+		when(accountRepository.findAccountByFullAccountNumber("100001000002")).thenReturn(
+			Optional.of(withdrawalAccount));
 
 		Account payoutAccount = mock(Account.class);
-		when(accountRepository.findAccountByFullAccountNumber("100001000003"))
-			.thenReturn(Optional.of(payoutAccount));
+		when(accountRepository.findAccountByFullAccountNumber("100001000003")).thenReturn(Optional.of(payoutAccount));
 
-		doThrow(new BadRequestException(ErrorCode.MATURITY_PAYOUT_ACCOUNT_NOT_OWNED))
-			.when(payoutAccount).verifyPayoutAccount(memberId);
+		doThrow(new BadRequestException(ErrorCode.MATURITY_PAYOUT_ACCOUNT_NOT_OWNED)).when(payoutAccount)
+			.verifyPayoutAccount(memberId);
 
-		BadRequestException ex = assertThrows(
-			BadRequestException.class,
-			() -> accountService.createDepositAccount(request)
-		);
+		BadRequestException ex = assertThrows(BadRequestException.class,
+			() -> accountService.createDepositAccount(request));
 		assertEquals(ErrorCode.MATURITY_PAYOUT_ACCOUNT_NOT_OWNED.getCode(), ex.getCode());
 	}
 
@@ -355,21 +330,18 @@ class AccountServiceTest {
 		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
 
 		Account withdrawalAccount = mock(Account.class);
-		when(accountRepository.findAccountByFullAccountNumber("100001000002"))
-			.thenReturn(Optional.of(withdrawalAccount));
+		when(accountRepository.findAccountByFullAccountNumber("100001000002")).thenReturn(
+			Optional.of(withdrawalAccount));
 
 		Account payoutAccount = mock(Account.class);
-		when(accountRepository.findAccountByFullAccountNumber("100001000003"))
-			.thenReturn(Optional.of(payoutAccount));
+		when(accountRepository.findAccountByFullAccountNumber("100001000003")).thenReturn(Optional.of(payoutAccount));
 
 		doNothing().when(withdrawalAccount).verifyWithdrawalAccount(memberId, 5000L);
-		doThrow(new BadRequestException(ErrorCode.MATURITY_ACCOUNT_IS_NOT_ACTIVE))
-			.when(payoutAccount).verifyPayoutAccount(memberId);
+		doThrow(new BadRequestException(ErrorCode.MATURITY_ACCOUNT_IS_NOT_ACTIVE)).when(payoutAccount)
+			.verifyPayoutAccount(memberId);
 
-		BadRequestException ex = assertThrows(
-			BadRequestException.class,
-			() -> accountService.createDepositAccount(request)
-		);
+		BadRequestException ex = assertThrows(BadRequestException.class,
+			() -> accountService.createDepositAccount(request));
 		assertEquals(ErrorCode.MATURITY_ACCOUNT_IS_NOT_ACTIVE.getCode(), ex.getCode());
 	}
 
@@ -398,8 +370,10 @@ class AccountServiceTest {
 
 		Account withdrawalAccount = mock(Account.class);
 		Account payoutAccount = mock(Account.class);
-		when(accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber)).thenReturn(Optional.of(withdrawalAccount));
-		when(accountRepository.findAccountByFullAccountNumber(payoutAccountNumber)).thenReturn(Optional.of(payoutAccount));
+		when(accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber)).thenReturn(
+			Optional.of(withdrawalAccount));
+		when(accountRepository.findAccountByFullAccountNumber(payoutAccountNumber)).thenReturn(
+			Optional.of(payoutAccount));
 
 		doNothing().when(withdrawalAccount).verifyWithdrawalAccount(memberId, monthlyInstallmentAmount);
 		doNothing().when(payoutAccount).verifyPayoutAccount(memberId);
@@ -414,12 +388,8 @@ class AccountServiceTest {
 		LocalDate expectedExpiryDate = LocalDate.now().plusMonths(24L);
 
 		Account installmentAccount = mock(Account.class);
-		when(request.toEntity(eq(newAccountNumber),
-			eq(interestRate),
-			eq(111L),
-			eq(222L),
-			eq(expectedExpiryDate)))
-			.thenReturn(installmentAccount);
+		when(request.toEntity(eq(newAccountNumber), eq(interestRate), eq(111L), eq(222L),
+			eq(expectedExpiryDate))).thenReturn(installmentAccount);
 
 		when(accountRepository.saveInstallmentAccount(installmentAccount)).thenReturn(installmentAccount);
 
@@ -451,15 +421,12 @@ class AccountServiceTest {
 		when(accountProductRepository.existsAccountProductById(productId)).thenReturn(true);
 		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
 
-		when(accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber))
-			.thenReturn(Optional.empty());
-		when(accountRepository.findAccountByFullAccountNumber(payoutAccountNumber))
-			.thenReturn(Optional.of(mock(Account.class)));
+		when(accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber)).thenReturn(Optional.empty());
+		when(accountRepository.findAccountByFullAccountNumber(payoutAccountNumber)).thenReturn(
+			Optional.of(mock(Account.class)));
 
-		BadRequestException exception = assertThrows(
-			BadRequestException.class,
-			() -> accountService.createInstallmentAccount(request)
-		);
+		BadRequestException exception = assertThrows(BadRequestException.class,
+			() -> accountService.createInstallmentAccount(request));
 		assertEquals(ErrorCode.ACCOUNT_NOT_FOUND.getCode(), exception.getCode());
 		verify(accountRepository).findAccountByFullAccountNumber(withdrawalAccountNumber);
 	}
@@ -483,19 +450,17 @@ class AccountServiceTest {
 		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
 
 		Account withdrawalAccount = mock(Account.class);
-		when(accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber))
-			.thenReturn(Optional.of(withdrawalAccount));
+		when(accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber)).thenReturn(
+			Optional.of(withdrawalAccount));
 		Account payoutAccount = mock(Account.class);
-		when(accountRepository.findAccountByFullAccountNumber(payoutAccountNumber))
-			.thenReturn(Optional.of(payoutAccount));
+		when(accountRepository.findAccountByFullAccountNumber(payoutAccountNumber)).thenReturn(
+			Optional.of(payoutAccount));
 
-		doThrow(new BadRequestException(ErrorCode.WITHDRAWAL_ACCOUNT_NOT_OWNED))
-			.when(withdrawalAccount).verifyWithdrawalAccount(memberId, 1000L);
+		doThrow(new BadRequestException(ErrorCode.WITHDRAWAL_ACCOUNT_NOT_OWNED)).when(withdrawalAccount)
+			.verifyWithdrawalAccount(memberId, 1000L);
 
-		BadRequestException exception = assertThrows(
-			BadRequestException.class,
-			() -> accountService.createInstallmentAccount(request)
-		);
+		BadRequestException exception = assertThrows(BadRequestException.class,
+			() -> accountService.createInstallmentAccount(request));
 		assertEquals(ErrorCode.WITHDRAWAL_ACCOUNT_NOT_OWNED.getCode(), exception.getCode());
 	}
 
@@ -518,19 +483,17 @@ class AccountServiceTest {
 		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
 
 		Account withdrawalAccount = mock(Account.class);
-		when(accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber))
-			.thenReturn(Optional.of(withdrawalAccount));
+		when(accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber)).thenReturn(
+			Optional.of(withdrawalAccount));
 		Account payoutAccount = mock(Account.class);
-		when(accountRepository.findAccountByFullAccountNumber(payoutAccountNumber))
-			.thenReturn(Optional.of(payoutAccount));
+		when(accountRepository.findAccountByFullAccountNumber(payoutAccountNumber)).thenReturn(
+			Optional.of(payoutAccount));
 
-		doThrow(new BadRequestException(ErrorCode.WITHDRAWAL_ACCOUNT_IS_NOT_ACTIVE))
-			.when(withdrawalAccount).verifyWithdrawalAccount(memberId, 1000L);
+		doThrow(new BadRequestException(ErrorCode.WITHDRAWAL_ACCOUNT_IS_NOT_ACTIVE)).when(withdrawalAccount)
+			.verifyWithdrawalAccount(memberId, 1000L);
 
-		BadRequestException exception = assertThrows(
-			BadRequestException.class,
-			() -> accountService.createInstallmentAccount(request)
-		);
+		BadRequestException exception = assertThrows(BadRequestException.class,
+			() -> accountService.createInstallmentAccount(request));
 		assertEquals(ErrorCode.WITHDRAWAL_ACCOUNT_IS_NOT_ACTIVE.getCode(), exception.getCode());
 	}
 
@@ -549,15 +512,12 @@ class AccountServiceTest {
 		when(accountProductRepository.existsAccountProductById(productId)).thenReturn(true);
 		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
 
-		when(accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber))
-			.thenReturn(Optional.of(mock(Account.class)));
-		when(accountRepository.findAccountByFullAccountNumber(payoutAccountNumber))
-			.thenReturn(Optional.empty());
+		when(accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber)).thenReturn(
+			Optional.of(mock(Account.class)));
+		when(accountRepository.findAccountByFullAccountNumber(payoutAccountNumber)).thenReturn(Optional.empty());
 
-		BadRequestException exception = assertThrows(
-			BadRequestException.class,
-			() -> accountService.createInstallmentAccount(request)
-		);
+		BadRequestException exception = assertThrows(BadRequestException.class,
+			() -> accountService.createInstallmentAccount(request));
 		assertEquals(ErrorCode.ACCOUNT_NOT_FOUND.getCode(), exception.getCode());
 	}
 
@@ -580,19 +540,17 @@ class AccountServiceTest {
 		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
 
 		Account withdrawalAccount = mock(Account.class);
-		when(accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber))
-			.thenReturn(Optional.of(withdrawalAccount));
+		when(accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber)).thenReturn(
+			Optional.of(withdrawalAccount));
 		Account payoutAccount = mock(Account.class);
-		when(accountRepository.findAccountByFullAccountNumber(payoutAccountNumber))
-			.thenReturn(Optional.of(payoutAccount));
+		when(accountRepository.findAccountByFullAccountNumber(payoutAccountNumber)).thenReturn(
+			Optional.of(payoutAccount));
 
-		doThrow(new BadRequestException(ErrorCode.MATURITY_PAYOUT_ACCOUNT_NOT_OWNED))
-			.when(payoutAccount).verifyPayoutAccount(memberId);
+		doThrow(new BadRequestException(ErrorCode.MATURITY_PAYOUT_ACCOUNT_NOT_OWNED)).when(payoutAccount)
+			.verifyPayoutAccount(memberId);
 
-		BadRequestException exception = assertThrows(
-			BadRequestException.class,
-			() -> accountService.createInstallmentAccount(request)
-		);
+		BadRequestException exception = assertThrows(BadRequestException.class,
+			() -> accountService.createInstallmentAccount(request));
 		assertEquals(ErrorCode.MATURITY_PAYOUT_ACCOUNT_NOT_OWNED.getCode(), exception.getCode());
 	}
 
@@ -615,20 +573,18 @@ class AccountServiceTest {
 		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
 
 		Account withdrawalAccount = mock(Account.class);
-		when(accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber))
-			.thenReturn(Optional.of(withdrawalAccount));
+		when(accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber)).thenReturn(
+			Optional.of(withdrawalAccount));
 		Account payoutAccount = mock(Account.class);
-		when(accountRepository.findAccountByFullAccountNumber(payoutAccountNumber))
-			.thenReturn(Optional.of(payoutAccount));
+		when(accountRepository.findAccountByFullAccountNumber(payoutAccountNumber)).thenReturn(
+			Optional.of(payoutAccount));
 
 		doNothing().when(withdrawalAccount).verifyWithdrawalAccount(memberId, 1000L);
-		doThrow(new BadRequestException(ErrorCode.MATURITY_ACCOUNT_IS_NOT_ACTIVE))
-			.when(payoutAccount).verifyPayoutAccount(memberId);
+		doThrow(new BadRequestException(ErrorCode.MATURITY_ACCOUNT_IS_NOT_ACTIVE)).when(payoutAccount)
+			.verifyPayoutAccount(memberId);
 
-		BadRequestException exception = assertThrows(
-			BadRequestException.class,
-			() -> accountService.createInstallmentAccount(request)
-		);
+		BadRequestException exception = assertThrows(BadRequestException.class,
+			() -> accountService.createInstallmentAccount(request));
 		assertEquals(ErrorCode.MATURITY_ACCOUNT_IS_NOT_ACTIVE.getCode(), exception.getCode());
 	}
 }

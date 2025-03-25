@@ -15,12 +15,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import bank.donghang.core.account.dto.request.InstallmentAccountRegisterRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import bank.donghang.core.account.application.AccountService;
 import bank.donghang.core.account.dto.request.DemandAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.DepositAccountRegisterRequest;
+import bank.donghang.core.account.dto.request.InstallmentAccountRegisterRequest;
 import bank.donghang.core.account.dto.response.AccountRegisterResponse;
 import bank.donghang.core.common.controller.ControllerTest;
 
