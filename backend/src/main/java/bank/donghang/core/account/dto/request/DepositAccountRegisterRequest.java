@@ -5,11 +5,22 @@ import java.time.LocalDate;
 import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.account.domain.enums.AccountStatus;
 
-public record DepositAccountRegisterRequest(Long memberId, Long accountProductId, String password,
-											String withdrawalAccountNumber, String payoutAccountNumber,
-											Long initDepositAmount) {
-	public Account toEntity(String generatedAccountNumber, Double interestRate, Long withdrawalAccountId,
-		Long payoutAccountId, Long initDepositAmount, LocalDate expiryDate) {
+public record DepositAccountRegisterRequest(
+	Long memberId,
+	Long accountProductId,
+	String password,
+	String withdrawalAccountNumber,
+	String payoutAccountNumber,
+	Long initDepositAmount
+) {
+	public Account toEntity(
+		String generatedAccountNumber,
+		Double interestRate,
+		Long withdrawalAccountId,
+		Long payoutAccountId,
+		Long initDepositAmount,
+		LocalDate expiryDate
+	) {
 		return Account.builder()
 			.memberId(memberId)
 			.accountProductId(accountProductId)

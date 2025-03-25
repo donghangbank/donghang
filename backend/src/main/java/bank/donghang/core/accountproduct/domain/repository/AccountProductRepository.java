@@ -1,13 +1,10 @@
 package bank.donghang.core.accountproduct.domain.repository;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
 import bank.donghang.core.accountproduct.domain.AccountProduct;
-import bank.donghang.core.common.exception.BadRequestException;
-import bank.donghang.core.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 
 @Repository

@@ -3,7 +3,6 @@ package bank.donghang.core.account.application;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -19,7 +18,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import bank.donghang.core.account.domain.Account;
-import bank.donghang.core.account.domain.InstallmentSchedule;
 import bank.donghang.core.account.domain.repository.AccountRepository;
 import bank.donghang.core.account.dto.request.BalanceRequest;
 import bank.donghang.core.account.dto.request.DemandAccountRegisterRequest;
@@ -53,14 +51,18 @@ class AccountServiceTest {
 
 		AccountProduct accountProduct = mock(AccountProduct.class);
 		doReturn(0.05).when(accountProduct).getInterestRate();
-		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
-		when(accountProductRepository.existsAccountProductById(productId)).thenReturn(true);
+		when(accountProductRepository.getAccountProductById(productId))
+			.thenReturn(accountProduct);
+		when(accountProductRepository.existsAccountProductById(productId))
+			.thenReturn(true);
 
 		String nextAccountNumber = "000001";
-		when(accountRepository.getNextAccountNumber("100", "001")).thenReturn(nextAccountNumber);
+		when(accountRepository.getNextAccountNumber("100", "001"))
+			.thenReturn(nextAccountNumber);
 
 		Account account = mock(Account.class);
-		when(request.toEntity(nextAccountNumber, accountProduct.getInterestRate())).thenReturn(account);
+		when(request.toEntity(nextAccountNumber, accountProduct.getInterestRate()))
+			.thenReturn(account);
 
 		when(accountRepository.saveAccount(account)).thenReturn(account);
 
@@ -79,8 +81,8 @@ class AccountServiceTest {
 		DemandAccountRegisterRequest request
 			= new DemandAccountRegisterRequest(1L, productId, "password123");
 
-		when(accountProductRepository.existsAccountProductById(productId)).thenThrow(
-			new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND));
+		when(accountProductRepository.existsAccountProductById(productId))
+			.thenThrow(new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND));
 
 		BadRequestException exception = assertThrows(BadRequestException.class,
 			() -> accountService.createDemandAccount(request));
@@ -97,33 +99,44 @@ class AccountServiceTest {
 		String payoutAccountNumber = "100001000003";
 
 		DepositAccountRegisterRequest request = mock(DepositAccountRegisterRequest.class);
-		when(request.accountProductId()).thenReturn(productId);
-		when(request.memberId()).thenReturn(memberId);
-		when(request.withdrawalAccountNumber()).thenReturn(withdrawalAccountNumber);
-		when(request.payoutAccountNumber()).thenReturn(payoutAccountNumber);
-		when(request.initDepositAmount()).thenReturn(5000L);
+		when(request.accountProductId())
+			.thenReturn(productId);
+		when(request.memberId())
+			.thenReturn(memberId);
+		when(request.withdrawalAccountNumber())
+			.thenReturn(withdrawalAccountNumber);
+		when(request.payoutAccountNumber())
+			.thenReturn(payoutAccountNumber);
+		when(request.initDepositAmount())
+			.thenReturn(5000L);
 
 		AccountProduct accountProduct = mock(AccountProduct.class);
-		when(accountProduct.isDepositProduct()).thenReturn(true);
-		when(accountProduct.getInterestRate()).thenReturn(0.5);
-		when(accountProduct.getSubscriptionPeriod()).thenReturn(12L);
+		when(accountProduct.isDepositProduct())
+			.thenReturn(true);
+		when(accountProduct.getInterestRate())
+			.thenReturn(0.5);
+		when(accountProduct.getSubscriptionPeriod())
+			.thenReturn(12L);
 
-		when(accountProductRepository.existsAccountProductById(productId)).thenReturn(true);
-		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
+		when(accountProductRepository.existsAccountProductById(productId))
+			.thenReturn(true);
+		when(accountProductRepository.getAccountProductById(productId))
+			.thenReturn(accountProduct);
 
 		Account withdrawalAccount = mock(Account.class);
 		Account payoutAccount = mock(Account.class);
 
-		when(accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber)).thenReturn(
-			Optional.of(withdrawalAccount));
-		when(accountRepository.findAccountByFullAccountNumber(payoutAccountNumber)).thenReturn(
-			Optional.of(payoutAccount));
+		when(accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber))
+			.thenReturn(Optional.of(withdrawalAccount));
+		when(accountRepository.findAccountByFullAccountNumber(payoutAccountNumber))
+			.thenReturn(Optional.of(payoutAccount));
 
 		doNothing().when(withdrawalAccount).verifyWithdrawalAccount(memberId, 5000L);
 		doNothing().when(payoutAccount).verifyPayoutAccount(memberId);
 
-		String newDepositAccountNumber = "200001000010"; // 새 예금 계좌번호
-		when(accountRepository.getNextAccountNumber("200", "001")).thenReturn(newDepositAccountNumber);
+		String newDepositAccountNumber = "200001000010";
+		when(accountRepository.getNextAccountNumber("200", "001"))
+			.thenReturn(newDepositAccountNumber);
 
 		when(withdrawalAccount.getAccountId()).thenReturn(101L);
 		when(payoutAccount.getAccountId()).thenReturn(202L);
@@ -138,10 +151,12 @@ class AccountServiceTest {
 			eq(0.5),
 			eq(101L),
 			eq(202L),
-			eq(0L),            // 가입 시 잔액 0
-			any(LocalDate.class))).thenReturn(depositAccount);
+			eq(0L),
+			any(LocalDate.class)))
+			.thenReturn(depositAccount);
 
-		when(accountRepository.saveAccount(depositAccount)).thenReturn(depositAccount);
+		when(accountRepository.saveAccount(depositAccount))
+			.thenReturn(depositAccount);
 
 		AccountRegisterResponse response = accountService.createDepositAccount(request);
 

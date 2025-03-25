@@ -1,6 +1,5 @@
 package bank.donghang.core.account.domain.repository;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Repository;

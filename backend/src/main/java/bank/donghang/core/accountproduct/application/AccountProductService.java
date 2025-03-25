@@ -38,11 +38,10 @@ public class AccountProductService {
 		return AccountProductDetail.from(accountProduct);
 	}
 
-	public AccountProductSummary registerAccountProduct(
-		AccountProductCreationRequest accountProductCreationRequestDto) {
+	public AccountProductSummary registerAccountProduct(AccountProductCreationRequest request) {
 
 		AccountProduct accountProduct = accountProductRepository.saveAccountProduct(
-			accountProductCreationRequestDto.toEntity());
+			request.toEntity());
 		return AccountProductSummary.from(accountProduct);
 	}
 }

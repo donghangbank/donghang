@@ -61,7 +61,10 @@ public class TransactionService {
 		// 	TransactionType.DEPOSIT
 		// );
 
-		validateBalance(request.amount(), sendingAccount);
+		validateBalance(
+			request.amount(),
+			sendingAccount
+		);
 
 		sendingAccount.withdraw(request.amount());
 		receivingAccount.deposit(request.amount());
@@ -151,7 +154,10 @@ public class TransactionService {
 		// 	TransactionType.WITHDRAWAL
 		// );
 
-		validateBalance(request.amount(), account);
+		validateBalance(
+			request.amount(),
+			account
+		);
 
 		account.withdraw(request.amount());
 
@@ -211,7 +217,10 @@ public class TransactionService {
 		}
 	}
 
-	private void validateAccountExistenceAndPassword(String fullAccountNumber, String password) {
+	private void validateAccountExistenceAndPassword(
+		String fullAccountNumber,
+		String password
+	) {
 		Account account = accountRepository.findAccountByFullAccountNumber(fullAccountNumber)
 			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
 

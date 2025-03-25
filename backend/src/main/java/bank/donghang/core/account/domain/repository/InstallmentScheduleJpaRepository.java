@@ -11,6 +11,8 @@ import bank.donghang.core.account.domain.enums.InstallmentStatus;
 
 @Repository
 public interface InstallmentScheduleJpaRepository extends JpaRepository<InstallmentSchedule, Long> {
-	List<InstallmentSchedule> findInstallmentScheduleByInstallmentScheduledDateAndInstallmentStatus(LocalDate today,
-		InstallmentStatus status);
+	List<InstallmentSchedule> findInstallmentScheduleByInstallmentScheduledDateAndInstallmentStatus(
+		LocalDate today,
+		InstallmentStatus status
+	);
 }
