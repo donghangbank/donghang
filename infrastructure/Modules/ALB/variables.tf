@@ -1,3 +1,7 @@
+variable "external_alb_certificate_arn" {
+  type = string
+}
+
 variable "external_alb_health_check_path" {
   type = string
 }
