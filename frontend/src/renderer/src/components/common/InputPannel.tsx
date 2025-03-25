@@ -18,7 +18,8 @@ export const InputPanel: React.FC<InputPanelProps> = ({
 			<div className="flex flex-col flex-1 justify-between m-10 p-10 bg-white rounded-2xl">
 				<div className="text-right flex flex-col justify-center flex-1">
 					<span className="text-8xl leading-snug">
-						{mainLabel}를 입력하시고
+						{mainLabel}
+						{mainLabel === "금액" ? "을" : "를"} 입력하시고
 						<br />
 						<span className="text-green">확인</span>을 눌러주십시오
 						{(mainLabel === "비밀번호" || mainLabel === "주민등록번호") && (
