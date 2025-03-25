@@ -3,6 +3,7 @@ stages:
   - check_frontend
   - build_backend
   - aws_ecr_login
+  - publish_backend
 
 check_infrastructure:
   stage: check_infrastructure
@@ -74,3 +75,23 @@ aws_ecr_login:
   artifacts:
     paths:
       - password.txt
+
+publish_backend:
+  stage: publish_backend
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^release.*/'
+  needs:
+    - job: aws_ecr_login
+      artifacts: true
+  image: amazoncorretto:17-alpine-jdk
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
+  before_script:
+    - cd backend
+  script:
+    - chmod +x ./gradlew
+    - ./gradlew jib -Djib.to.image=$AWS_ECR_REPO_URI -Djib.to.auth.username=AWS -Djib.to.auth.password=$(cat ../password.txt)
