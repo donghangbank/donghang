@@ -45,7 +45,8 @@ public class AccountRepository {
 	}
 
 	public List<InstallmentSchedule> findInstallmentScheduleByInstallmentDateAndScheduled(LocalDate today) {
-		return installmentScheduleJpaRepository.findInstallmentScheduleByInstallmentScheduledDateAndInstallmentStatus(today, InstallmentStatus.SCHEDULED);
+		return installmentScheduleJpaRepository.findInstallmentScheduleByInstallmentScheduledDateAndInstallmentStatus(
+			today, InstallmentStatus.SCHEDULED);
 	}
 
 	/**
