@@ -61,36 +61,8 @@ public class TransactionService {
 		// 	TransactionType.DEPOSIT
 		// );
 
-		validateBalance(
-			request.amount(),
-			sendingAccount
-		);
-
-		sendingAccount.withdraw(request.amount());
-		receivingAccount.deposit(request.amount());
-
-		Transaction senderTransaction = Transaction.createTransaction(
-			request.description(),
-			request.amount(),
-			sendingAccount.getAccountBalance(),
-			sendingAccount.getAccountId(),
-			TransactionType.WITHDRAWAL,
-			TransactionStatus.COMPLETED,
-			request.sessionStartTime()
-		);
-
-		Transaction recipientTransaction = Transaction.createTransaction(
-			request.description(),
-			request.amount(),
-			receivingAccount.getAccountBalance(),
-			receivingAccount.getAccountId(),
-			TransactionType.DEPOSIT,
-			TransactionStatus.COMPLETED,
-			request.sessionStartTime()
-		);
-
-		transactionRepository.saveTransaction(senderTransaction);
-		transactionRepository.saveTransaction(recipientTransaction);
+		Transaction senderTransaction = transfer(sendingAccount, receivingAccount, request.description(),
+			request.amount(), request.sessionStartTime());
 
 		return TransactionResponse.of(
 			request,
@@ -98,6 +70,44 @@ public class TransactionService {
 			receivingAccount,
 			senderTransaction
 		);
+	}
+
+	public Transaction transfer(
+		Account sendingAccount,
+		Account receivingAccount,
+		String description,
+		Long amount,
+		LocalDateTime sessionStartTime) {
+
+		validateBalance(amount, sendingAccount);
+
+		sendingAccount.withdraw(amount);
+		receivingAccount.deposit(amount);
+
+		Transaction senderTransaction = Transaction.createTransaction(
+			description,
+			amount,
+			sendingAccount.getAccountBalance(),
+			sendingAccount.getAccountId(),
+			TransactionType.WITHDRAWAL,
+			TransactionStatus.COMPLETED,
+			sessionStartTime
+		);
+
+		Transaction recipientTransaction = Transaction.createTransaction(
+			description,
+			amount,
+			receivingAccount.getAccountBalance(),
+			receivingAccount.getAccountId(),
+			TransactionType.DEPOSIT,
+			TransactionStatus.COMPLETED,
+			sessionStartTime
+		);
+
+		transactionRepository.saveTransaction(senderTransaction);
+		transactionRepository.saveTransaction(recipientTransaction);
+
+		return senderTransaction;
 	}
 
 	@DistributedLock(
