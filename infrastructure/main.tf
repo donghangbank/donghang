@@ -19,6 +19,10 @@ module "ecr" {
   source = "./Modules/ECR"
 }
 
+module "ecs" {
+  source = "./Modules/ECS"
+}
+
 module "elasticache" {
   source           = "./Modules/ElastiCache"
   database_subnets = module.networing.database_subnets
