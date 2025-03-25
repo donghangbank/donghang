@@ -2,6 +2,7 @@ stages:
   - check_infrastructure
   - check_frontend
   - build_backend
+  - aws_ecr_login
 
 check_infrastructure:
   stage: check_infrastructure
@@ -56,3 +57,20 @@ build_backend:
   script:
     - chmod +x ./gradlew
     - ./gradlew build --build-cache -Dspring.profiles.active=dev
+
+aws_ecr_login:
+  stage: aws_ecr_login
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^release.*/'
+  image:
+    name: amazon/aws-cli
+    entrypoint: [ "" ]
+  variables:
+    AWS_ACCESS_KEY_ID: $AWS_ECR_ACCESS_KEY_ID
+    AWS_SECRET_ACCESS_KEY: $AWS_ECR_SECRET_KEY
+    AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+  script:
+    - aws ecr get-login-password --region $AWS_DEFAULT_REGION >> password.txt
+  artifacts:
+    paths:
+      - password.txt
