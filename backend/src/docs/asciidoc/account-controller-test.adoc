@@ -20,3 +20,12 @@ include::{snippets}/account-controller-test/register-deposit-account_success/htt
 
 include::{snippets}/account-controller-test/register-deposit-account_success/http-response.adoc[]
 
+=== 적금 상품 가입 (POST /api/v1/accounts/installments)
+
+==== 요청
+
+include::{snippets}/account-controller-test/register-installment-account_success/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/account-controller-test/register-installment-account_success/http-response.adoc[]
