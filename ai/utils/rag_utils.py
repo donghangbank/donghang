@@ -10,7 +10,7 @@ embeddings_model = HuggingFaceEmbeddings(
     encode_kwargs={'normalize_embeddings': True},
 )
 
-vectorstore = FAISS.load_local("faiss_index", embeddings_model, allow_dangerous_deserialization=True)
+vectorstore = FAISS.load_local("../faiss", embeddings_model, allow_dangerous_deserialization=True)
 
 async def predict_action(text: str):
     """ 텍스트 기반 FAISS을 통한 행동 예측 """
