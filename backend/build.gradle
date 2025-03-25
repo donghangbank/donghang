@@ -4,6 +4,7 @@ plugins {
     id 'org.springframework.boot' version '3.4.3'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.asciidoctor.jvm.convert' version '3.3.2'
+    id 'com.google.cloud.tools.jib' version '3.4.4'
 }
 
 group = 'bank.donghang'
@@ -115,5 +116,20 @@ sourceSets {
         java {
             srcDir querydslDir
         }
+    }
+}
+
+jib {
+    from {
+        image = 'amazoncorretto:17-alpine-jdk'
+    }
+    to {
+        tags = ['latest', "${project.version}".toString()]
+        credHelper = 'ecr-login'
+    }
+    container {
+        creationTime = 'USE_CURRENT_TIMESTAMP'
+        jvmFlags = ['-XX:+UseContainerSupport', '-Dserver.port=8080', '-Duser.timezone=Asia/Seoul', '-Dfile.encoding=UTF-8']
+        ports = ['8080']
     }
 }
