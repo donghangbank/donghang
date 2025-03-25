@@ -6,14 +6,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MvcResult;
 
+import bank.donghang.core.account.dto.request.TransactionHistoryRequest;
+import bank.donghang.core.account.dto.response.TransactionHistoryResponse;
+import bank.donghang.core.common.dto.PageInfo;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import bank.donghang.core.account.application.TransactionService;
@@ -134,5 +141,56 @@ class TransactionControllerTest extends ControllerTest {
 				.content(objectMapper.writeValueAsString(request)))
 			.andDo(print())
 			.andExpect(status().isOk());
+	}
+
+	@Test
+	@DisplayName("사용자는 계좌의 거래 내역을 조회할 수 있다.")
+	void can_get_transaction_histories() throws Exception {
+		String accountNumber = "1101101234567890";
+		String password = "1234";
+
+		var request = new TransactionHistoryRequest(accountNumber, password);
+
+		List<TransactionHistoryResponse> expectedTransactions = List.of(
+			new TransactionHistoryResponse(
+				1L,
+				LocalDateTime.now().minusHours(2),
+				TransactionType.DEPOSIT,
+				"Salary deposit",
+				1000L,
+				1000L
+			),
+			new TransactionHistoryResponse(
+				2L,
+				LocalDateTime.now().minusHours(1),
+				TransactionType.WITHDRAWAL,
+				"ATM withdrawal",
+				500L,
+				500L
+			)
+		);
+
+		PageInfo<TransactionHistoryResponse> expectedPage = new PageInfo<>(
+			null,
+			expectedTransactions,
+			false
+		);
+
+		given(transactionService.getTransactionHistories(request, null))
+			.willReturn(expectedPage);
+
+		MvcResult result = mockMvc.perform(post("/api/v1/transactions/histories")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isOk())
+			.andReturn();
+
+		var response = objectMapper.readValue(
+			result.getResponse().getContentAsString(),
+			new TypeReference<PageInfo<TransactionHistoryResponse>>() {
+			}
+		);
+
+		Assertions.assertThat(response).usingRecursiveComparison().isEqualTo(expectedPage);
 	}
 }

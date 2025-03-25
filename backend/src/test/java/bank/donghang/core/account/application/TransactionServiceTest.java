@@ -4,8 +4,10 @@ import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,9 +17,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.account.domain.enums.AccountStatus;
+import bank.donghang.core.account.domain.enums.TransactionType;
 import bank.donghang.core.account.domain.repository.AccountRepository;
 import bank.donghang.core.account.domain.repository.TransactionRepository;
+import bank.donghang.core.account.dto.request.TransactionHistoryRequest;
 import bank.donghang.core.account.dto.request.TransactionRequest;
+import bank.donghang.core.account.dto.response.TransactionHistoryResponse;
+import bank.donghang.core.common.dto.PageInfo;
 import bank.donghang.core.common.exception.BadRequestException;
 
 @ExtendWith(MockitoExtension.class)
@@ -98,5 +104,68 @@ class TransactionServiceTest {
 
 		verify(accountRepository, times(1)).findAccountByFullAccountNumber(sendingAccountNumber);
 		verify(accountRepository, times(1)).findAccountByFullAccountNumber(receivingAccountNumber);
+	}
+
+	@Test
+	@DisplayName("사용자는 거래 내역을 조회할 수 있다.")
+	void getTransactionHistories_Success() {
+		String accountNumber = "12345678";
+		String password = "1234";
+		String pageToken = "page1";
+
+		TransactionHistoryRequest request = new TransactionHistoryRequest(accountNumber, password);
+
+		Account mockAccount = Account.builder()
+			.accountNumber(accountNumber)
+			.password(password)
+			.accountStatus(AccountStatus.ACTIVE)
+			.accountBalance(1000L)
+			.accountTypeCode("100")
+			.branchCode("001")
+			.memberId(1L)
+			.accountProductId(1L)
+			.dailyTransferLimit(1000000L)
+			.singleTransferLimit(500000L)
+			.interestRate(0.5)
+			.build();
+
+		List<TransactionHistoryResponse> mockTransactions = List.of(
+			new TransactionHistoryResponse(
+				1L,
+				LocalDateTime.now(),
+				TransactionType.DEPOSIT,
+				"Salary",
+				1000L,
+				1500L
+			),
+			new TransactionHistoryResponse(
+				2L,
+				LocalDateTime.now(),
+				TransactionType.WITHDRAWAL,
+				"Shopping",
+				500L,
+				1000L
+			)
+		);
+
+		PageInfo<TransactionHistoryResponse> expectedResponse = PageInfo.of(
+			"nextPageToken",
+			mockTransactions,
+			true
+		);
+
+		when(accountRepository.findAccountByFullAccountNumber(accountNumber))
+			.thenReturn(java.util.Optional.of(mockAccount));
+		when(transactionRepository.getTransactionHistoryByFullAccountNumber(accountNumber, pageToken))
+			.thenReturn(expectedResponse);
+
+		PageInfo<TransactionHistoryResponse> actualResponse = transactionService.getTransactionHistories(request,
+			pageToken);
+
+		Assertions.assertNotNull(actualResponse);
+		Assertions.assertEquals(expectedResponse.data().size(), actualResponse.data().size());
+		Assertions.assertEquals(expectedResponse.hasNext(), actualResponse.hasNext());
+		verify(accountRepository, times(1)).findAccountByFullAccountNumber(accountNumber);
+		verify(transactionRepository, times(1)).getTransactionHistoryByFullAccountNumber(accountNumber, pageToken);
 	}
 }

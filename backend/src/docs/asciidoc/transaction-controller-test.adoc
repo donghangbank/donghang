@@ -29,3 +29,13 @@ include::{snippets}/transaction-controller-test/deposit_by_account/http-request.
 ==== 응답
 
 include::{snippets}/transaction-controller-test/deposit_by_account/http-response.adoc[]
+
+=== 계좌 거래 내역 조회 (POST /api/v1/transactions/histories)
+
+==== 요청
+
+include::{snippets}/transaction-controller-test/can_get_transaction_histories/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/transaction-controller-test/can_get_transaction_histories/http-response.adoc[]
