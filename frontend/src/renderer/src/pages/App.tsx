@@ -6,7 +6,7 @@ import {
 	DepthOfField,
 	BrightnessContrast
 } from "@react-three/postprocessing";
-import { Link } from "react-router-dom";
+import VoiceCommandPanel from "@renderer/components/common/VoiceCommandPanel";
 
 /* eslint-disable react/no-unknown-property */
 
@@ -51,9 +51,10 @@ function App(): JSX.Element {
 				</Canvas>
 			</div>
 			<div style={{ width: "66.67vw" }}>
-				<Link to="/deposit">
-					<button type="button">입금하기 이동</button>
-				</Link>
+				<VoiceCommandPanel
+					title="원하시는 업무를 말씀해 주세요"
+					prompts={["돈을 넣고 싶어", "돈을 꺼내고 싶어", "내가 손녀한테 돈을 보내고 싶어"]}
+				/>
 			</div>
 		</div>
 	);
