@@ -6,8 +6,8 @@ import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.account.domain.enums.AccountStatus;
 
 public record InstallmentAccountRegisterRequest(Long memberId, Long accountProductId, String password,
-											String withdrawalAccountNumber, String payoutAccountNumber,
-											Long monthlyInstallmentAmount, Integer monthlyInstallmentDay) {
+												String withdrawalAccountNumber, String payoutAccountNumber,
+												Long monthlyInstallmentAmount, Integer monthlyInstallmentDay) {
 	public Account toEntity(String generatedAccountNumber, Double interestRate, Long withdrawalAccountId,
 		Long payoutAccountId, LocalDate expiryDate) {
 		return Account.builder()
