@@ -17,9 +17,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import bank.donghang.core.account.domain.Account;
+import bank.donghang.core.account.domain.InstallmentSchedule;
 import bank.donghang.core.account.domain.repository.AccountRepository;
 import bank.donghang.core.account.dto.request.DemandAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.DepositAccountRegisterRequest;
+import bank.donghang.core.account.dto.request.InstallmentAccountRegisterRequest;
 import bank.donghang.core.account.dto.response.AccountRegisterResponse;
 import bank.donghang.core.accountproduct.domain.AccountProduct;
 import bank.donghang.core.accountproduct.domain.repository.AccountProductRepository;
@@ -369,5 +371,264 @@ class AccountServiceTest {
 			() -> accountService.createDepositAccount(request)
 		);
 		assertEquals(ErrorCode.MATURITY_ACCOUNT_IS_NOT_ACTIVE.getCode(), ex.getCode());
+	}
+
+	@Test
+	@DisplayName("사용자는 적금 상품에 가입할 수 있다.")
+	void createInstallmentAccount_success() {
+		Long productId = 3L;
+		Long memberId = 100L;
+		String withdrawalAccountNumber = "100001000004";
+		String payoutAccountNumber = "100001000005";
+		Long monthlyInstallmentAmount = 1000L;
+
+		InstallmentAccountRegisterRequest request = mock(InstallmentAccountRegisterRequest.class);
+		when(request.accountProductId()).thenReturn(productId);
+		when(request.memberId()).thenReturn(memberId);
+		when(request.withdrawalAccountNumber()).thenReturn(withdrawalAccountNumber);
+		when(request.payoutAccountNumber()).thenReturn(payoutAccountNumber);
+		when(request.monthlyInstallmentAmount()).thenReturn(monthlyInstallmentAmount);
+
+		AccountProduct accountProduct = mock(AccountProduct.class);
+		when(accountProduct.getInterestRate()).thenReturn(5.0);
+		when(accountProduct.getSubscriptionPeriod()).thenReturn(24L);
+
+		when(accountProductRepository.existsAccountProductById(productId)).thenReturn(true);
+		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
+
+		Account withdrawalAccount = mock(Account.class);
+		Account payoutAccount = mock(Account.class);
+		when(accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber)).thenReturn(Optional.of(withdrawalAccount));
+		when(accountRepository.findAccountByFullAccountNumber(payoutAccountNumber)).thenReturn(Optional.of(payoutAccount));
+
+		doNothing().when(withdrawalAccount).verifyWithdrawalAccount(memberId, monthlyInstallmentAmount);
+		doNothing().when(payoutAccount).verifyPayoutAccount(memberId);
+
+		String newAccountNumber = "300001000010";
+		when(accountRepository.getNextAccountNumber("300", "001")).thenReturn(newAccountNumber);
+
+		when(withdrawalAccount.getAccountId()).thenReturn(111L);
+		when(payoutAccount.getAccountId()).thenReturn(222L);
+
+		Double interestRate = accountProduct.getInterestRate();
+		LocalDate expectedExpiryDate = LocalDate.now().plusMonths(24L);
+
+		Account installmentAccount = mock(Account.class);
+		when(request.toEntity(eq(newAccountNumber),
+			eq(interestRate),
+			eq(111L),
+			eq(222L),
+			eq(expectedExpiryDate)))
+			.thenReturn(installmentAccount);
+
+		when(accountRepository.saveInstallmentAccount(installmentAccount)).thenReturn(installmentAccount);
+
+		AccountRegisterResponse response = accountService.createInstallmentAccount(request);
+
+		assertNotNull(response);
+		verify(accountProductRepository).existsAccountProductById(productId);
+		verify(accountProductRepository).getAccountProductById(productId);
+		verify(accountRepository).findAccountByFullAccountNumber(withdrawalAccountNumber);
+		verify(accountRepository).findAccountByFullAccountNumber(payoutAccountNumber);
+		verify(withdrawalAccount).verifyWithdrawalAccount(memberId, monthlyInstallmentAmount);
+		verify(payoutAccount).verifyPayoutAccount(memberId);
+		verify(accountRepository).getNextAccountNumber("300", "001");
+		verify(accountRepository).saveInstallmentAccount(installmentAccount);
+	}
+
+	@Test
+	@DisplayName("적금 가입 시 존재하지 않는 출금 계좌를 입력하면 에러가 발생한다.")
+	void creatInstallmentAccount_shouldThrowExceptionWhenWithdrawalAccountNotExist() {
+		Long productId = 3L;
+		InstallmentAccountRegisterRequest request = mock(InstallmentAccountRegisterRequest.class);
+		when(request.accountProductId()).thenReturn(productId);
+		String withdrawalAccountNumber = "100001000004";
+		String payoutAccountNumber = "100001000005";
+		when(request.withdrawalAccountNumber()).thenReturn(withdrawalAccountNumber);
+		when(request.payoutAccountNumber()).thenReturn(payoutAccountNumber);
+
+		AccountProduct accountProduct = mock(AccountProduct.class);
+		when(accountProductRepository.existsAccountProductById(productId)).thenReturn(true);
+		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
+
+		when(accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber))
+			.thenReturn(Optional.empty());
+		when(accountRepository.findAccountByFullAccountNumber(payoutAccountNumber))
+			.thenReturn(Optional.of(mock(Account.class)));
+
+		BadRequestException exception = assertThrows(
+			BadRequestException.class,
+			() -> accountService.createInstallmentAccount(request)
+		);
+		assertEquals(ErrorCode.ACCOUNT_NOT_FOUND.getCode(), exception.getCode());
+		verify(accountRepository).findAccountByFullAccountNumber(withdrawalAccountNumber);
+	}
+
+	@Test
+	@DisplayName("적금 가입 시 본인 소유가 아닌 출금 계좌를 입력하면 에러가 발생한다.")
+	void createInstallmentAccount_shouldThrowExceptionWhenWithdrawalAccountNotOwned() {
+		Long productId = 3L;
+		Long memberId = 100L;
+		InstallmentAccountRegisterRequest request = mock(InstallmentAccountRegisterRequest.class);
+		when(request.accountProductId()).thenReturn(productId);
+		when(request.memberId()).thenReturn(memberId);
+		String withdrawalAccountNumber = "100001000004";
+		String payoutAccountNumber = "100001000005";
+		when(request.withdrawalAccountNumber()).thenReturn(withdrawalAccountNumber);
+		when(request.payoutAccountNumber()).thenReturn(payoutAccountNumber);
+		when(request.monthlyInstallmentAmount()).thenReturn(1000L);
+
+		AccountProduct accountProduct = mock(AccountProduct.class);
+		when(accountProductRepository.existsAccountProductById(productId)).thenReturn(true);
+		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
+
+		Account withdrawalAccount = mock(Account.class);
+		when(accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber))
+			.thenReturn(Optional.of(withdrawalAccount));
+		Account payoutAccount = mock(Account.class);
+		when(accountRepository.findAccountByFullAccountNumber(payoutAccountNumber))
+			.thenReturn(Optional.of(payoutAccount));
+
+		doThrow(new BadRequestException(ErrorCode.WITHDRAWAL_ACCOUNT_NOT_OWNED))
+			.when(withdrawalAccount).verifyWithdrawalAccount(memberId, 1000L);
+
+		BadRequestException exception = assertThrows(
+			BadRequestException.class,
+			() -> accountService.createInstallmentAccount(request)
+		);
+		assertEquals(ErrorCode.WITHDRAWAL_ACCOUNT_NOT_OWNED.getCode(), exception.getCode());
+	}
+
+	@Test
+	@DisplayName("적금 가입 시 출금 계좌가 활성화 상태가 아니면 에러가 발생한다.")
+	void createInstallmentAccount_shouldThrowExceptionWhenWithdrawalAccountNotActive() {
+		Long productId = 3L;
+		Long memberId = 100L;
+		InstallmentAccountRegisterRequest request = mock(InstallmentAccountRegisterRequest.class);
+		when(request.accountProductId()).thenReturn(productId);
+		when(request.memberId()).thenReturn(memberId);
+		String withdrawalAccountNumber = "100001000004";
+		String payoutAccountNumber = "100001000005";
+		when(request.withdrawalAccountNumber()).thenReturn(withdrawalAccountNumber);
+		when(request.payoutAccountNumber()).thenReturn(payoutAccountNumber);
+		when(request.monthlyInstallmentAmount()).thenReturn(1000L);
+
+		AccountProduct accountProduct = mock(AccountProduct.class);
+		when(accountProductRepository.existsAccountProductById(productId)).thenReturn(true);
+		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
+
+		Account withdrawalAccount = mock(Account.class);
+		when(accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber))
+			.thenReturn(Optional.of(withdrawalAccount));
+		Account payoutAccount = mock(Account.class);
+		when(accountRepository.findAccountByFullAccountNumber(payoutAccountNumber))
+			.thenReturn(Optional.of(payoutAccount));
+
+		doThrow(new BadRequestException(ErrorCode.WITHDRAWAL_ACCOUNT_IS_NOT_ACTIVE))
+			.when(withdrawalAccount).verifyWithdrawalAccount(memberId, 1000L);
+
+		BadRequestException exception = assertThrows(
+			BadRequestException.class,
+			() -> accountService.createInstallmentAccount(request)
+		);
+		assertEquals(ErrorCode.WITHDRAWAL_ACCOUNT_IS_NOT_ACTIVE.getCode(), exception.getCode());
+	}
+
+	@Test
+	@DisplayName("적금 가입 시 존재하지 않는 환급 계좌를 입력하면 에러가 발생한다.")
+	void createInstallmentAccount_shouldThrowExceptionWhenPayoutAccountNotExist() {
+		Long productId = 3L;
+		InstallmentAccountRegisterRequest request = mock(InstallmentAccountRegisterRequest.class);
+		when(request.accountProductId()).thenReturn(productId);
+		String withdrawalAccountNumber = "100001000004";
+		String payoutAccountNumber = "100001000005";
+		when(request.withdrawalAccountNumber()).thenReturn(withdrawalAccountNumber);
+		when(request.payoutAccountNumber()).thenReturn(payoutAccountNumber);
+
+		AccountProduct accountProduct = mock(AccountProduct.class);
+		when(accountProductRepository.existsAccountProductById(productId)).thenReturn(true);
+		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
+
+		when(accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber))
+			.thenReturn(Optional.of(mock(Account.class)));
+		when(accountRepository.findAccountByFullAccountNumber(payoutAccountNumber))
+			.thenReturn(Optional.empty());
+
+		BadRequestException exception = assertThrows(
+			BadRequestException.class,
+			() -> accountService.createInstallmentAccount(request)
+		);
+		assertEquals(ErrorCode.ACCOUNT_NOT_FOUND.getCode(), exception.getCode());
+	}
+
+	@Test
+	@DisplayName("적금 가입 시 본인 소유가 아닌 환급 계좌를 입력하면 에러가 발생한다.")
+	void createInstallmentAccount_shouldThrowExceptionWhenPayoutAccountNotOwned() {
+		Long productId = 3L;
+		Long memberId = 100L;
+		InstallmentAccountRegisterRequest request = mock(InstallmentAccountRegisterRequest.class);
+		when(request.accountProductId()).thenReturn(productId);
+		when(request.memberId()).thenReturn(memberId);
+		String withdrawalAccountNumber = "100001000004";
+		String payoutAccountNumber = "100001000005";
+		when(request.withdrawalAccountNumber()).thenReturn(withdrawalAccountNumber);
+		when(request.payoutAccountNumber()).thenReturn(payoutAccountNumber);
+		when(request.monthlyInstallmentAmount()).thenReturn(1000L);
+
+		AccountProduct accountProduct = mock(AccountProduct.class);
+		when(accountProductRepository.existsAccountProductById(productId)).thenReturn(true);
+		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
+
+		Account withdrawalAccount = mock(Account.class);
+		when(accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber))
+			.thenReturn(Optional.of(withdrawalAccount));
+		Account payoutAccount = mock(Account.class);
+		when(accountRepository.findAccountByFullAccountNumber(payoutAccountNumber))
+			.thenReturn(Optional.of(payoutAccount));
+
+		doThrow(new BadRequestException(ErrorCode.MATURITY_PAYOUT_ACCOUNT_NOT_OWNED))
+			.when(payoutAccount).verifyPayoutAccount(memberId);
+
+		BadRequestException exception = assertThrows(
+			BadRequestException.class,
+			() -> accountService.createInstallmentAccount(request)
+		);
+		assertEquals(ErrorCode.MATURITY_PAYOUT_ACCOUNT_NOT_OWNED.getCode(), exception.getCode());
+	}
+
+	@Test
+	@DisplayName("적금 가입 시 환급 계좌가 활성화 상태가 아니면 에러가 발생한다.")
+	void createInstallmentAccount_shouldThrowExceptionWhenPayoutAccountNotActive() {
+		Long productId = 3L;
+		Long memberId = 100L;
+		InstallmentAccountRegisterRequest request = mock(InstallmentAccountRegisterRequest.class);
+		when(request.accountProductId()).thenReturn(productId);
+		when(request.memberId()).thenReturn(memberId);
+		String withdrawalAccountNumber = "100001000004";
+		String payoutAccountNumber = "100001000005";
+		when(request.withdrawalAccountNumber()).thenReturn(withdrawalAccountNumber);
+		when(request.payoutAccountNumber()).thenReturn(payoutAccountNumber);
+		when(request.monthlyInstallmentAmount()).thenReturn(1000L);
+
+		AccountProduct accountProduct = mock(AccountProduct.class);
+		when(accountProductRepository.existsAccountProductById(productId)).thenReturn(true);
+		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
+
+		Account withdrawalAccount = mock(Account.class);
+		when(accountRepository.findAccountByFullAccountNumber(withdrawalAccountNumber))
+			.thenReturn(Optional.of(withdrawalAccount));
+		Account payoutAccount = mock(Account.class);
+		when(accountRepository.findAccountByFullAccountNumber(payoutAccountNumber))
+			.thenReturn(Optional.of(payoutAccount));
+
+		doNothing().when(withdrawalAccount).verifyWithdrawalAccount(memberId, 1000L);
+		doThrow(new BadRequestException(ErrorCode.MATURITY_ACCOUNT_IS_NOT_ACTIVE))
+			.when(payoutAccount).verifyPayoutAccount(memberId);
+
+		BadRequestException exception = assertThrows(
+			BadRequestException.class,
+			() -> accountService.createInstallmentAccount(request)
+		);
+		assertEquals(ErrorCode.MATURITY_ACCOUNT_IS_NOT_ACTIVE.getCode(), exception.getCode());
 	}
 }
