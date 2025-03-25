@@ -81,3 +81,42 @@ resource "aws_ecs_task_definition" "webserver_ecs_task_definition" {
     Name = "donghang-webserver-ecs-task"
   }
 }
+
+resource "aws_ecs_task_definition" "appserver_ecs_task_definition" {
+  family             = "donghang-appserver-ecs-task"
+  network_mode       = "awsvpc"
+  execution_role_arn = var.ecs_task_execution_role_arn
+  task_role_arn      = var.appserver_ecs_task_role_arn
+
+  container_definitions = jsonencode([
+    {
+      name      = "appserver-container",
+      image     = "${var.ecr_repository_url}:latest",
+      memory    = 768,
+      cpu       = 512,
+      essential = true,
+      portMappings = [{
+        containerPort = 8080,
+        protocol      = "tcp"
+      }],
+      logConfiguration = {
+        logDriver = "awslogs",
+        options = {
+          "awslogs-group"         = "${var.appserver_log_group_name}",
+          "awslogs-region"        = "${var.aws_region}",
+          "awslogs-stream-prefix" = "app"
+        }
+      },
+      environmentFiles = [
+        {
+          value = "${var.asset_bucket_arn}/environments/.env",
+          type  = "s3"
+        }
+      ]
+    }
+  ])
+
+  tags = {
+    Name = "donghang-appserver-ecs-task"
+  }
+}

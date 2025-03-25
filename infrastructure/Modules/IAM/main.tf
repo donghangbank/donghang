@@ -63,3 +63,17 @@ resource "aws_iam_role" "webserver_ecs_task_role" {
     Name = "donghang-webserver-ecs-task-role"
   }
 }
+
+resource "aws_iam_role" "appserver_ecs_task_role" {
+  name               = "donghang-appserver-ecs-task-role"
+  assume_role_policy = data.aws_iam_policy_document.task_assume_role_policy.json
+
+  tags = {
+    Name = "donghang-appserver-ecs-task-role"
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "appserver_ecs_task_role_policy" {
+  role       = aws_iam_role.appserver_ecs_task_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonElastiCacheFullAccess"
+}

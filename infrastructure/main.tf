@@ -25,7 +25,11 @@ module "ecr" {
 
 module "ecs" {
   source                      = "./Modules/ECS"
+  appserver_ecs_task_role_arn = module.iam.appserver_ecs_task_role_arn
+  appserver_log_group_name    = module.cloudwatch.appserver_log_group_name
+  asset_bucket_arn            = module.s3.asset_bucket_arn
   aws_region                  = var.aws_region
+  ecr_repository_url          = module.ecr.ecr_repository_url
   ecs_task_execution_role_arn = module.iam.ecs_task_execution_role_arn
   internal_alb_dns_name       = module.alb.internal_alb_dns_name
   webserver_ecs_task_role_arn = module.iam.webserver_ecs_task_role_arn

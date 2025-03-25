@@ -1,4 +1,20 @@
+variable "appserver_ecs_task_role_arn" {
+  type = string
+}
+
+variable "appserver_log_group_name" {
+  type = string
+}
+
+variable "asset_bucket_arn" {
+  type = string
+}
+
 variable "aws_region" {
+  type = string
+}
+
+variable "ecr_repository_url" {
   type = string
 }
 
