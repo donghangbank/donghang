@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import bank.donghang.core.bank.domain.Bank;
 import lombok.RequiredArgsConstructor;
 
+@Repository
 @RequiredArgsConstructor
 public class BankRepository {
 
