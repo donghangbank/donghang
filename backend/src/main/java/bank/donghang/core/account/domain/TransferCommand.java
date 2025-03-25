@@ -8,8 +8,8 @@ import lombok.Getter;
 
 @Builder
 public record TransferCommand(
-	long sendingAccountId,
-	long receivingAccountId,
+	Account sendingAccount,
+	Account receivingAccount,
 	Long amount, String description,
 	LocalDateTime sessionStartTime) {
 }
