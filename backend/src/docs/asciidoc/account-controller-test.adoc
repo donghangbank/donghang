@@ -1,12 +1,22 @@
 == AccountController
 
-=== 계좌 생성 (POST /api/v1/accounts)
+=== 자유 입출금 계좌 생성 (POST /api/v1/accounts/demands)
 
 ==== 요청
 
-include::{snippets}/account-controller-test/register-account_success/http-request.adoc[]
+include::{snippets}/account-controller-test/register-demand-account_success/http-request.adoc[]
 
 ==== 응답
 
-include::{snippets}/account-controller-test/register-account_success/http-response.adoc[]
+include::{snippets}/account-controller-test/register-demand-account_success/http-response.adoc[]
+
+=== 예금 상품 가입 (POST /api/v1/accounts/deposits)
+
+==== 요청
+
+include::{snippets}/account-controller-test/register-deposit-account_success/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/account-controller-test/register-deposit-account_success/http-response.adoc[]
 
