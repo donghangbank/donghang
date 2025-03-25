@@ -2,8 +2,8 @@ package bank.donghang.core.account.application;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -65,7 +65,7 @@ class ConcurrentTransactionTest {
 			.singleTransferLimit(500_000L)
 			.accountBalance(INITIAL_BALANCE)
 			.interestRate(2.5)
-			.accountExpiryDate(new Date())
+			.accountExpiryDate(LocalDate.now())
 			.build();
 
 		Account account2 = Account.builder()
@@ -80,7 +80,7 @@ class ConcurrentTransactionTest {
 			.singleTransferLimit(500_000L)
 			.accountBalance(INITIAL_BALANCE)
 			.interestRate(2.5)
-			.accountExpiryDate(new Date())
+			.accountExpiryDate(LocalDate.now())
 			.build();
 
 		accountRepository.saveAccount(account1);

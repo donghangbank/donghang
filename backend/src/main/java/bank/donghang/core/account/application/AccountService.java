@@ -82,12 +82,12 @@ public class AccountService {
 
 		Account savedDepositAccount = accountRepository.saveAccount(newDepositAccount);
 
-		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-			@Override
-			public void afterCommit() {
-				// todo. withdrawal 계좌에서 newDepositAccount로 송금 로직 추가
-			}
-		});
+		// TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+		// 	@Override
+		// 	public void afterCommit() {
+		// 		// todo. withdrawal 계좌에서 newDepositAccount로 송금 로직 추가
+		// 	}
+		// });
 
 		return AccountRegisterResponse.from(
 			savedDepositAccount,

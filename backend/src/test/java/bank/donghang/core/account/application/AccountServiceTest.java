@@ -162,7 +162,6 @@ class AccountServiceTest {
 		when(request.payoutAccountNumber()).thenReturn("100001000003");
 
 		AccountProduct accountProduct = mock(AccountProduct.class);
-		when(accountProduct.isDepositProduct()).thenReturn(true);
 		when(accountProductRepository.existsAccountProductById(productId)).thenReturn(true);
 		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
 
@@ -287,7 +286,6 @@ class AccountServiceTest {
 		when(request.payoutAccountNumber()).thenReturn("100001000003");
 
 		AccountProduct accountProduct = mock(AccountProduct.class);
-		when(accountProduct.isDepositProduct()).thenReturn(true);
 		when(accountProductRepository.existsAccountProductById(productId)).thenReturn(true);
 		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
 
