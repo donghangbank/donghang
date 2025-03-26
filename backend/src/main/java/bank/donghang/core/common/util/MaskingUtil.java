@@ -47,10 +47,11 @@ public class MaskingUtil {
 		if (matcher.find()) {
 			int length = accountNumber.length();
 			if (length > 5) {
-				char[] c = new char[5];
-				Arrays.fill(c, '*');
+				char[] target = new char[5];
+				Arrays.fill(target, '*');
 
-				return accountNumber.replace(accountNumber, accountNumber.substring(0, length - 5) + String.valueOf(c));
+				return accountNumber.replace(accountNumber,
+					accountNumber.substring(0, length - 5) + String.valueOf(target));
 			}
 		}
 		return accountNumber;
