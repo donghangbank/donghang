@@ -63,7 +63,7 @@ public class AccountService {
 		);
 	}
 
-	// 예치금 이체가 실패하면 에금 계좌 생성도 취소하기 위해 Transactional 어노테이션을 붙였습니다.
+	// 예치금 이체가 실패하면 예금 계좌 생성도 취소하기 위해 Transactional 어노테이션을 붙였습니다.
 	@Transactional
 	public AccountRegisterResponse createDepositAccount(DepositAccountRegisterRequest req) {
 		DepositInstallmentAccountData data = getDepositInstallmentAccountData(
