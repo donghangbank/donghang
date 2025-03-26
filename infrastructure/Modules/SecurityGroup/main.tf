@@ -172,7 +172,7 @@ resource "aws_security_group" "sg_ssm_ec2" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = var.database_subnet_cidr_block
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = {
