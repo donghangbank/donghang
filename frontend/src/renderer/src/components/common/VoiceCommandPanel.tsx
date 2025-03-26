@@ -1,4 +1,4 @@
-import AudioVisualizer from "./AudioVisualizer";
+import { VoiceButton } from "./VoiceButton";
 import VoiceCommandPrompt from "./VoiceCommandPrompt";
 import PropTypes from "prop-types";
 
@@ -31,6 +31,8 @@ export const VoiceCommandPanel = ({ title, prompts }: VoiceCommandPanelProps): J
 				<AudioVisualizer />
 				<span className="ml-3 text-white text-5xl font-bold">듣고 있어요</span>
 			</div>
+
+			<VoiceButton />
 		</div>
 	);
 };
