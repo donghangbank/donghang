@@ -1,5 +1,6 @@
 package bank.donghang.core.common.util;
 
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,7 +40,19 @@ public class MaskingUtil {
 		return value.replaceAll("(?<=.{3}).(?=[^@]*?@)", "*");
 	}
 
-	private static String accountNumberMaskOf(String value) {
-		return value.replaceAll("(?<=.{3}).(?=[^@]*?@)", "*");
+	private static String accountNumberMaskOf(String accountNumber) {
+		String regex = "(^[0-9]+)$";
+
+		Matcher matcher = Pattern.compile(regex).matcher(accountNumber);
+		if (matcher.find()) {
+			int length = accountNumber.length();
+			if (length > 5) {
+				char[] c = new char[5];
+				Arrays.fill(c, '*');
+
+				return accountNumber.replace(accountNumber, accountNumber.substring(0, length - 5) + String.valueOf(c));
+			}
+		}
+		return accountNumber;
 	}
 }
