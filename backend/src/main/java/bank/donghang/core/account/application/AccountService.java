@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.account.domain.InstallmentSchedule;
-import bank.donghang.core.account.dto.TransferInfo;
 import bank.donghang.core.account.domain.repository.AccountRepository;
+import bank.donghang.core.account.dto.TransferInfo;
 import bank.donghang.core.account.dto.request.BalanceRequest;
 import bank.donghang.core.account.dto.request.DemandAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.DepositAccountRegisterRequest;
