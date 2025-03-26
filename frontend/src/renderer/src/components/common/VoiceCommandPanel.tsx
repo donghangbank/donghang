@@ -7,7 +7,7 @@ interface VoiceCommandPanelProps {
 	prompts: string[];
 }
 
-export const VoiceCommandPanel: React.FC<VoiceCommandPanelProps> = ({ title, prompts }) => {
+export const VoiceCommandPanel = ({ title, prompts }: VoiceCommandPanelProps): JSX.Element => {
 	const match = title.match(/(.+?)([을를])(.*)/);
 	const [blueText, particle, restText] = match ? [match[1], match[2], match[3]] : [title, "", ""];
 

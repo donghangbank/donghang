@@ -7,7 +7,12 @@ interface NumberButtonProps {
 	onClick?: () => void;
 }
 
-export const NumberButton: React.FC<NumberButtonProps> = ({ text, bgColor, isSquare, onClick }) => {
+export const NumberButton = ({
+	text,
+	bgColor,
+	isSquare,
+	onClick
+}: NumberButtonProps): JSX.Element => {
 	return (
 		<button
 			type="button"

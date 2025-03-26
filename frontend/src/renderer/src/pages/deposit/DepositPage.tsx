@@ -3,7 +3,7 @@ import NumberPad from "@renderer/components/common/NumberPad";
 import { formatAccountNumber } from "@renderer/utils/formatters";
 import { useState } from "react";
 
-export const DepositPage: React.FC = () => {
+export const DepositPage = (): JSX.Element => {
 	const [inputValue, setInputValue] = useState("");
 
 	return (

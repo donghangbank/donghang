@@ -7,12 +7,12 @@ interface InputPanelProps {
 	format: (value: string) => string;
 }
 
-export const InputPanel: React.FC<InputPanelProps> = ({
+export const InputPanel = ({
 	inputValue,
 	mainLabel,
 	subLabel,
 	format
-}) => {
+}: InputPanelProps): JSX.Element => {
 	return (
 		<div className="flex flex-col h-screen">
 			<div className="flex flex-col flex-1 justify-between m-10 p-10 bg-white rounded-2xl shadow-custom">

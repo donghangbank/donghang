@@ -7,7 +7,7 @@ interface NumberPadProps {
 	type?: string;
 }
 
-export const NumberPad: React.FC<NumberPadProps> = ({ setInputValue, type }) => {
+export const NumberPad = ({ setInputValue, type }: NumberPadProps): JSX.Element => {
 	const getMaxLength = (): number => {
 		switch (type) {
 			case "account":

@@ -1,4 +1,4 @@
-const AudioVisualizerStatic: React.FC = () => {
+const AudioVisualizerStatic = (): JSX.Element => {
 	return (
 		<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
 			<title>Static AudioVisualizer</title>

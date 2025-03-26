@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useFBX } from "@react-three/drei";
 import * as THREE from "three";
@@ -9,7 +9,7 @@ import bowAnimation from "@renderer/assets/models/avatar_bow.fbx?url";
 
 type AnimationType = "idle" | "walk" | "bow";
 
-export const AvatarController: React.FC = () => {
+export const AvatarController = (): JSX.Element => {
 	const avatarRef = useRef<THREE.Group>(null);
 	const mixerRef = useRef<THREE.AnimationMixer | null>(null);
 
