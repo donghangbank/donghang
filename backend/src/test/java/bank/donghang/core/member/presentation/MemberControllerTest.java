@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MvcResult;
 
+import bank.donghang.core.member.dto.request.MemberDetailRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import bank.donghang.core.common.controller.ControllerTest;
@@ -46,13 +47,19 @@ class MemberControllerTest extends ControllerTest {
 			MemberStatus.ACTIVE
 		);
 
+		var request = new MemberDetailRequest(
+			memberId,
+			false
+		);
+
 		MemberDetailResponse expect = MemberDetailResponse.from(member);
 
-		when(memberService.findMember(memberId))
+		when(memberService.findMember(request))
 			.thenReturn(expect);
 
-		MvcResult result = mockMvc.perform(get("/api/v1/members/{memberId}", memberId)
-				.contentType(MediaType.APPLICATION_JSON))
+		MvcResult result = mockMvc.perform(post("/api/v1/members")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
 			.andDo(print())
 			.andExpect(status().isOk())
 			.andReturn();
