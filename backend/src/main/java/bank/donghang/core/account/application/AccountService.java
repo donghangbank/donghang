@@ -205,8 +205,10 @@ public class AccountService {
 		LocalDate today
 	) {
 		try {
-			Optional<Account> optSendingAccount = accountRepository.findAccountById(installmentSchedule.getWithdrawalAccountId());
-			Optional<Account> optInstallAccount = accountRepository.findAccountById(installmentSchedule.getInstallmentAccountId());
+			Optional<Account> optSendingAccount = accountRepository.findAccountById(
+				installmentSchedule.getWithdrawalAccountId());
+			Optional<Account> optInstallAccount = accountRepository.findAccountById(
+				installmentSchedule.getInstallmentAccountId());
 
 			Account sendingAccount = optSendingAccount.orElseThrow(
 				() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND)
@@ -220,9 +222,9 @@ public class AccountService {
 				sendingAccount,
 				installmentAccount,
 				installmentSchedule.getInstallmentAmount(),
-				installmentSchedule.getInstallmentSequence()+"번 째 납입",
+				installmentSchedule.getInstallmentSequence() + "번 째 납입",
 				LocalDateTime.now()
-				);
+			);
 
 			transferFacade.transfer(command);
 

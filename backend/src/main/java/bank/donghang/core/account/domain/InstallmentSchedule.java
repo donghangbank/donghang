@@ -74,7 +74,7 @@ public class InstallmentSchedule {
 			.initialInstallmentScheduleDay(initialInstallmentScheduleDay)
 			.installmentScheduledDate(nextInstallmentScheduleDate)
 			.installmentAmount(installmentAmount)
-			.installmentSequence(installmentSequence+1)
+			.installmentSequence(installmentSequence + 1)
 			.build();
 	}
 
@@ -86,10 +86,9 @@ public class InstallmentSchedule {
 				Math.min(
 					initialInstallmentScheduleDay,
 					YearMonth
-						.from(
-							LocalDate
-								.now().
-								plusMonths(1))
+						.from(LocalDate
+							.now()
+							.plusMonths(1))
 						.lengthOfMonth()));
 	}
 

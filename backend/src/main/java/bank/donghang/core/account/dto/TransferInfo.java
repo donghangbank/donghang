@@ -12,11 +12,14 @@ public record TransferInfo(
 	Long amount, String description,
 	LocalDateTime sessionStartTime) {
 	public String sendingAccountNumber() {
+
 		return sendingAccount.getAccountTypeCode()
 			+ sendingAccount.getBranchCode()
 			+ sendingAccount.getAccountNumber();
 	}
+
 	public String receivingAccountNumber() {
+
 		return receivingAccount.getAccountTypeCode()
 			+ receivingAccount.getBranchCode()
 			+ receivingAccount.getAccountNumber();
