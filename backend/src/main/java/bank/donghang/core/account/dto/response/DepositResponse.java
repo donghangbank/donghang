@@ -3,8 +3,11 @@ package bank.donghang.core.account.dto.response;
 import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.account.domain.Transaction;
 import bank.donghang.core.account.domain.enums.TransactionType;
+import bank.donghang.core.common.annotation.Mask;
+import bank.donghang.core.common.enums.MaskingType;
 
 public record DepositResponse(
+	@Mask(type = MaskingType.ACCOUNT_NUMBER)
 	String accountNumber,
 	Long amount,
 	Long balance,
@@ -15,7 +18,7 @@ public record DepositResponse(
 		Transaction transaction
 	) {
 		return new DepositResponse(
-			account.getAccountNumber(),
+			account.getAccountTypeCode() + account.getBranchCode() + account.getAccountNumber(),
 			transaction.getAmount(),
 			account.getAccountBalance(),
 			TransactionType.DEPOSIT

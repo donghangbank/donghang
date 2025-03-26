@@ -19,6 +19,7 @@ import bank.donghang.core.account.dto.response.TransactionHistoryResponse;
 import bank.donghang.core.account.dto.response.TransactionResponse;
 import bank.donghang.core.account.dto.response.WithdrawalResponse;
 import bank.donghang.core.common.annotation.DistributedLock;
+import bank.donghang.core.common.annotation.MaskApply;
 import bank.donghang.core.common.annotation.TransferDistributedLock;
 import bank.donghang.core.common.dto.PageInfo;
 import bank.donghang.core.common.exception.BadRequestException;
@@ -36,10 +37,9 @@ public class TransactionService {
 
 	@TransferDistributedLock(
 		key1 = "#request.sendingAccountNumber",
-		key2 = "#request.receivingAccountNumber",
-		waitTime = 1000L,
-		leaseTime = 3000L
+		key2 = "#request.receivingAccountNumber"
 	)
+	@MaskApply(typeValue = TransactionResponse.class)
 	public TransactionResponse transferByAccount(TransactionRequest request) {
 
 		Account sendingAccount = accountRepository.findAccountByFullAccountNumber(request.sendingAccountNumber())
@@ -61,8 +61,13 @@ public class TransactionService {
 		// 	TransactionType.DEPOSIT
 		// );
 
-		Transaction senderTransaction = transfer(sendingAccount, receivingAccount, request.description(),
-			request.amount(), request.sessionStartTime());
+		Transaction senderTransaction = transfer(
+			sendingAccount,
+			receivingAccount,
+			request.description(),
+			request.amount(),
+			request.sessionStartTime()
+		);
 
 		return TransactionResponse.of(
 			request,
@@ -73,9 +78,9 @@ public class TransactionService {
 	}
 
 	@DistributedLock(
-		key = "#request.accountNumber",
-		waitTime = 100L
+		key = "#request.accountNumber"
 	)
+	@MaskApply(typeValue = DepositResponse.class)
 	public DepositResponse deposit(DepositRequest request) {
 
 		Account account = accountRepository.findAccountByFullAccountNumber(request.accountNumber())
@@ -111,9 +116,9 @@ public class TransactionService {
 	}
 
 	@DistributedLock(
-		key = "#request.accountNumber",
-		waitTime = 100L
+		key = "#request.accountNumber"
 	)
+	@MaskApply(typeValue = WithdrawalResponse.class)
 	public WithdrawalResponse withdraw(WithdrawalRequest request) {
 
 		Account account = accountRepository.findAccountByFullAccountNumber(request.accountNumber())
@@ -157,7 +162,10 @@ public class TransactionService {
 		TransactionHistoryRequest request,
 		String pageToken
 	) {
-		validateAccountExistenceAndPassword(request.accountNumber(), request.password());
+		validateAccountExistenceAndPassword(
+			request.accountNumber(),
+			request.password()
+		);
 
 		PageInfo<TransactionHistoryResponse> response = transactionRepository.getTransactionHistoryByFullAccountNumber(
 			request.accountNumber(),
