@@ -107,7 +107,8 @@ class ConcurrentTransactionTest {
 						accountNumber2,
 						TRANSFER_AMOUNT,
 						"test",
-						LocalDateTime.now()
+						LocalDateTime.now(),
+						true
 					);
 					transactionService.transferByAccount(request);
 				} catch (Exception e) {
@@ -142,7 +143,8 @@ class ConcurrentTransactionTest {
 					DepositRequest request = new DepositRequest(
 						accountNumber1,
 						DEPOSIT_AMOUNT,
-						LocalDateTime.now()
+						LocalDateTime.now(),
+						true
 					);
 					transactionService.deposit(request);
 				} catch (Exception e) {
@@ -173,7 +175,8 @@ class ConcurrentTransactionTest {
 					WithdrawalRequest request = new WithdrawalRequest(
 						accountNumber1,
 						WITHDRAW_AMOUNT,
-						LocalDateTime.now()
+						LocalDateTime.now(),
+						true
 					);
 					transactionService.withdraw(request);
 				} catch (Exception e) {

@@ -56,7 +56,8 @@ class TransactionServiceTest {
 			receivingAccountNumber,
 			amount,
 			"테스트 이체",
-			LocalDateTime.of(2025, 3, 20, 10, 0, 0)
+			LocalDateTime.of(2025, 3, 20, 10, 0, 0),
+			true
 		);
 
 		Account sendingAccount = Account.builder()

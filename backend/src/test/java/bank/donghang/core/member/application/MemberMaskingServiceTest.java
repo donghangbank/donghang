@@ -34,6 +34,8 @@ class MemberMaskingServiceTest {
 
 	@BeforeEach
 	void setUp() {
+		memberRepository.deleteAll();
+
 		Member member = Member.of(
 			"홍길동",
 			"hong@example.com",
@@ -49,7 +51,9 @@ class MemberMaskingServiceTest {
 
 	@Test
 	void can_find_member_by_without_masking() {
-		MemberDetailRequest request = new MemberDetailRequest(savedMember.getId(), true);
+		MemberDetailRequest request = new MemberDetailRequest(
+			savedMember.getId(), true
+		);
 		MemberDetailResponse response = memberService.findMember(request);
 
 		assertThat(response.name()).isEqualTo("홍길동");
