@@ -75,7 +75,7 @@ class AccountControllerTest extends ControllerTest {
 			.andExpect(jsonPath("$.productName").value("Savings Product"))
 			.andExpect(jsonPath("$.accountNumber").value("100001000001"))
 			.andExpect(jsonPath("$.accountBalance").value(0))
-			.andExpect(jsonPath("$.interestDate").value(0.05))
+			.andExpect(jsonPath("$.interestRate").value(0.05))
 			.andDo(document("demand-account-register"));
 	}
 
@@ -120,7 +120,7 @@ class AccountControllerTest extends ControllerTest {
 			.andExpect(jsonPath("$.productName").value("Deposit Product"))
 			.andExpect(jsonPath("$.accountNumber").value("200001000001"))
 			.andExpect(jsonPath("$.accountBalance").value(0))
-			.andExpect(jsonPath("$.interestDate").value(0.5))
+			.andExpect(jsonPath("$.interestRate").value(0.5))
 			.andExpect(jsonPath("$.accountExpiryDate").exists())
 			.andDo(document("deposit-account-register"));
 	}
@@ -168,7 +168,7 @@ class AccountControllerTest extends ControllerTest {
 			.andExpect(jsonPath("$.productName").value("Installment Product"))
 			.andExpect(jsonPath("$.accountNumber").value("300001000001"))
 			.andExpect(jsonPath("$.accountBalance").value(0))
-			.andExpect(jsonPath("$.interestDate").value(5.0))
+			.andExpect(jsonPath("$.interestRate").value(5.0))
 			.andExpect(jsonPath("$.accountExpiryDate").exists())
 			.andDo(document("installment-account-register"));
 	}
