@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { VoiceButton } from "./VoiceButton";
 import VoiceCommandPrompt from "./VoiceCommandPrompt";
 import PropTypes from "prop-types";
@@ -27,9 +28,17 @@ export const VoiceCommandPanel = ({ title, prompts }: VoiceCommandPanelProps): J
 				<span className="text-4xl text-[#777777]">안전한 금융거래를 위해 음성이 녹음됩니다.</span>
 			</div>
 
-			<div className="inline-flex items-center px-5 py-10 rounded-full bg-purple-linear animate-pulse self-center">
-				<AudioVisualizer />
-				<span className="ml-3 text-white text-5xl font-bold">듣고 있어요</span>
+			<div className="flex justify-center gap-5">
+				<Link to={"/deposit"}>
+					<button type="button" className="text-8xl bg-blue rounded-3xl text-white p-5">
+						입금하기
+					</button>
+				</Link>
+				<Link to={"/deposit/confirm"}>
+					<button type="button" className="text-8xl bg-blue rounded-3xl text-white p-5">
+						내용맞음?
+					</button>
+				</Link>
 			</div>
 
 			<VoiceButton />
