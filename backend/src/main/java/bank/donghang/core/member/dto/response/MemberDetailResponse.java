@@ -9,7 +9,9 @@ public record MemberDetailResponse(
 	Long id,
 	@Mask(type = MaskingType.NAME)
 	String name,
+	@Mask(type = MaskingType.EMAIL)
 	String email,
+	@Mask(type = MaskingType.PHONE_NUMBER)
 	String phoneNumber,
 	MemberStatus memberStatus
 ) {
