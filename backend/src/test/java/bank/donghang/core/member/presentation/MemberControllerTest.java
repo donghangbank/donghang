@@ -16,13 +16,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MvcResult;
 
-import bank.donghang.core.member.dto.request.MemberDetailRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import bank.donghang.core.common.controller.ControllerTest;
 import bank.donghang.core.member.application.MemberService;
 import bank.donghang.core.member.domain.Member;
 import bank.donghang.core.member.domain.enums.MemberStatus;
+import bank.donghang.core.member.dto.request.MemberDetailRequest;
 import bank.donghang.core.member.dto.response.MemberDetailResponse;
 
 @WebMvcTest(MemberController.class)

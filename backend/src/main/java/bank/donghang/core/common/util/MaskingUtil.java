@@ -7,7 +7,7 @@ import bank.donghang.core.common.enums.MaskingType;
 
 public class MaskingUtil {
 
-	public static String MaskingOf(MaskingType type, String value) {
+	public static String maskingOf(MaskingType type, String value) {
 		return switch (type) {
 			case NAME -> nameMaskOf(value);
 			case PHONE_NUMBER -> phoneNumberMaskOf(value);

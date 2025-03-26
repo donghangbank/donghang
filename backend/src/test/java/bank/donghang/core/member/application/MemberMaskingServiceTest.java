@@ -1,11 +1,9 @@
 package bank.donghang.core.member.application;
 
-import bank.donghang.core.common.exception.BadRequestException;
-import bank.donghang.core.member.domain.Member;
-import bank.donghang.core.member.domain.enums.MemberStatus;
-import bank.donghang.core.member.domain.repository.MemberRepository;
-import bank.donghang.core.member.dto.request.MemberDetailRequest;
-import bank.donghang.core.member.dto.response.MemberDetailResponse;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,10 +12,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
-import java.time.LocalDateTime;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import bank.donghang.core.common.exception.BadRequestException;
+import bank.donghang.core.member.domain.Member;
+import bank.donghang.core.member.domain.enums.MemberStatus;
+import bank.donghang.core.member.domain.repository.MemberRepository;
+import bank.donghang.core.member.dto.request.MemberDetailRequest;
+import bank.donghang.core.member.dto.response.MemberDetailResponse;
 
 @ActiveProfiles("test")
 @TestPropertySource(locations = "file:${user.dir}/test.env")

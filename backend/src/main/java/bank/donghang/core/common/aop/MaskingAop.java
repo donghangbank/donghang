@@ -109,7 +109,7 @@ public class MaskingAop {
 			if (fieldValue instanceof String && field.isAnnotationPresent(Mask.class)) {
 				Mask mask = field.getAnnotation(Mask.class);
 				MaskingType maskingType = mask.type();
-				fieldValue = MaskingUtil.MaskingOf(
+				fieldValue = MaskingUtil.maskingOf(
 					maskingType,
 					(String)fieldValue
 				);
