@@ -11,7 +11,7 @@ public record AccountRegisterResponse(
 	String payoutAccountNumber,
 	String accountNumber,
 	Long accountBalance,
-	Double interestDate,
+	Double interestRate,
 	LocalDate accountExpiryDate
 ) {
 	public static AccountRegisterResponse from(Account account, AccountProduct product, String withdrawalAccountNumber,
