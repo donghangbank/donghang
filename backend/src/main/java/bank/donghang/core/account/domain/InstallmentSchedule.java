@@ -50,7 +50,7 @@ public class InstallmentSchedule {
 	@Column(nullable = false, name = "installment_sequence")
 	private int installmentSequence;
 
-	public InstallmentSchedule reassignInstallmentSchedule(LocalDate today) {
+	public InstallmentSchedule reassignInstallmentSchedule() {
 		LocalDate nextInstallmentScheduleDate = createNextInstallmentScheduleDate();
 		setInstallmentStatus(InstallmentStatus.FAILED);
 		InstallmentSchedule newInstallmentSchedule = InstallmentSchedule.builder()

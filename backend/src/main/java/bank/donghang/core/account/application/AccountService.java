@@ -233,7 +233,7 @@ public class AccountService {
 			accountRepository.saveInstallmentSchedule(nextSchedule);
 
 		} catch (BadRequestException e) {
-			InstallmentSchedule newInstallmentSchedule = installmentSchedule.reassignInstallmentSchedule(today);
+			InstallmentSchedule newInstallmentSchedule = installmentSchedule.reassignInstallmentSchedule();
 			accountRepository.saveInstallmentSchedule(newInstallmentSchedule);
 			throw e; // 개별 트랜잭션 내에서 실패 시 rollback을 위해 예외 재던짐
 		}
