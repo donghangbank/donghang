@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 public class InstallmentSchedule {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(unique = true, nullable = false, name = "installment_schedul_id")
+	@Column(unique = true, nullable = false, name = "installment_schedule_id")
 	private long installmentScheduleId;
 
 	@Column(nullable = false, name = "installment_account_id")
