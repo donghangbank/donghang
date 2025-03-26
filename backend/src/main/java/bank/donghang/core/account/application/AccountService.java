@@ -1,6 +1,7 @@
 package bank.donghang.core.account.application;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.account.domain.InstallmentSchedule;
+import bank.donghang.core.account.dto.TransferInfo;
 import bank.donghang.core.account.domain.repository.AccountRepository;
 import bank.donghang.core.account.dto.request.BalanceRequest;
 import bank.donghang.core.account.dto.request.DemandAccountRegisterRequest;
@@ -27,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class AccountService {
+	private final TransferFacade transferFacade;
 	private final AccountRepository accountRepository;
 	private final AccountProductRepository accountProductRepository;
 
@@ -60,6 +63,8 @@ public class AccountService {
 		);
 	}
 
+	// 예치금 이체가 실패하면 에금 계좌 생성도 취소하기 위해 Transactional 어노테이션을 붙였습니다.
+	@Transactional
 	public AccountRegisterResponse createDepositAccount(DepositAccountRegisterRequest req) {
 		DepositInstallmentAccountData data = getDepositInstallmentAccountData(
 			req.accountProductId(),
@@ -90,13 +95,15 @@ public class AccountService {
 		);
 
 		Account savedDepositAccount = accountRepository.saveAccount(newDepositAccount);
+		TransferInfo request = new TransferInfo(
+			data.withdrawalAccount,
+			savedDepositAccount,
+			req.initDepositAmount(),
+			"Initial Deposit",
+			LocalDateTime.now()
+		);
 
-		// TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-		// 	@Override
-		// 	public void afterCommit() {
-		// 		// todo. withdrawal 계좌에서 newDepositAccount로 송금 로직 추가
-		// 	}
-		// });
+		transferFacade.transfer(request);
 
 		return AccountRegisterResponse.from(
 			savedDepositAccount,
@@ -198,12 +205,34 @@ public class AccountService {
 		LocalDate today
 	) {
 		try {
-			// todo: withdrawalAccountId -> installmentAccountId로 installmentAmount 만큼 이체 처리
+			Optional<Account> optSendingAccount = accountRepository.findAccountById(installmentSchedule.getWithdrawalAccountId());
+			Optional<Account> optInstallAccount = accountRepository.findAccountById(installmentSchedule.getInstallmentAccountId());
+
+			Account sendingAccount = optSendingAccount.orElseThrow(
+				() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND)
+			);
+
+			Account installmentAccount = optInstallAccount.orElseThrow(
+				() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND)
+			);
+
+			TransferInfo command = new TransferInfo(
+				sendingAccount,
+				installmentAccount,
+				installmentSchedule.getInstallmentAmount(),
+				installmentSchedule.getInstallmentSequence()+"번 째 납입",
+				LocalDateTime.now()
+				);
+
+			transferFacade.transfer(command);
+
+			// 다음 납입 계획 저장
+			InstallmentSchedule nextSchedule = installmentSchedule.createNextInstallmentScheduleBasedOnInitialDate();
+			accountRepository.saveInstallmentSchedule(nextSchedule);
+
 		} catch (BadRequestException e) {
-			if (e.getCode() == ErrorCode.NOT_ENOUGH_BALANCE.getCode()) { // 잔액 부족
-				InstallmentSchedule newInstallmentSchedule = installmentSchedule.reassignInstallmentSchedule(today);
-				accountRepository.saveInstallmentSchedule(newInstallmentSchedule);
-			}
+			InstallmentSchedule newInstallmentSchedule = installmentSchedule.reassignInstallmentSchedule(today);
+			accountRepository.saveInstallmentSchedule(newInstallmentSchedule);
 			throw e; // 개별 트랜잭션 내에서 실패 시 rollback을 위해 예외 재던짐
 		}
 	}

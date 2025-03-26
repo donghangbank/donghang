@@ -1,6 +1,7 @@
 package bank.donghang.core.account.domain;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 
 import bank.donghang.core.account.domain.enums.InstallmentStatus;
 import jakarta.persistence.Column;
@@ -40,6 +41,9 @@ public class InstallmentSchedule {
 	@Column(nullable = false, name = "installment_status")
 	private InstallmentStatus installmentStatus;
 
+	@Column(nullable = false, name = "initial_installment_schedule_day")
+	private int initialInstallmentScheduleDay;
+
 	@Column(nullable = false, name = "installment_scheduled_date")
 	private LocalDate installmentScheduledDate;
 
@@ -47,15 +51,46 @@ public class InstallmentSchedule {
 	private int installmentSequence;
 
 	public InstallmentSchedule reassignInstallmentSchedule(LocalDate today) {
+		LocalDate nextInstallmentScheduleDate = createNextInstallmentScheduleDate();
 		setInstallmentStatus(InstallmentStatus.FAILED);
 		InstallmentSchedule newInstallmentSchedule = InstallmentSchedule.builder()
 			.installmentAccountId(installmentAccountId)
 			.withdrawalAccountId(withdrawalAccountId)
-			.installmentScheduledDate(today.plusDays(1))
+			.initialInstallmentScheduleDay(initialInstallmentScheduleDay)
+			.installmentScheduledDate(nextInstallmentScheduleDate)
 			.installmentAmount(installmentAmount)
 			.installmentSequence(this.getInstallmentSequence())
 			.build();
 		return newInstallmentSchedule;
+	}
+
+	public InstallmentSchedule createNextInstallmentScheduleBasedOnInitialDate() {
+		LocalDate nextInstallmentScheduleDate = createNextInstallmentScheduleDate();
+
+		return InstallmentSchedule.builder()
+			.installmentAccountId(installmentAccountId)
+			.withdrawalAccountId(withdrawalAccountId)
+			.installmentStatus(InstallmentStatus.SCHEDULED)
+			.initialInstallmentScheduleDay(initialInstallmentScheduleDay)
+			.installmentScheduledDate(nextInstallmentScheduleDate)
+			.installmentAmount(installmentAmount)
+			.installmentSequence(installmentSequence+1)
+			.build();
+	}
+
+	public LocalDate createNextInstallmentScheduleDate() {
+
+		return LocalDate.now()
+			.plusMonths(1)
+			.withDayOfMonth(
+				Math.min(
+					initialInstallmentScheduleDay,
+					YearMonth
+						.from(
+							LocalDate
+								.now().
+								plusMonths(1))
+						.lengthOfMonth()));
 	}
 
 	private void setInstallmentStatus(InstallmentStatus status) {

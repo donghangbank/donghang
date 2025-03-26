@@ -37,6 +37,9 @@ class AccountServiceTest {
 	private AccountService accountService;
 
 	@Mock
+	private TransferFacade transferFacade;
+
+	@Mock
 	private AccountRepository accountRepository;
 
 	@Mock
@@ -155,12 +158,15 @@ class AccountServiceTest {
 			any(LocalDate.class)))
 			.thenReturn(depositAccount);
 
+		doNothing().when(transferFacade).transfer(any());
+
 		when(accountRepository.saveAccount(depositAccount))
 			.thenReturn(depositAccount);
 
 		AccountRegisterResponse response = accountService.createDepositAccount(request);
 
 		assertNotNull(response);
+		verify(transferFacade).transfer(any());
 	}
 
 	@Test

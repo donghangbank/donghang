@@ -1,6 +1,7 @@
 package bank.donghang.core.account.domain.repository;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,9 +26,21 @@ public class AccountRepository {
 		return accountJpaRepository.save(account);
 	}
 
+	// 적금 게좌 저장 + 적금 납입 스케줄 저장
 	@Transactional
 	public Account saveInstallmentAccount(Account account) {
 		Account savedAccount = saveAccount(account);
+		LocalDate nextInstallmentDate = LocalDate.now()
+			.plusMonths(1)
+			.withDayOfMonth(
+				Math.min(account.getMonthlyInstallmentDay(),
+					YearMonth
+						.from(
+							LocalDate
+								.now()
+								.plusMonths(1))
+						.lengthOfMonth()));
+
 		InstallmentSchedule installmentSchedule =
 			InstallmentSchedule
 				.builder().installmentAccountId(savedAccount.getAccountId())
@@ -35,7 +48,7 @@ public class AccountRepository {
 				.installmentAmount(savedAccount.getMonthlyInstallmentAmount())
 				.installmentSequence(1)
 				.installmentStatus(InstallmentStatus.SCHEDULED)
-				.installmentScheduledDate(LocalDate.now().plusMonths(1))
+				.installmentScheduledDate(nextInstallmentDate)
 				.build();
 
 		installmentScheduleJpaRepository.save(installmentSchedule);
