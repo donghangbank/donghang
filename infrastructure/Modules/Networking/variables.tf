@@ -22,6 +22,10 @@ variable "sg_vpce_ecr_id" {
   type = string
 }
 
+variable "sg_vpce_ssm_id" {
+  type = string
+}
+
 variable "vpc_cidr" {
   type = string
 }

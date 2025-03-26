@@ -62,6 +62,7 @@ module "networing" {
   private_subnet_cidr_block  = var.private_subnet_cidr_block
   public_subnet_cidr_block   = var.public_subnet_cidr_block
   sg_vpce_ecr_id             = module.security_group.sg_vpce_ecr_id
+  sg_vpce_ssm_id             = module.security_group.sg_vpce_ssm_id
   vpc_cidr                   = var.vpc_cidr
 }
 
