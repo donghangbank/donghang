@@ -7,15 +7,17 @@ import {
 	DepthOfField,
 	EffectComposer
 } from "@react-three/postprocessing";
-import { useAIAnalysis } from "@renderer/hooks/ai/useAIAnalysis";
+import { useVideoAnalysis } from "@renderer/hooks/ai/useVideoAnalysis";
 import { UserContext } from "@renderer/contexts/UserContext";
 import { useContext } from "react";
-import { useVideoStream } from "@renderer/hooks/ai/useVideoStream";
+import { useMediaStream } from "@renderer/hooks/ai/useMediaStream";
+import { useAudioAnalysis } from "@renderer/hooks/ai/useAudioAnalysis";
 
 export default function AICanvas(): JSX.Element {
-	const { isElderly, isUsingPhone } = useContext(UserContext);
-	const { videoRef, canvasRef } = useVideoStream();
-	useAIAnalysis(videoRef, canvasRef);
+	const { isElderly, isUsingPhone, userMsg, isTalking } = useContext(UserContext);
+	const { videoRef, canvasRef } = useMediaStream();
+	useAudioAnalysis();
+	useVideoAnalysis(videoRef, canvasRef);
 
 	return (
 		<div>
@@ -27,7 +29,7 @@ export default function AICanvas(): JSX.Element {
 				shadows
 				gl={{ antialias: true }}
 				camera={{ position: [0, 0.6, 5.5], rotation: [-0.15, 0, 0], fov: 70 }}
-				style={{ width: "100%", height: "100vh" }}
+				className="w-[100%] h-[100vh]"
 			>
 				{/* 전체적인 조명 */}
 				<ambientLight intensity={0.6} color={"#ffffff"} />
@@ -63,6 +65,8 @@ export default function AICanvas(): JSX.Element {
 					<span className="text-2xl text-black">
 						{isUsingPhone ? "휴대폰 사용 중" : "휴대폰 사용 중 아님"}
 					</span>
+					<span>{isTalking ? "사용자 말하는 중..." : "말하지 않는 중"}</span>
+					<span>{"사용자 음성: " + userMsg}</span>
 				</div>
 			</div>
 		</div>
