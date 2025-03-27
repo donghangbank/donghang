@@ -3,8 +3,10 @@ package bank.donghang.core.account.domain.repository;
 import static bank.donghang.core.account.domain.QAccount.*;
 import static bank.donghang.core.account.domain.QTransaction.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import bank.donghang.core.account.dto.query.AccountTransactionInfo;
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.types.Projections;
@@ -52,6 +54,25 @@ public class TransactionJpaRepositoryCustomImpl implements TransactionJpaReposit
 			.limit(pageSize + 1)
 			.fetch();
 	}
+
+	@Override
+	public List<AccountTransactionInfo> getTransactionsBetweenDates(
+			LocalDateTime start,
+			LocalDateTime end
+	) {
+		return queryFactory.select(
+						Projections.constructor(
+								AccountTransactionInfo.class,
+								account.accountId,
+								transaction.amount,
+								transaction.status,
+								transaction.type
+						))
+				.from(transaction)
+				.where(transaction.createdAt.between(start, end))
+				.fetch();
+	}
+
 
 	private BooleanExpression isInRange(String pageToken) {
 		if (pageToken == null) {

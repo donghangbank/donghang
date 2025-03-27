@@ -2,6 +2,8 @@ package bank.donghang.core.account.application;
 
 import java.time.LocalDateTime;
 
+import bank.donghang.core.account.dto.request.*;
+import bank.donghang.core.account.dto.response.*;
 import org.springframework.stereotype.Service;
 
 import bank.donghang.core.account.domain.Account;
@@ -10,14 +12,6 @@ import bank.donghang.core.account.domain.enums.TransactionStatus;
 import bank.donghang.core.account.domain.enums.TransactionType;
 import bank.donghang.core.account.domain.repository.AccountRepository;
 import bank.donghang.core.account.domain.repository.TransactionRepository;
-import bank.donghang.core.account.dto.request.DepositRequest;
-import bank.donghang.core.account.dto.request.TransactionHistoryRequest;
-import bank.donghang.core.account.dto.request.TransactionRequest;
-import bank.donghang.core.account.dto.request.WithdrawalRequest;
-import bank.donghang.core.account.dto.response.DepositResponse;
-import bank.donghang.core.account.dto.response.TransactionHistoryResponse;
-import bank.donghang.core.account.dto.response.TransactionResponse;
-import bank.donghang.core.account.dto.response.WithdrawalResponse;
 import bank.donghang.core.common.annotation.DistributedLock;
 import bank.donghang.core.common.annotation.MaskApply;
 import bank.donghang.core.common.annotation.TransferDistributedLock;
@@ -188,6 +182,11 @@ public class TransactionService {
 		);
 
 		return response;
+	}
+
+	public BankLedgerCheckResponse checkTransactions (BankLedgerCheckRequest request) {
+		LocalDateTime startTime = request.checkRequestTime().minusDays(1);
+		LocalDateTime endTime = request.checkRequestTime();
 	}
 
 	private void validateBalance(Long amount, Account account) {

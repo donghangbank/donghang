@@ -1,7 +1,9 @@
 package bank.donghang.core.account.domain.repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import bank.donghang.core.account.dto.query.AccountTransactionInfo;
 import org.springframework.stereotype.Repository;
 
 import bank.donghang.core.account.domain.Transaction;
@@ -61,5 +63,15 @@ public class TransactionRepository {
 		String nextPageToken = String.valueOf(lastData.transactionId());
 
 		return PageInfo.of(nextPageToken, data, true);
+	}
+
+	public List<AccountTransactionInfo> findTransactionsBetweenDates(
+			LocalDateTime start,
+			LocalDateTime end
+	) {
+		return transactionJpaRepositoryCustomImpl.getTransactionsBetweenDates(
+				start,
+				end
+		);
 	}
 }
