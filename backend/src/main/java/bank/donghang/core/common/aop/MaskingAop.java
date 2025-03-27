@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import bank.donghang.core.common.annotation.Mask;
 import bank.donghang.core.common.annotation.MaskApply;
 import bank.donghang.core.common.dto.MaskingDto;
+import bank.donghang.core.common.dto.PageInfo;
 import bank.donghang.core.common.enums.MaskingType;
 import bank.donghang.core.common.util.MaskingUtil;
 
@@ -61,16 +62,18 @@ public class MaskingAop {
 		Object response
 	)
 		throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-		if (response instanceof List) {
-			return applyMaskingForList(
-				klass,
-				response
+		if(response instanceof PageInfo) {
+			PageInfo<?> pageInfo = (PageInfo<?>) response;
+			List<?> maskedList = applyMaskingForList(klass, pageInfo.getData());
+			return (T) PageInfo.of(
+				pageInfo.getPageToken(),
+				maskedList,
+				pageInfo.isHasNext()
 			);
+		} else if (response instanceof List) {
+			return applyMaskingForList(klass, response);
 		} else {
-			return applyMaskingForRecord(
-				clazz,
-				response
-			);
+			return applyMaskingForRecord(clazz, response);
 		}
 	}
 

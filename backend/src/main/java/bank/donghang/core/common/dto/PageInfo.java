@@ -18,4 +18,16 @@ public record PageInfo<T>(
 			hasNext
 		);
 	}
+
+	public String getPageToken() {
+		return pageToken;
+	}
+
+	public boolean isHasNext() {
+		return hasNext;
+	}
+
+	public List<T> getData() {
+		return data;
+	}
 }
