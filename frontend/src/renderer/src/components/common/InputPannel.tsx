@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
 interface InputPanelProps {
@@ -13,6 +15,27 @@ export const InputPanel = ({
 	subLabel,
 	format
 }: InputPanelProps): JSX.Element => {
+	const navigate = useNavigate();
+	const [timeLeft, setTimeLeft] = useState(60);
+
+	useEffect((): void | (() => void) => {
+		const interval = setInterval(() => {
+			setTimeLeft((prevTime) => {
+				if (prevTime <= 1) {
+					clearInterval(interval);
+					navigate("/");
+					return 0;
+				}
+				return prevTime - 1;
+			});
+		}, 1000);
+		return () => clearInterval(interval);
+	}, [navigate]);
+
+	const minutes = Math.floor(timeLeft / 60);
+	const seconds = timeLeft % 60;
+	const formattedTime = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+
 	return (
 		<div className="flex flex-col h-full">
 			<div className="flex flex-col flex-1 justify-between m-10 p-10 bg-white rounded-2xl shadow-custom">
@@ -33,7 +56,11 @@ export const InputPanel = ({
 				<div className="flex flex-col p-10 gap-16 bg-background rounded-2xl">
 					<div className="flex justify-between">
 						<span className="text-8xl text-blue font-bold">{subLabel}</span>
-						<span className="text-8xl text-blue font-bold">1:00</span>
+						<span
+							className={`text-8xl font-bold ${timeLeft < 10 ? "text-red shake" : "text-blue"}`}
+						>
+							{formattedTime}
+						</span>
 					</div>
 					<div className="flex flex-col">
 						<input
