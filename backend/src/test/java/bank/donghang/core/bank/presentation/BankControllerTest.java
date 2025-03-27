@@ -38,7 +38,6 @@ class BankControllerTest extends ControllerTest {
 
 	@MockitoBean
 	private BankService bankService;
-	
 	@MockitoBean
 	private S3FileService s3FileService;
 

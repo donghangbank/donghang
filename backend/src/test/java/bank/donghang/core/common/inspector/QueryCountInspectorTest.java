@@ -27,5 +27,4 @@ class QueryCountInspectorTest {
 
 		Assertions.assertThat(queryCountInspector.getCount()).isOne();
 	}
-
 }

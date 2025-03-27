@@ -7,7 +7,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -37,7 +36,7 @@ class QueryLoggingInterceptorTest {
 
 	@Test
 	@DisplayName("preHandle 단계에서 queryCountInspector.startCounter()가 호출된다.")
-	void preHandle() throws Exception {
+	void pre_handle() throws Exception {
 		doNothing().when(queryCountInspector).startCounter();
 
 		queryLoggingInterceptor.preHandle(
@@ -45,13 +44,12 @@ class QueryLoggingInterceptorTest {
 			null,
 			null
 		);
-
 		Mockito.verify(queryCountInspector).startCounter();
 	}
 
 	@Test
 	@DisplayName("afterCompletion 단계에서 queryCountInspector의 값을 가져와 로그에 출력한다.")
-	void afterCompletion() throws Exception {
+	void after_completion() throws Exception {
 		doNothing().when(queryCountInspector).clearCounter();
 		Mockito.when(queryCountInspector.getCount())
 			.thenReturn(1L);
@@ -74,10 +72,10 @@ class QueryLoggingInterceptorTest {
 
 	@Test
 	@DisplayName("쿼리 횟수가 특정 횟수를 넘어가면 경고 로그를 출력한다.")
-	void afterCompletion_log_warn() throws Exception {
+	void after_completion_log_warn() throws Exception {
 		doNothing().when(queryCountInspector).clearCounter();
-		Mockito.when(queryCountInspector.getCount()).
-			thenReturn(100000L);
+		Mockito.when(queryCountInspector.getCount())
+			.thenReturn(100000L);
 		Mockito.when(queryCountInspector.getTimeStamp())
 			.thenReturn(0L);
 
@@ -94,5 +92,4 @@ class QueryLoggingInterceptorTest {
 		Mockito.verify(queryCountInspector).getCount();
 		Mockito.verify(queryCountInspector).getTimeStamp();
 	}
-
 }
