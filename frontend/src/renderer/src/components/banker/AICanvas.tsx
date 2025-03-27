@@ -10,13 +10,19 @@ import {
 import { useAIAnalysis } from "@renderer/hooks/ai/useAIAnalysis";
 import { UserContext } from "@renderer/contexts/UserContext";
 import { useContext } from "react";
+import { useVideoStream } from "@renderer/hooks/ai/useVideoStream";
 
 export default function AICanvas(): JSX.Element {
 	const { isElderly, isUsingPhone } = useContext(UserContext);
-	useAIAnalysis();
+	const { videoRef, canvasRef } = useVideoStream();
+	useAIAnalysis(videoRef, canvasRef);
 
 	return (
 		<div>
+			<div>
+				<video ref={videoRef} autoPlay playsInline width={640} height={640} className="hidden" />
+				<canvas ref={canvasRef} width={640} height={640} className="hidden" />
+			</div>
 			<Canvas
 				shadows
 				gl={{ antialias: true }}
