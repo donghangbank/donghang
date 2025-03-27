@@ -2,10 +2,12 @@ import { createHashRouter } from "react-router-dom";
 import App from "./pages/App";
 import DepositPage from "./pages/deposit/DepositPage";
 import DepositConfirmPage from "./pages/deposit/DepositConfirmPage";
+import MainLayout from "./layouts/MainLayout";
 
 const router = createHashRouter([
 	{
 		path: "/",
+		element: <MainLayout />,
 		children: [
 			{ index: true, element: <App /> },
 			{ path: "deposit", element: <DepositPage /> },
