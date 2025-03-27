@@ -55,7 +55,8 @@ public class AccountController {
 	@PostMapping("/me")
 	public ResponseEntity<PageInfo<AccountSummaryResponse>> getMyAccounts(
 		@RequestBody MyAccountsRequest request,
-		@RequestParam(required = false) String pageToken) {
+		@RequestParam(required = false) String pageToken
+	) {
 		return ResponseEntity.ok(accountService.getMyAccounts(request, pageToken));
 	}
 

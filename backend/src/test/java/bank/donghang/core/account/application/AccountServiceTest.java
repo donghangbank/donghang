@@ -58,9 +58,16 @@ class AccountServiceTest {
 		Long cursor = Long.parseLong(pageToken);
 
 		AccountSummaryResponse summary = new AccountSummaryResponse(
-			"TestBank", "****1234", AccountProductType.DEMAND, 1000L
+			"TestBank",
+			"****1234",
+			AccountProductType.DEMAND,
+			1000L
 		);
-		PageInfo<AccountSummaryResponse> expected = PageInfo.of("456", List.of(summary), true);
+		PageInfo<AccountSummaryResponse> expected = PageInfo.of(
+			"456",
+			List.of(summary),
+			true
+		);
 
 		when(accountRepository.getMyAccounts(memberId, cursor)).thenReturn(expected);
 
@@ -86,7 +93,11 @@ class AccountServiceTest {
 			.thenReturn(true);
 
 		String nextAccountNumber = "000001";
-		when(accountRepository.getNextAccountNumber("100", "001"))
+		when(accountRepository.getNextAccountNumber(
+			"100",
+			"001"
+			)
+		)
 			.thenReturn(nextAccountNumber);
 
 		Account account = mock(Account.class);
@@ -98,7 +109,10 @@ class AccountServiceTest {
 		AccountRegisterResponse response = accountService.createDemandAccount(request);
 		assertNotNull(response);
 		verify(accountProductRepository).getAccountProductById(productId);
-		verify(accountRepository).getNextAccountNumber("100", "001");
+		verify(accountRepository).getNextAccountNumber(
+			"100",
+			"001"
+		);
 		verify(accountRepository).saveAccount(account);
 	}
 
@@ -106,7 +120,12 @@ class AccountServiceTest {
 	@DisplayName("존재하지 않는 계좌 상품으로 계좌 생성을 시도하면 에러가 발생한다. (Demand 계좌)")
 	void createDemandAccount_shouldThrowExceptionWhenAccountProductNotExist() {
 		Long productId = 2000L;
-		DemandAccountRegisterRequest request = new DemandAccountRegisterRequest(1L, productId, "1234", true);
+		DemandAccountRegisterRequest request = new DemandAccountRegisterRequest(
+			1L,
+			productId,
+			"1234",
+			true
+		);
 
 		when(accountProductRepository.existsAccountProductById(productId))
 			.thenThrow(new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND));
@@ -154,8 +173,9 @@ class AccountServiceTest {
 		String newDepositAccountNumber = "200001000010";
 		when(accountRepository.getNextAccountNumber(
 			"200",
-			"001"))
-			.thenReturn(newDepositAccountNumber);
+			"001"
+			)
+		).thenReturn(newDepositAccountNumber);
 
 		when(withdrawalAccount.getAccountId()).thenReturn(101L);
 		when(payoutAccount.getAccountId()).thenReturn(202L);
