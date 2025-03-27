@@ -1,23 +1,20 @@
-import InputPanel from "@renderer/components/common/InputPannel";
-import NumberPad from "@renderer/components/common/NumberPad";
-import { formatAccountNumber } from "@renderer/utils/formatters";
-import { useState } from "react";
+import AICanvas from "@renderer/components/banker/AICanvas";
+import VoiceCommandPanel from "@renderer/components/common/VoiceCommandPanel";
 
 export const DepositPage = (): JSX.Element => {
-	const [inputValue, setInputValue] = useState("");
+	const prompts = [
+		{ prompt: "카드", link: "/deposit/card" },
+		{ prompt: "통장", link: "/deposit/bankbook" },
+		{ prompt: "계좌번호", link: "/deposit/account" }
+	];
 
 	return (
 		<div className="flex h-full">
-			<div className="h-full" style={{ width: "66.67vw" }}>
-				<InputPanel
-					inputValue={inputValue}
-					mainLabel={"계좌번호"}
-					subLabel={"본인 계좌"}
-					format={formatAccountNumber}
-				/>
-			</div>
 			<div className="h-full" style={{ width: "33.33vw" }}>
-				<NumberPad setInputValue={setInputValue} type="account" />
+				<AICanvas />
+			</div>
+			<div className="h-full" style={{ width: "66.67vw" }}>
+				<VoiceCommandPanel title="무엇을 가져 오셨나요?" prompts={prompts} />
 			</div>
 		</div>
 	);
