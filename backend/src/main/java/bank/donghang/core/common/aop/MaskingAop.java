@@ -64,16 +64,25 @@ public class MaskingAop {
 		throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
 		if (response instanceof PageInfo) {
 			PageInfo<?> pageInfo = (PageInfo<?>)response;
-			List<?> maskedList = applyMaskingForList(klass, pageInfo.getData());
+			List<?> maskedList = applyMaskingForList(
+				klass,
+				pageInfo.getData()
+			);
 			return (T)PageInfo.of(
 				pageInfo.getPageToken(),
 				maskedList,
 				pageInfo.isHasNext()
 			);
 		} else if (response instanceof List) {
-			return applyMaskingForList(klass, response);
+			return applyMaskingForList(
+				klass,
+				response
+			);
 		} else {
-			return applyMaskingForRecord(clazz, response);
+			return applyMaskingForRecord(
+				clazz,
+				response
+			);
 		}
 	}
 
