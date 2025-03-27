@@ -221,7 +221,7 @@ class AccountControllerTest extends ControllerTest {
 
 		willDoNothing().given(accountService).deleteAccount(request);
 
-		mockMvc.perform(delete("/api/v1/accounts")
+		mockMvc.perform(patch("/api/v1/accounts")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isNoContent());
