@@ -5,9 +5,10 @@ import PropTypes from "prop-types";
 interface NumberPadProps {
 	setInputValue: React.Dispatch<React.SetStateAction<string>>;
 	type?: string;
+	link: string;
 }
 
-export const NumberPad = ({ setInputValue, type }: NumberPadProps): JSX.Element => {
+export const NumberPad = ({ setInputValue, type, link }: NumberPadProps): JSX.Element => {
 	const getMaxLength = (): number => {
 		switch (type) {
 			case "account":
@@ -86,7 +87,9 @@ export const NumberPad = ({ setInputValue, type }: NumberPadProps): JSX.Element 
 			</div>
 
 			<div className="h-[20%] grid grid-cols-2 gap-2.5">
-				<NumberButton text={"확인"} bgColor="bg-green" isSquare={false} />
+				<Link to={link}>
+					<NumberButton text={"확인"} bgColor="bg-green" isSquare={false} />
+				</Link>
 				<Link to={"/"}>
 					<NumberButton text={"취소"} bgColor="bg-red" isSquare={false} />
 				</Link>
@@ -97,7 +100,8 @@ export const NumberPad = ({ setInputValue, type }: NumberPadProps): JSX.Element 
 
 NumberPad.propTypes = {
 	setInputValue: PropTypes.func.isRequired,
-	type: PropTypes.string
+	type: PropTypes.string,
+	link: PropTypes.string.isRequired
 };
 
 export default NumberPad;
