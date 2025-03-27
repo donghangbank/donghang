@@ -39,3 +39,13 @@ include::{snippets}/account-controller-test/can_get_account_balance/http-request
 ==== 응답
 
 include::{snippets}/account-controller-test/can_get_account_balance/http-response.adoc[]
+
+=== 계좌 삭제 (DELETE /api/v1/accounts)
+
+==== 요청
+
+include::{snippets}/account-controller-test/can_delete_account/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/account-controller-test/can_delete_account/http-response.adoc[]

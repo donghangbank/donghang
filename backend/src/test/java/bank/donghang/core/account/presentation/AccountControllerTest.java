@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MvcResult;
 
+import bank.donghang.core.account.dto.request.DeleteAccountRequest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -208,5 +209,23 @@ class AccountControllerTest extends ControllerTest {
 		);
 
 		Assertions.assertThat(response).usingRecursiveComparison().isEqualTo(expect);
+	}
+
+	@Test
+	@DisplayName("계좌를 삭제할 수 있다.")
+	void can_delete_account() throws Exception {
+		var request = new DeleteAccountRequest(
+			"1101101234567890",
+			"1234"
+		);
+
+		willDoNothing().given(accountService).deleteAccount(request);
+
+		mockMvc.perform(delete("/api/v1/accounts")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isNoContent());
+
+		verify(accountService).deleteAccount(request);
 	}
 }
