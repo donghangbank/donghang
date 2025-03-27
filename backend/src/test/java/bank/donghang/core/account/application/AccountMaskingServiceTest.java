@@ -2,6 +2,13 @@ package bank.donghang.core.account.application;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
+
 import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.account.domain.enums.AccountStatus;
 import bank.donghang.core.account.domain.repository.AccountRepository;
@@ -12,13 +19,6 @@ import bank.donghang.core.account.dto.response.AccountRegisterResponse;
 import bank.donghang.core.accountproduct.domain.AccountProduct;
 import bank.donghang.core.accountproduct.domain.enums.AccountProductType;
 import bank.donghang.core.accountproduct.domain.repository.AccountProductRepository;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 
 @ActiveProfiles("test")
 @TestPropertySource(locations = "file:${user.dir}/test.env")
