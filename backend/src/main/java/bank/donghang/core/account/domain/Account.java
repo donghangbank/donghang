@@ -34,8 +34,6 @@ import lombok.NoArgsConstructor;
 			"account_number"
 		})
 })
-@SQLDelete(sql = "UPDATE account SET account_status = 'INACTIVE' WHERE account_id = ?")
-@SQLRestriction("account_status <> 'DELETED'")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
@@ -94,6 +92,10 @@ public class Account {
 
 	@Column(name = "account_expiry_date")
 	private LocalDate accountExpiryDate;
+
+	public void deleteAccount() {
+		this.accountStatus = AccountStatus.INACTIVE;
+	}
 
 	public void deposit(Long amount) {
 		if (amount < 0) {

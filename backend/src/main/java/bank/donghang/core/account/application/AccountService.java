@@ -252,7 +252,7 @@ public class AccountService {
 			throw new BadRequestException(ErrorCode.PASSWORD_MISMATCH);
 		}
 
-		accountRepository.delete(account);
+		account.deleteAccount();
 	}
 
 	public BalanceResponse getAccountBalance(BalanceRequest request) {
