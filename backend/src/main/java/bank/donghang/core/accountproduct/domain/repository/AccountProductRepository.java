@@ -27,4 +27,8 @@ public class AccountProductRepository {
 	public boolean existsAccountProductById(Long id) {
 		return accountProductJpaRepository.existsAccountProductByAccountProductId(id);
 	}
+
+	public void deleteAll() {
+		accountProductJpaRepository.deleteAll();
+	}
 }

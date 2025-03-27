@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.account.domain.enums.AccountStatus;
+import bank.donghang.core.common.dto.MaskingDto;
 
 public record DepositAccountRegisterRequest(
 	Long memberId,
@@ -11,8 +12,9 @@ public record DepositAccountRegisterRequest(
 	String password,
 	String withdrawalAccountNumber,
 	String payoutAccountNumber,
-	Long initDepositAmount
-) {
+	Long initDepositAmount,
+	boolean disableMasking
+) implements MaskingDto {
 	public Account toEntity(
 		String generatedAccountNumber,
 		Double interestRate,
@@ -37,5 +39,10 @@ public record DepositAccountRegisterRequest(
 			.maturityPayoutAccountId(payoutAccountId)
 			.accountExpiryDate(expiryDate)
 			.build();
+	}
+
+	@Override
+	public boolean getDisableMasking() {
+		return disableMasking;
 	}
 }

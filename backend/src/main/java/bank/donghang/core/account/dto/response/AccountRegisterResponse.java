@@ -4,10 +4,14 @@ import java.time.LocalDate;
 
 import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.accountproduct.domain.AccountProduct;
+import bank.donghang.core.common.annotation.Mask;
+import bank.donghang.core.common.enums.MaskingType;
 
 public record AccountRegisterResponse(
 	String productName,
+	@Mask(type = MaskingType.ACCOUNT_NUMBER)
 	String withdrawalAccountNumber,
+	@Mask(type = MaskingType.ACCOUNT_NUMBER)
 	String payoutAccountNumber,
 	String accountNumber,
 	Long accountBalance,

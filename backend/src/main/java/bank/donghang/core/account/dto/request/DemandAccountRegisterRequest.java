@@ -2,12 +2,14 @@ package bank.donghang.core.account.dto.request;
 
 import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.account.domain.enums.AccountStatus;
+import bank.donghang.core.common.dto.MaskingDto;
 
 public record DemandAccountRegisterRequest(
 	Long memberId,
 	Long accountProductId,
-	String password
-) {
+	String password,
+	boolean disableMasking
+) implements MaskingDto {
 	// todo. password encoding
 	// todo. account type handling logic
 	public Account toEntity(String generatedAccountNumber, Double interestRate) {
@@ -24,5 +26,10 @@ public record DemandAccountRegisterRequest(
 			.accountBalance(0L)
 			.interestRate(interestRate)
 			.build();
+	}
+
+	@Override
+	public boolean getDisableMasking() {
+		return disableMasking;
 	}
 }
