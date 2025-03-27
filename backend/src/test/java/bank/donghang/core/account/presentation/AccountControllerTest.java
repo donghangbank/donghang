@@ -6,8 +6,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.when;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -26,8 +26,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MvcResult;
 
-import bank.donghang.core.account.dto.response.AccountSummaryResponse;
-import bank.donghang.core.accountproduct.domain.enums.AccountProductType;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -39,7 +37,9 @@ import bank.donghang.core.account.dto.request.DepositAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.InstallmentAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.MyAccountsRequest;
 import bank.donghang.core.account.dto.response.AccountRegisterResponse;
+import bank.donghang.core.account.dto.response.AccountSummaryResponse;
 import bank.donghang.core.account.dto.response.BalanceResponse;
+import bank.donghang.core.accountproduct.domain.enums.AccountProductType;
 import bank.donghang.core.common.controller.ControllerTest;
 import bank.donghang.core.common.dto.PageInfo;
 
