@@ -37,7 +37,9 @@ public class TransactionService {
 
 	@TransferDistributedLock(
 		key1 = "#request.sendingAccountNumber",
-		key2 = "#request.receivingAccountNumber"
+		key2 = "#request.receivingAccountNumber",
+		waitTime = 30L,
+		leaseTime = 10L
 	)
 	@MaskApply(typeValue = TransactionResponse.class)
 	public TransactionResponse transferByAccount(TransactionRequest request) {

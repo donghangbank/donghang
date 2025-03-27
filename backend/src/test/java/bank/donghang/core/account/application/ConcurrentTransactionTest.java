@@ -37,7 +37,7 @@ class ConcurrentTransactionTest {
 	private AccountRepository accountRepository;
 
 	private static final int THREAD_COUNT = 100;
-	private static final Long INITIAL_BALANCE = 100L;
+	private static final Long INITIAL_BALANCE = 10000L;
 	private static final Long DEPOSIT_AMOUNT = 1L;
 	private static final Long WITHDRAW_AMOUNT = 1L;
 	private static final Long TRANSFER_AMOUNT = 1L;
