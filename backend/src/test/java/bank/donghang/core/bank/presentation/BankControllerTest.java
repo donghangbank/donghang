@@ -35,8 +35,10 @@ class BankControllerTest extends ControllerTest {
 
 	@Autowired
 	ObjectMapper objectMapper;
+
 	@MockitoBean
 	private BankService bankService;
+	
 	@MockitoBean
 	private S3FileService s3FileService;
 
