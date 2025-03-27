@@ -5,9 +5,17 @@ export const UserContext = createContext<{
 	setIsElderly: (value: boolean) => void;
 	isUsingPhone: boolean;
 	setIsUsingPhone: (value: boolean) => void;
+	isTalking: boolean;
+	setIsTalking: (value: boolean) => void;
+	userMsg: string;
+	setUserMsg: (value: string) => void;
 }>({
 	isElderly: false,
 	setIsElderly: () => {},
 	isUsingPhone: false,
-	setIsUsingPhone: () => {}
+	setIsUsingPhone: () => {},
+	isTalking: false,
+	setIsTalking: () => {},
+	userMsg: "",
+	setUserMsg: () => {}
 });
