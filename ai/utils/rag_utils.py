@@ -18,6 +18,7 @@ async def predict_action(text: str):
     similarity_score = result[0][1]
     if similarity_score<0.12:
         return {
+            "user_text": text,
             "predicted_action": result[0][0].metadata["answer"]
         }
-    return {"predicted_action": "etc"}
+    return {"user_text": text,"predicted_action": "etc"}

@@ -20,6 +20,7 @@ async def websocket_endpoint(websocket: WebSocket):
             if not stt_text.strip():
                 logger.error("STT 실패")
                 await websocket.send_text(json.dumps({
+                    "user_text": "",
                     "predicted_action": "음성 인식에 실패했습니다."
                 }))
                 continue
