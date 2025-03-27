@@ -64,6 +64,10 @@ public class AccountRepository {
 			today, InstallmentStatus.SCHEDULED);
 	}
 
+	public void deleteAll() {
+		accountJpaRepository.deleteAll();
+	}
+
 	/**
 	 * (과목코드, 지점코드) 조합으로 다음 계좌번호를 생성한다.
 	 * 예: 마지막 계좌번호가 000001이면 -> 000002

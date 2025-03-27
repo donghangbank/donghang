@@ -22,6 +22,7 @@ import bank.donghang.core.account.dto.response.AccountRegisterResponse;
 import bank.donghang.core.account.dto.response.BalanceResponse;
 import bank.donghang.core.accountproduct.domain.AccountProduct;
 import bank.donghang.core.accountproduct.domain.repository.AccountProductRepository;
+import bank.donghang.core.common.annotation.MaskApply;
 import bank.donghang.core.common.exception.BadRequestException;
 import bank.donghang.core.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -65,6 +66,7 @@ public class AccountService {
 
 	// 예치금 이체가 실패하면 예금 계좌 생성도 취소하기 위해 Transactional 어노테이션을 붙였습니다.
 	@Transactional
+	@MaskApply(typeValue = AccountRegisterResponse.class)
 	public AccountRegisterResponse createDepositAccount(DepositAccountRegisterRequest req) {
 		DepositInstallmentAccountData data = getDepositInstallmentAccountData(
 			req.accountProductId(),
@@ -113,6 +115,7 @@ public class AccountService {
 		);
 	}
 
+	@MaskApply(typeValue = AccountRegisterResponse.class)
 	public AccountRegisterResponse createInstallmentAccount(InstallmentAccountRegisterRequest req) {
 		DepositInstallmentAccountData data = getDepositInstallmentAccountData(
 			req.accountProductId(),
@@ -150,6 +153,7 @@ public class AccountService {
 		);
 	}
 
+	@MaskApply(typeValue = AccountRegisterResponse.class)
 	private DepositInstallmentAccountData getDepositInstallmentAccountData(
 		Long accountProductId,
 		String withdrawalAccountNumber, String payoutAccountNumber

@@ -82,7 +82,7 @@ class AccountServiceTest {
 	void createDemandAccount_shouldThrowExceptionWhenAccountProductNotExist() {
 		Long productId = 2000L;
 		DemandAccountRegisterRequest request
-			= new DemandAccountRegisterRequest(1L, productId, "password123");
+			= new DemandAccountRegisterRequest(1L, productId, "1234", true);
 
 		when(accountProductRepository.existsAccountProductById(productId))
 			.thenThrow(new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND));

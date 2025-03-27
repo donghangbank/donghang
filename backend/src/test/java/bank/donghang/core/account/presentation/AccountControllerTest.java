@@ -50,7 +50,8 @@ class AccountControllerTest extends ControllerTest {
 		DemandAccountRegisterRequest request = new DemandAccountRegisterRequest(
 			memberId,
 			accountProductId,
-			password
+			password,
+			true
 		);
 
 		AccountRegisterResponse response = new AccountRegisterResponse(
@@ -95,7 +96,8 @@ class AccountControllerTest extends ControllerTest {
 			password,
 			withdrawalAccountNumber,
 			payoutAccountNumber,
-			initialDepositAmount
+			initialDepositAmount,
+			true
 		);
 
 		AccountRegisterResponse response = new AccountRegisterResponse(
@@ -143,7 +145,8 @@ class AccountControllerTest extends ControllerTest {
 			withdrawalAccountNumber,
 			payoutAccountNumber,
 			monthlyInstallmentAmount,
-			monthlyInstallmentDay
+			monthlyInstallmentDay,
+			true
 		);
 
 		AccountRegisterResponse response = new AccountRegisterResponse(
