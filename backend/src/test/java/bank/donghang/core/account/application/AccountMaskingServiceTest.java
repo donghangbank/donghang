@@ -3,6 +3,7 @@ package bank.donghang.core.account.application;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +20,7 @@ import bank.donghang.core.account.dto.response.AccountRegisterResponse;
 import bank.donghang.core.accountproduct.domain.AccountProduct;
 import bank.donghang.core.accountproduct.domain.enums.AccountProductType;
 import bank.donghang.core.accountproduct.domain.repository.AccountProductRepository;
+import bank.donghang.core.common.dto.PageInfo;
 
 @ActiveProfiles("test")
 @TestPropertySource(locations = "file:${user.dir}/test.env")
@@ -80,6 +82,25 @@ class AccountMaskingServiceTest {
 		demandProduct = accountProductRepository.saveAccountProduct(tempDemand);
 		depositProduct = accountProductRepository.saveAccountProduct(tempDeposit);
 		installmentProduct = accountProductRepository.saveAccountProduct(tempInstallment);
+	}
+
+	@Test
+	@DisplayName("사용자는 본인의 계좌 목록을 조회할 수 있다. (Masking ON)")
+	void getMyAccounts_whenMaskingEnabled() {
+		Long memberId = 1L;
+		String pageToken = null; // 첫 페이지
+		PageInfo<?> result = accountService.getMyAccounts(
+			new bank.donghang.core.account.dto.request.MyAccountsRequest(memberId),
+			pageToken);
+		assertNotNull(result);
+		// 조회된 계좌 목록이 있다면 각 계좌의 accountNumber에 마스킹 처리가 되어있는지 확인
+		result.data().forEach(summary -> {
+			String accountNumber = ((bank.donghang.core.account.dto.response.AccountSummaryResponse) summary)
+				.accountNumber();
+			if (accountNumber != null) {
+				assertTrue(isMasked(accountNumber));
+			}
+		});
 	}
 
 	@Test

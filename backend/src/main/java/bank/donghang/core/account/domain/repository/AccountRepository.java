@@ -10,7 +10,9 @@ import org.springframework.stereotype.Repository;
 import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.account.domain.InstallmentSchedule;
 import bank.donghang.core.account.domain.enums.InstallmentStatus;
+import bank.donghang.core.account.dto.response.AccountSummaryResponse;
 import bank.donghang.core.account.dto.response.BalanceResponse;
+import bank.donghang.core.common.dto.PageInfo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -20,6 +22,10 @@ public class AccountRepository {
 	private final AccountJpaRepository accountJpaRepository;
 	private final InstallmentScheduleJpaRepository installmentScheduleJpaRepository;
 	private final AccountJpaRepositoryCustomImpl accountJpaRepositoryCustomImpl;
+
+	public PageInfo<AccountSummaryResponse> getMyAccounts(Long memberId, Long cursor) {
+		return accountJpaRepositoryCustomImpl.getAccountSummaries(memberId, cursor);
+	}
 
 	@Transactional
 	public Account saveAccount(Account account) {

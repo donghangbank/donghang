@@ -19,11 +19,14 @@ import bank.donghang.core.account.dto.request.DeleteAccountRequest;
 import bank.donghang.core.account.dto.request.DemandAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.DepositAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.InstallmentAccountRegisterRequest;
+import bank.donghang.core.account.dto.request.MyAccountsRequest;
 import bank.donghang.core.account.dto.response.AccountRegisterResponse;
+import bank.donghang.core.account.dto.response.AccountSummaryResponse;
 import bank.donghang.core.account.dto.response.BalanceResponse;
 import bank.donghang.core.accountproduct.domain.AccountProduct;
 import bank.donghang.core.accountproduct.domain.repository.AccountProductRepository;
 import bank.donghang.core.common.annotation.MaskApply;
+import bank.donghang.core.common.dto.PageInfo;
 import bank.donghang.core.common.exception.BadRequestException;
 import bank.donghang.core.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +37,15 @@ public class AccountService {
 	private final TransferFacade transferFacade;
 	private final AccountRepository accountRepository;
 	private final AccountProductRepository accountProductRepository;
+
+	@MaskApply(typeValue = PageInfo.class, genericTypeValue = AccountSummaryResponse.class)
+	public PageInfo<AccountSummaryResponse> getMyAccounts(MyAccountsRequest request, String pageToken) {
+		Long cursor = pageToken == null ? null : Long.parseLong(pageToken);
+		System.out.println("In service, memberId: " + request.memberId());
+		PageInfo<AccountSummaryResponse> response = accountRepository.getMyAccounts(request.memberId(), cursor);
+		System.out.println(response);
+		return response;
+	}
 
 	public AccountRegisterResponse createDemandAccount(DemandAccountRegisterRequest demandAccountRegisterRequest) {
 		Long productId = demandAccountRegisterRequest.accountProductId();

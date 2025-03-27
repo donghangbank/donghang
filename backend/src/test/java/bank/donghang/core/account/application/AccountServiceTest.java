@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.*;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
@@ -23,10 +24,14 @@ import bank.donghang.core.account.dto.request.BalanceRequest;
 import bank.donghang.core.account.dto.request.DemandAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.DepositAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.InstallmentAccountRegisterRequest;
+import bank.donghang.core.account.dto.request.MyAccountsRequest;
 import bank.donghang.core.account.dto.response.AccountRegisterResponse;
+import bank.donghang.core.account.dto.response.AccountSummaryResponse;
 import bank.donghang.core.account.dto.response.BalanceResponse;
 import bank.donghang.core.accountproduct.domain.AccountProduct;
+import bank.donghang.core.accountproduct.domain.enums.AccountProductType;
 import bank.donghang.core.accountproduct.domain.repository.AccountProductRepository;
+import bank.donghang.core.common.dto.PageInfo;
 import bank.donghang.core.common.exception.BadRequestException;
 import bank.donghang.core.common.exception.ErrorCode;
 
@@ -46,11 +51,32 @@ class AccountServiceTest {
 	private AccountProductRepository accountProductRepository;
 
 	@Test
+	@DisplayName("사용자는 본인의 계좌 목록을 조회할 수 있다.")
+	void getMyAccounts() {
+		Long memberId = 1L;
+		String pageToken = "123"; // 예: 마지막 계좌의 accountId가 123
+		Long cursor = Long.parseLong(pageToken);
+
+		AccountSummaryResponse summary = new AccountSummaryResponse(
+			"TestBank", "****1234", AccountProductType.DEMAND, 1000L
+		);
+		PageInfo<AccountSummaryResponse> expected = PageInfo.of("456", List.of(summary), true);
+
+		when(accountRepository.getMyAccounts(memberId, cursor)).thenReturn(expected);
+
+		PageInfo<AccountSummaryResponse> result = accountService.getMyAccounts(new MyAccountsRequest(memberId),
+			pageToken);
+		assertNotNull(result);
+		assertEquals(expected, result);
+		verify(accountRepository).getMyAccounts(memberId, cursor);
+	}
+
+	@Test
 	@DisplayName("사용자는 자유입출금 계좌를 생성할 수 있다.")
 	void createDemandAccount() {
 		Long productId = 1L;
 		DemandAccountRegisterRequest request = mock(DemandAccountRegisterRequest.class);
-		when(request.accountProductId()).thenReturn(1L);
+		when(request.accountProductId()).thenReturn(productId);
 
 		AccountProduct accountProduct = mock(AccountProduct.class);
 		doReturn(0.05).when(accountProduct).getInterestRate();
@@ -70,7 +96,6 @@ class AccountServiceTest {
 		when(accountRepository.saveAccount(account)).thenReturn(account);
 
 		AccountRegisterResponse response = accountService.createDemandAccount(request);
-
 		assertNotNull(response);
 		verify(accountProductRepository).getAccountProductById(productId);
 		verify(accountRepository).getNextAccountNumber("100", "001");
@@ -81,8 +106,7 @@ class AccountServiceTest {
 	@DisplayName("존재하지 않는 계좌 상품으로 계좌 생성을 시도하면 에러가 발생한다. (Demand 계좌)")
 	void createDemandAccount_shouldThrowExceptionWhenAccountProductNotExist() {
 		Long productId = 2000L;
-		DemandAccountRegisterRequest request
-			= new DemandAccountRegisterRequest(1L, productId, "1234", true);
+		DemandAccountRegisterRequest request = new DemandAccountRegisterRequest(1L, productId, "1234", true);
 
 		when(accountProductRepository.existsAccountProductById(productId))
 			.thenThrow(new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND));
@@ -102,29 +126,19 @@ class AccountServiceTest {
 		String payoutAccountNumber = "100001000003";
 
 		DepositAccountRegisterRequest request = mock(DepositAccountRegisterRequest.class);
-		when(request.accountProductId())
-			.thenReturn(productId);
-		when(request.memberId())
-			.thenReturn(memberId);
-		when(request.withdrawalAccountNumber())
-			.thenReturn(withdrawalAccountNumber);
-		when(request.payoutAccountNumber())
-			.thenReturn(payoutAccountNumber);
-		when(request.initDepositAmount())
-			.thenReturn(5000L);
+		when(request.accountProductId()).thenReturn(productId);
+		when(request.memberId()).thenReturn(memberId);
+		when(request.withdrawalAccountNumber()).thenReturn(withdrawalAccountNumber);
+		when(request.payoutAccountNumber()).thenReturn(payoutAccountNumber);
+		when(request.initDepositAmount()).thenReturn(5000L);
 
 		AccountProduct accountProduct = mock(AccountProduct.class);
-		when(accountProduct.isDepositProduct())
-			.thenReturn(true);
-		when(accountProduct.getInterestRate())
-			.thenReturn(0.5);
-		when(accountProduct.getSubscriptionPeriod())
-			.thenReturn(12L);
+		when(accountProduct.isDepositProduct()).thenReturn(true);
+		when(accountProduct.getInterestRate()).thenReturn(0.5);
+		when(accountProduct.getSubscriptionPeriod()).thenReturn(12L);
 
-		when(accountProductRepository.existsAccountProductById(productId))
-			.thenReturn(true);
-		when(accountProductRepository.getAccountProductById(productId))
-			.thenReturn(accountProduct);
+		when(accountProductRepository.existsAccountProductById(productId)).thenReturn(true);
+		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
 
 		Account withdrawalAccount = mock(Account.class);
 		Account payoutAccount = mock(Account.class);
@@ -138,7 +152,9 @@ class AccountServiceTest {
 		doNothing().when(payoutAccount).verifyPayoutAccount(memberId);
 
 		String newDepositAccountNumber = "200001000010";
-		when(accountRepository.getNextAccountNumber("200", "001"))
+		when(accountRepository.getNextAccountNumber(
+			"200",
+			"001"))
 			.thenReturn(newDepositAccountNumber);
 
 		when(withdrawalAccount.getAccountId()).thenReturn(101L);
@@ -160,11 +176,9 @@ class AccountServiceTest {
 
 		doNothing().when(transferFacade).transfer(any());
 
-		when(accountRepository.saveAccount(depositAccount))
-			.thenReturn(depositAccount);
+		when(accountRepository.saveAccount(depositAccount)).thenReturn(depositAccount);
 
 		AccountRegisterResponse response = accountService.createDepositAccount(request);
-
 		assertNotNull(response);
 		verify(transferFacade).transfer(any());
 	}
@@ -413,13 +427,17 @@ class AccountServiceTest {
 		LocalDate expectedExpiryDate = LocalDate.now().plusMonths(24L);
 
 		Account installmentAccount = mock(Account.class);
-		when(request.toEntity(eq(newAccountNumber), eq(interestRate), eq(111L), eq(222L),
-			eq(expectedExpiryDate))).thenReturn(installmentAccount);
+		when(request.toEntity(
+			eq(newAccountNumber),
+			eq(interestRate),
+			eq(111L),
+			eq(222L),
+			eq(expectedExpiryDate)))
+			.thenReturn(installmentAccount);
 
 		when(accountRepository.saveInstallmentAccount(installmentAccount)).thenReturn(installmentAccount);
 
 		AccountRegisterResponse response = accountService.createInstallmentAccount(request);
-
 		assertNotNull(response);
 		verify(accountProductRepository).existsAccountProductById(productId);
 		verify(accountProductRepository).getAccountProductById(productId);
@@ -613,11 +631,12 @@ class AccountServiceTest {
 		assertEquals(ErrorCode.MATURITY_ACCOUNT_IS_NOT_ACTIVE.getCode(), exception.getCode());
 	}
 
+	@Test
 	@DisplayName("사용자는 잔액을 조회할 수 있다.")
-	void can_get_account_balance() {
-		Long balance = 1000L;
+	void getAccountBalance_success() {
 		String accountNumber = "100001000002";
 		String password = "correctPassword";
+		Long balance = 1000L;
 		String bankName = "삼성은행";
 
 		Account account = Account.builder()
@@ -625,26 +644,20 @@ class AccountServiceTest {
 			.password(password)
 			.build();
 
-		BalanceResponse expectedResponse = new BalanceResponse(
-			accountNumber,
-			bankName,
-			balance
-		);
+		BalanceResponse expectedResponse = new BalanceResponse(accountNumber, bankName, balance);
 
 		given(accountRepository.findAccountByFullAccountNumber(accountNumber))
 			.willReturn(Optional.of(account));
-
 		given(accountRepository.getAccountBalance(accountNumber))
 			.willReturn(expectedResponse);
 
 		BalanceRequest request = new BalanceRequest(accountNumber, password);
-
 		BalanceResponse actualResponse = accountService.getAccountBalance(request);
 
-		Assertions.assertThat(actualResponse).isNotNull();
-		Assertions.assertThat(actualResponse.accountNumber()).isEqualTo(accountNumber);
-		Assertions.assertThat(actualResponse.bankName()).isEqualTo(bankName);
-		Assertions.assertThat(actualResponse.balance()).isEqualTo(balance);
+		assertNotNull(actualResponse);
+		assertEquals(expectedResponse.accountNumber(), actualResponse.accountNumber());
+		assertEquals(expectedResponse.bankName(), actualResponse.bankName());
+		assertEquals(expectedResponse.balance(), actualResponse.balance());
 
 		verify(accountRepository).findAccountByFullAccountNumber(accountNumber);
 		verify(accountRepository).getAccountBalance(accountNumber);
