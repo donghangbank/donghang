@@ -3,11 +3,11 @@ import VoiceCommandPanel from "@renderer/components/common/VoiceCommandPanel";
 
 function App(): JSX.Element {
 	return (
-		<div className="flex">
-			<div style={{ width: "33.33vw" }}>
+		<div className="flex h-full">
+			<div className="h-full" style={{ width: "33.33vw" }}>
 				<AICanvas />
 			</div>
-			<div style={{ width: "66.67vw" }}>
+			<div className="h-full" style={{ width: "66.67vw" }}>
 				<VoiceCommandPanel
 					title="원하시는 업무를 말씀해 주세요"
 					prompts={["돈을 넣고 싶어", "돈을 꺼내고 싶어", "내가 손녀한테 돈을 보내고 싶어"]}

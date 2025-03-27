@@ -13,7 +13,7 @@ export const VoiceCommandPanel = ({ title, prompts }: VoiceCommandPanelProps): J
 	const [blueText, particle, restText] = match ? [match[1], match[2], match[3]] : [title, "", ""];
 
 	return (
-		<div className="flex flex-col h-screen justify-between items-center p-10">
+		<div className="flex flex-col h-full justify-between items-center p-10">
 			<div className="w-full flex flex-col items-center p-10 gap-10 bg-white rounded-2xl shadow-custom">
 				<span className="text-7xl font-bold text-center">
 					<span className="text-blue">{blueText}</span>

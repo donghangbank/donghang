@@ -7,8 +7,8 @@ export const DepositPage = (): JSX.Element => {
 	const [inputValue, setInputValue] = useState("");
 
 	return (
-		<div className="flex h-screen">
-			<div style={{ width: "66.67vw" }}>
+		<div className="flex h-full">
+			<div className="h-full" style={{ width: "66.67vw" }}>
 				<InputPanel
 					inputValue={inputValue}
 					mainLabel={"계좌번호"}
@@ -16,7 +16,7 @@ export const DepositPage = (): JSX.Element => {
 					format={formatAccountNumber}
 				/>
 			</div>
-			<div style={{ width: "33.33vw" }}>
+			<div className="h-full" style={{ width: "33.33vw" }}>
 				<NumberPad setInputValue={setInputValue} type="account" />
 			</div>
 		</div>

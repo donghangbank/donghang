@@ -39,8 +39,8 @@ export const NumberPad = ({ setInputValue, type }: NumberPadProps): JSX.Element 
 	};
 
 	return (
-		<div className="h-screen flex flex-col gap-2.5">
-			<div className="h-[20vh] grid grid-cols-3 gap-2.5">
+		<div className="h-full flex flex-col gap-2.5">
+			<div className="h-[20%] grid grid-cols-3 gap-2.5">
 				{["1", "2", "3"].map((num) => (
 					<NumberButton
 						key={`${num}-button`}
@@ -51,7 +51,7 @@ export const NumberPad = ({ setInputValue, type }: NumberPadProps): JSX.Element 
 					/>
 				))}
 			</div>
-			<div className="h-[20vh] grid grid-cols-3 gap-2.5">
+			<div className="h-[20%] grid grid-cols-3 gap-2.5">
 				{["4", "5", "6"].map((num) => (
 					<NumberButton
 						key={`${num}-button`}
@@ -62,7 +62,7 @@ export const NumberPad = ({ setInputValue, type }: NumberPadProps): JSX.Element 
 					/>
 				))}
 			</div>
-			<div className="h-[20vh] grid grid-cols-3 gap-2.5">
+			<div className="h-[20%] grid grid-cols-3 gap-2.5">
 				{["7", "8", "9"].map((num) => (
 					<NumberButton
 						key={`${num}-button`}
@@ -74,7 +74,7 @@ export const NumberPad = ({ setInputValue, type }: NumberPadProps): JSX.Element 
 				))}
 			</div>
 
-			<div className="h-[20vh] grid grid-cols-3 gap-2.5">
+			<div className="h-[20%] grid grid-cols-3 gap-2.5">
 				<NumberButton text={"지움"} bgColor="bg-blue" isSquare onClick={handleNumberDeleteClick} />
 				<NumberButton
 					text={"0"}
@@ -85,7 +85,7 @@ export const NumberPad = ({ setInputValue, type }: NumberPadProps): JSX.Element 
 				<NumberButton text={"정정"} bgColor="bg-blue" isSquare onClick={handleNumberClearClick} />
 			</div>
 
-			<div className="h-[20vh] grid grid-cols-2 gap-2.5">
+			<div className="h-[20%] grid grid-cols-2 gap-2.5">
 				<NumberButton text={"확인"} bgColor="bg-green" isSquare={false} />
 				<Link to={"/"}>
 					<NumberButton text={"취소"} bgColor="bg-red" isSquare={false} />

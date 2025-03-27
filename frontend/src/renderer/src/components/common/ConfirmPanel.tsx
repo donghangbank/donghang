@@ -9,7 +9,7 @@ interface ConfirmPanelProps {
 
 export const ConfirmPanel = ({ title, items }: ConfirmPanelProps): JSX.Element => {
 	return (
-		<div className="flex flex-col h-screen justify-between">
+		<div className="flex flex-col h-full justify-between">
 			<div className="m-10 p-10 flex flex-col rounded-2xl bg-white flex-1 justify-between">
 				<span className="my-20 text-8xl font-bold text-center">{title}</span>
 				<div className="flex flex-col p-5 gap-5 bg-background rounded-2xl text-7xl font-bold leading-snug text-center">

@@ -14,7 +14,7 @@ export const InputPanel = ({
 	format
 }: InputPanelProps): JSX.Element => {
 	return (
-		<div className="flex flex-col h-screen">
+		<div className="flex flex-col h-full">
 			<div className="flex flex-col flex-1 justify-between m-10 p-10 bg-white rounded-2xl shadow-custom">
 				<div className="text-right flex flex-col justify-center flex-1">
 					<span className="text-8xl leading-snug">
