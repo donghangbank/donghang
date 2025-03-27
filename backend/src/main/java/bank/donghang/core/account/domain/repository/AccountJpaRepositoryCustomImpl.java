@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
-import bank.donghang.core.bank.domain.QBank;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -20,6 +19,7 @@ import bank.donghang.core.account.domain.QAccount;
 import bank.donghang.core.account.dto.response.AccountSummaryResponse;
 import bank.donghang.core.account.dto.response.BalanceResponse;
 import bank.donghang.core.accountproduct.domain.QAccountProduct;
+import bank.donghang.core.bank.domain.QBank;
 import bank.donghang.core.common.dto.PageInfo;
 import lombok.RequiredArgsConstructor;
 

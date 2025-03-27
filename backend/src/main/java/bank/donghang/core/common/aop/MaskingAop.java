@@ -62,10 +62,10 @@ public class MaskingAop {
 		Object response
 	)
 		throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-		if(response instanceof PageInfo) {
-			PageInfo<?> pageInfo = (PageInfo<?>) response;
+		if (response instanceof PageInfo) {
+			PageInfo<?> pageInfo = (PageInfo<?>)response;
 			List<?> maskedList = applyMaskingForList(klass, pageInfo.getData());
-			return (T) PageInfo.of(
+			return (T)PageInfo.of(
 				pageInfo.getPageToken(),
 				maskedList,
 				pageInfo.isHasNext()
