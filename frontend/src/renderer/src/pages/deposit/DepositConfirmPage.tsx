@@ -7,7 +7,7 @@ const DepositConfirmPage = (): JSX.Element => {
 		{ text: "총 금액", value: "50,000 원" }
 	];
 
-	return <ConfirmPanel title="내용이 맞나요?" items={items} />;
+	return <ConfirmPanel title="내용이 맞나요?" items={items} link={"/deposit/specsheet"} />;
 };
 
 export default DepositConfirmPage;
