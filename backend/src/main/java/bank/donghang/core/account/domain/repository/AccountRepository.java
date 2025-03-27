@@ -108,6 +108,10 @@ public class AccountRepository {
 		accountJpaRepository.deleteAll();
 	}
 
+	public void delete(Account account) {
+		accountJpaRepository.delete(account);
+	}
+
 	public BalanceResponse getAccountBalance(String fullAccountNumber) {
 		String accountTypeCode = fullAccountNumber.substring(0, 3);
 		String branchCode = fullAccountNumber.substring(3, 6);

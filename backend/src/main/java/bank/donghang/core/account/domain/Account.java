@@ -2,6 +2,9 @@ package bank.donghang.core.account.domain;
 
 import java.time.LocalDate;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import bank.donghang.core.account.domain.enums.AccountStatus;
 import bank.donghang.core.account.domain.enums.TransactionType;
 import bank.donghang.core.common.exception.BadRequestException;
@@ -31,6 +34,8 @@ import lombok.NoArgsConstructor;
 			"account_number"
 		})
 })
+@SQLDelete(sql = "UPDATE account SET account_status = 'INACTIVE' WHERE account_id = ?")
+@SQLRestriction("account_status <> 'DELETED'")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter

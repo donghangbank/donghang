@@ -1,6 +1,7 @@
 package bank.donghang.core.account.presentation;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import bank.donghang.core.account.application.AccountService;
 import bank.donghang.core.account.dto.request.BalanceRequest;
+import bank.donghang.core.account.dto.request.DeleteAccountRequest;
 import bank.donghang.core.account.dto.request.DemandAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.DepositAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.InstallmentAccountRegisterRequest;
@@ -44,5 +46,11 @@ public class AccountController {
 	@PostMapping("/balance")
 	public ResponseEntity<BalanceResponse> getAccountBalance(@RequestBody BalanceRequest request) {
 		return ResponseEntity.ok(accountService.getAccountBalance(request));
+	}
+
+	@DeleteMapping
+	public ResponseEntity<Void> deleteAccount(@RequestBody DeleteAccountRequest request) {
+		accountService.deleteAccount(request);
+		return ResponseEntity.noContent().build();
 	}
 }

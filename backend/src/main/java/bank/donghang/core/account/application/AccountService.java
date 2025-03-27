@@ -15,6 +15,7 @@ import bank.donghang.core.account.domain.InstallmentSchedule;
 import bank.donghang.core.account.domain.repository.AccountRepository;
 import bank.donghang.core.account.dto.TransferInfo;
 import bank.donghang.core.account.dto.request.BalanceRequest;
+import bank.donghang.core.account.dto.request.DeleteAccountRequest;
 import bank.donghang.core.account.dto.request.DemandAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.DepositAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.InstallmentAccountRegisterRequest;
@@ -241,6 +242,17 @@ public class AccountService {
 			accountRepository.saveInstallmentSchedule(newInstallmentSchedule);
 			throw e; // 개별 트랜잭션 내에서 실패 시 rollback을 위해 예외 재던짐
 		}
+	}
+
+	public void deleteAccount(DeleteAccountRequest request) {
+		Account account = accountRepository.findAccountByFullAccountNumber(request.fullAccountNumber())
+			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
+
+		if (!account.getPassword().equals(request.password())) {
+			throw new BadRequestException(ErrorCode.PASSWORD_MISMATCH);
+		}
+
+		accountRepository.delete(account);
 	}
 
 	public BalanceResponse getAccountBalance(BalanceRequest request) {
