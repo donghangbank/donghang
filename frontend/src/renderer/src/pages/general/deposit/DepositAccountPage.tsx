@@ -1,9 +1,9 @@
 import InputPanel from "@renderer/components/common/InputPannel";
 import NumberPad from "@renderer/components/common/NumberPad";
-import { formatPassword } from "@renderer/utils/formatters";
+import { formatAccountNumber } from "@renderer/utils/formatters";
 import { useState } from "react";
 
-export const DepositPasswordPage = (): JSX.Element => {
+export const DepositAccountPage = (): JSX.Element => {
 	const [inputValue, setInputValue] = useState("");
 
 	return (
@@ -11,16 +11,16 @@ export const DepositPasswordPage = (): JSX.Element => {
 			<div className="h-full" style={{ width: "66.67vw" }}>
 				<InputPanel
 					inputValue={inputValue}
-					mainLabel={"비밀번호"}
-					subLabel={"비밀번호"}
-					format={formatPassword}
+					mainLabel={"계좌번호"}
+					subLabel={"본인 계좌"}
+					format={formatAccountNumber}
 				/>
 			</div>
 			<div className="h-full" style={{ width: "33.33vw" }}>
-				<NumberPad setInputValue={setInputValue} type="password" link="/deposit/auth" />
+				<NumberPad setInputValue={setInputValue} type="account" link="/general/deposit/password" />
 			</div>
 		</div>
 	);
 };
 
-export default DepositPasswordPage;
+export default DepositAccountPage;

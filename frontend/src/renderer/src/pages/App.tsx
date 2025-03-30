@@ -1,23 +1,22 @@
-import AICanvas from "@renderer/components/banker/AICanvas";
-import VoiceCommandPanel from "@renderer/components/common/VoiceCommandPanel";
+import { Link } from "react-router-dom";
 
-function App(): JSX.Element {
-	const prompts = [
-		{ prompt: "돈을 넣고 싶어", link: "/deposit" },
-		{ prompt: "돈을 꺼내고 싶어", link: "/withdrawal" },
-		{ prompt: "내가 손녀한테 돈을 보내고 싶어", link: "/transfer" }
-	];
-
+export const App = (): JSX.Element => {
 	return (
-		<div className="flex h-full">
-			<div className="h-full" style={{ width: "33.33vw" }}>
-				<AICanvas />
-			</div>
-			<div className="h-full" style={{ width: "66.67vw" }}>
-				<VoiceCommandPanel title="원하시는 업무를 말씀해 주세요" prompts={prompts} />
+		<div className="h-full flex items-center justify-center">
+			<div className="flex items-start justify-center  gap-5">
+				<Link to={"/senior"}>
+					<button type="button" className="p-5 bg-blue rounded-3xl text-white">
+						노인
+					</button>
+				</Link>
+				<Link to={"/general"}>
+					<button type="button" className="p-5 bg-red rounded-3xl text-white">
+						일반
+					</button>
+				</Link>
 			</div>
 		</div>
 	);
-}
+};
 
 export default App;
