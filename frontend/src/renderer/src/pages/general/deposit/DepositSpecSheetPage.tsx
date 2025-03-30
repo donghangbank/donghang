@@ -7,7 +7,7 @@ const DepositSpecSheetPage = (): JSX.Element => {
 		{ text: "수수료", value: "0 원" }
 	];
 
-	return <ConfirmPanel title="명세표를 드릴까요?" items={items} link="/final" />;
+	return <ConfirmPanel title="명세표를 드릴까요?" items={items} link="/general/final" />;
 };
 
 export default DepositSpecSheetPage;

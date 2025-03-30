@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-export const DepositCashInputPage = (): JSX.Element => {
+export const WithDrawalCardInputPage = (): JSX.Element => {
 	const navigate = useNavigate();
 
 	useEffect(() => {
 		setTimeout(() => {
-			navigate("/deposit/cash/counting");
+			navigate("/general/withdrawal/card/auth");
 		}, 1000);
 	}, [navigate]);
 
@@ -14,11 +14,11 @@ export const DepositCashInputPage = (): JSX.Element => {
 		<div className="flex flex-col h-full  p-10">
 			<div className="flex-1 flex flex-col items-center justify-center w-full bg-white p-10 rounded-2xl shadow-custom">
 				<span className=" text-8xl font-bold text-center leading-snug">
-					<span className="text-red">현금</span>을 넣어주십시오
+					<span className="text-red">카드</span>를 넣어주십시오
 				</span>
 			</div>
 		</div>
 	);
 };
 
-export default DepositCashInputPage;
+export default WithDrawalCardInputPage;
