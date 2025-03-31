@@ -20,7 +20,7 @@ export default function AICanvas(): JSX.Element {
 	useVideoAnalysis(videoRef, canvasRef);
 
 	return (
-		<div>
+		<div className="h-[90vh]">
 			<div>
 				<video ref={videoRef} autoPlay playsInline width={640} height={640} className="hidden" />
 				<canvas ref={canvasRef} width={640} height={640} className="hidden" />
@@ -28,16 +28,16 @@ export default function AICanvas(): JSX.Element {
 			<Canvas
 				shadows
 				gl={{ antialias: true }}
-				camera={{ position: [0, 0.6, 5.5], rotation: [-0.15, 0, 0], fov: 70 }}
-				className="w-[100%] h-[100vh]"
+				camera={{ position: [0, 0.4, 7.5], rotation: [-0.15, 0, 0], fov: 50 }}
+				onCreated={(state) => state.gl.setClearColor("#fBfCfE")}
 			>
 				{/* 전체적인 조명 */}
-				<ambientLight intensity={0.6} color={"#ffffff"} />
+				<ambientLight intensity={1.3} color={"#ffffff"} />
 
 				{/* 방향성 조명 (그림자 생성) */}
 				<directionalLight
 					castShadow
-					intensity={1}
+					intensity={0.5}
 					position={[5, 10, 5]}
 					shadow-mapSize-width={2048}
 					shadow-mapSize-height={2048}
@@ -45,10 +45,10 @@ export default function AICanvas(): JSX.Element {
 
 				{/* 추가적인 포인트 라이트 */}
 				<pointLight position={[0, 5, 8]} intensity={120} castShadow />
-				<pointLight position={[5, 5, 8]} intensity={80} castShadow />
-				<pointLight position={[-5, 5, 8]} intensity={80} castShadow />
-				<pointLight position={[0, -5, 8]} intensity={60} castShadow />
-
+				<pointLight position={[5, 5, 8]} intensity={100} castShadow />
+				<pointLight position={[-5, 5, 8]} intensity={100} castShadow />
+				<pointLight position={[0, -5, 8]} intensity={150} castShadow />
+				<pointLight position={[1, 0.2, 3.4]} intensity={0.5} castShadow />
 				{/* 3D 은행원원 컨트롤러 */}
 				<AvatarController />
 

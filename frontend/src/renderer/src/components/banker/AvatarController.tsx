@@ -153,5 +153,5 @@ export const AvatarController = (): JSX.Element => {
 		}
 	});
 
-	return <Avatar ref={avatarRef} position={[0, -2.5, 3]} scale={2} />;
+	return <Avatar ref={avatarRef} position={[0, -6, 3]} scale={4} />;
 };
