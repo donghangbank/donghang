@@ -7,12 +7,13 @@ export function useVideoAnalysis(
 	videoRef: React.RefObject<HTMLVideoElement>,
 	canvasRef: React.RefObject<HTMLCanvasElement>
 ): void {
-	const { setIsElderly, setIsUsingPhone } = useContext(UserContext);
+	const { setIsElderly, setIsUsingPhone, setIsUserExist } = useContext(UserContext);
 
 	// Use a more robust state management for age detection
 	const ageBufferRef = useRef<number[]>([]);
 	const [ageConfirmed, setAgeConfirmed] = useState(false);
 	const lastSentTimeRef = useRef<number>(0);
+	const continousDetectionRef = useRef<number>(10);
 
 	// Memoize WebSocket options to prevent unnecessary recreations
 	const wsOptions = useMemo(
@@ -30,10 +31,27 @@ export function useVideoAnalysis(
 							if (nextBuffer.length >= 3) {
 								const medianAge = calculateMedianAge(nextBuffer);
 								if (medianAge >= 8) {
-									setIsElderly(true);
-									setAgeConfirmed(true);
+									setIsElderly(2);
+								} else {
+									setIsElderly(1);
 								}
+								setAgeConfirmed(true);
 							}
+						}
+					}
+
+					if (data.predicted_age !== undefined) {
+						const ageIndex = Number(data.predicted_age);
+						if (ageIndex === 0) {
+							continousDetectionRef.current += 1;
+						} else {
+							continousDetectionRef.current = 0;
+						}
+
+						if (continousDetectionRef.current >= 10) {
+							setIsUserExist(false);
+						} else {
+							setIsUserExist(true);
 						}
 					}
 
@@ -52,7 +70,7 @@ export function useVideoAnalysis(
 				console.log("Video WebSocket connection closed");
 			}
 		}),
-		[setIsElderly, setIsUsingPhone, ageConfirmed]
+		[setIsElderly, setIsUsingPhone, setIsUserExist, ageConfirmed]
 	);
 
 	const { send } = useWebSocket("ws://localhost:8000/ws/video", wsOptions);
