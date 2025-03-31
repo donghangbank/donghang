@@ -29,6 +29,7 @@
 		"@react-three/postprocessing": "^3.0.4",
 		"@ricky0123/vad": "^0.2.4",
 		"electron-updater": "^6.3.9",
+		"framer-motion": "^12.6.2",
 		"react-icons": "^5.5.0",
 		"react-router-dom": "^7.4.0",
 		"three": "^0.174.0"
