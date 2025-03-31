@@ -1,8 +1,10 @@
 import { createContext } from "react";
 
 export const UserContext = createContext<{
-	isElderly: boolean;
-	setIsElderly: (value: boolean) => void;
+	isUserExist: boolean;
+	setIsUserExist: (value: boolean) => void;
+	isElderly: number;
+	setIsElderly: (value: number) => void;
 	isUsingPhone: boolean;
 	setIsUsingPhone: (value: boolean) => void;
 	isTalking: boolean;
@@ -10,7 +12,9 @@ export const UserContext = createContext<{
 	userMsg: string;
 	setUserMsg: (value: string) => void;
 }>({
-	isElderly: false,
+	isUserExist: false,
+	setIsUserExist: () => {},
+	isElderly: 0,
 	setIsElderly: () => {},
 	isUsingPhone: false,
 	setIsUsingPhone: () => {},
