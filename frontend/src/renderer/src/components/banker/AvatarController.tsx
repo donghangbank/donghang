@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useFBX } from "@react-three/drei";
 import * as THREE from "three";
@@ -6,12 +6,14 @@ import { Avatar } from "./Avatar";
 import idleAnimation from "@renderer/assets/models/avatar_idle.fbx?url";
 import walkAnimation from "@renderer/assets/models/avatar_walk.fbx?url";
 import bowAnimation from "@renderer/assets/models/avatar_bow.fbx?url";
+import { AIContext } from "@renderer/contexts/AIContext";
 
 type AnimationType = "idle" | "walk" | "bow";
 
 export const AvatarController = (): JSX.Element => {
 	const avatarRef = useRef<THREE.Group>(null);
 	const mixerRef = useRef<THREE.AnimationMixer | null>(null);
+	const { avatarState, setAvatarState } = useContext(AIContext);
 
 	const [currentAction, setCurrentAction] = useState<AnimationType>("idle");
 	const [isMoving, setIsMoving] = useState(false);
@@ -55,6 +57,7 @@ export const AvatarController = (): JSX.Element => {
 							nextAction.fadeOut(duration);
 							idle.reset().fadeIn(duration).play();
 							setCurrentAction("idle");
+							setAvatarState("idle");
 						}
 					}
 				};
@@ -65,7 +68,7 @@ export const AvatarController = (): JSX.Element => {
 				nextAction.clampWhenFinished = false;
 			}
 		},
-		[currentAction]
+		[currentAction, setAvatarState]
 	);
 
 	const rotateY = (angle: number): void => {
@@ -74,40 +77,12 @@ export const AvatarController = (): JSX.Element => {
 		}
 	};
 
-	const startMovement = useCallback(
-		(direction: "out" | "back"): void => {
-			setIsMoving(true);
-			moveStartTime.current = performance.now();
-			fadeToAction("walk");
-
-			if (direction === "out") {
-				rotateY(-Math.PI / 2); // 오른쪽으로 90도 회전
-			} else {
-				rotateY(Math.PI); // 뒤돌기 (180도)
-			}
-		},
-		[fadeToAction]
-	);
-
 	useEffect(() => {
-		const handleKeyDown = (e: KeyboardEvent): void => {
-			if (e.code === "KeyW" && !isMoving) {
-				const direction = isOut ? "back" : "out";
-				startMovement(direction);
-				return;
-			}
+		if (avatarState === "idle") fadeToAction("idle");
+		else fadeToAction(avatarState, false);
 
-			if (e.code === "KeyB" && !isMoving) {
-				fadeToAction("bow", false);
-				return;
-			}
-		};
-
-		window.addEventListener("keydown", handleKeyDown);
-		return (): void => {
-			window.removeEventListener("keydown", handleKeyDown);
-		};
-	}, [isOut, isMoving, startMovement, fadeToAction]);
+		console.log("Avatar state changed:", avatarState);
+	}, [avatarState, fadeToAction]);
 
 	useEffect(() => {
 		if (avatarRef.current) {

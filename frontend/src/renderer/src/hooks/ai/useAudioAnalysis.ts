@@ -39,17 +39,13 @@ export function useAudioAnalysis(): {
 		[setUserMsg]
 	);
 
-	const { send, readyState } = useWebSocket("ws://localhost:8000/ws/audio", wsOptions);
+	const { send, readyState } = useWebSocket("ws://localhost:8001/ws/audio", wsOptions);
 
 	const processQueue = useCallback(() => {
 		if (isProcessingRef.current || audioQueueRef.current.length === 0) return;
 
 		const blob = audioQueueRef.current.shift();
-		console.log("blob", blob);
-		console.log("readyState", readyState);
-		console.log("WebSocket.OPEN", WebSocket.OPEN);
 		if (!blob) return;
-		console.log("진짜 됐나?");
 		isProcessingRef.current = true;
 		const reader = new FileReader();
 
