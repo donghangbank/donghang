@@ -8,7 +8,6 @@ import bank.donghang.core.account.dto.request.DepositAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.InstallmentAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.MyAccountsRequest;
 import bank.donghang.core.account.dto.response.AccountOwnerNameResponse;
-import org.springframework.http.ResponseEntity;
 
 import bank.donghang.core.account.application.AccountService;
 import bank.donghang.core.account.dto.response.AccountRegisterResponse;
@@ -17,6 +16,8 @@ import bank.donghang.core.account.dto.response.BalanceResponse;
 import bank.donghang.core.common.dto.PageInfo;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
