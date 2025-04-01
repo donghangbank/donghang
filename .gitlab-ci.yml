@@ -93,10 +93,11 @@ publish_backend:
     DOCKER_TLS_CERTDIR: ""
   before_script:
     - cd backend
-    - cp $BE_PROD_ENV_FILE prod.env
+    - cp $BE_DEV_ENV_FILE dev.env
+    - cp $BE_TEST_ENV_FILE test.env
   script:
     - chmod +x ./gradlew
-    - ./gradlew build --build-cache -Dspring.profiles.active=prod
+    - ./gradlew build --build-cache -Dspring.profiles.active=dev
     - ./gradlew jib -Djib.to.image=$AWS_ECR_REPO_URI -Djib.to.auth.username=AWS -Djib.to.auth.password=$(cat ../password.txt)
 
 deploy_backend:
