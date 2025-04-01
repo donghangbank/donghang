@@ -2,9 +2,6 @@ package bank.donghang.core.account.application;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import bank.donghang.core.account.dto.request.AccountOwnerNameRequest;
-import bank.donghang.core.account.dto.response.AccountOwnerNameResponse;
-import bank.donghang.core.common.exception.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +13,7 @@ import org.springframework.test.context.TestPropertySource;
 import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.account.domain.enums.AccountStatus;
 import bank.donghang.core.account.domain.repository.AccountRepository;
+import bank.donghang.core.account.dto.request.AccountOwnerNameRequest;
 import bank.donghang.core.account.dto.request.DemandAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.DepositAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.InstallmentAccountRegisterRequest;
@@ -23,6 +21,7 @@ import bank.donghang.core.account.dto.response.AccountRegisterResponse;
 import bank.donghang.core.accountproduct.domain.AccountProduct;
 import bank.donghang.core.accountproduct.domain.enums.AccountProductType;
 import bank.donghang.core.accountproduct.domain.repository.AccountProductRepository;
+import bank.donghang.core.common.exception.BadRequestException;
 import bank.donghang.core.common.dto.PageInfo;
 
 @ActiveProfiles("test")
