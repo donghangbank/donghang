@@ -68,3 +68,13 @@ include::{snippets}/account-controller-test/can_find_account_owner_name/http-req
 ==== 응답
 
 include::{snippets}/account-controller-test/can_find_account_owner_name/http-response.adoc[]
+
+=== 계좌번호와 비밀번호로 인증 (POST /api/v1/accounts/check)
+
+==== 요청
+
+include::{snippets}/account-controller-test/can_check_account_password/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/account-controller-test/can_check_account_password/http-response.adoc[]

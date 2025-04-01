@@ -31,6 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import bank.donghang.core.account.application.AccountService;
 import bank.donghang.core.account.dto.request.AccountOwnerNameRequest;
+import bank.donghang.core.account.dto.request.AccountPasswordRequest;
 import bank.donghang.core.account.dto.request.BalanceRequest;
 import bank.donghang.core.account.dto.request.DeleteAccountRequest;
 import bank.donghang.core.account.dto.request.DemandAccountRegisterRequest;
@@ -249,5 +250,24 @@ class AccountControllerTest extends ControllerTest {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.ownerName").value(maskedName))
 				.andDo(document("get-account-owner-name"));
+	}
+
+	@Test
+	@DisplayName("계좌번호와 비밀번호로 인증할 수 있다.")
+	void can_check_account_password() throws Exception {
+		// given
+		String accountNumber = "100001123456";
+		String password = "0000";
+		AccountPasswordRequest request = new AccountPasswordRequest(accountNumber, password);
+
+		// 비밀번호 인증 로직은 void이므로 성공 시 200 OK만 확인하면 됨
+		willDoNothing().given(accountService).checkAccountPassword(any(AccountPasswordRequest.class));
+
+		// when & then
+		mockMvc.perform(post("/api/v1/accounts/check")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(request)))
+				.andExpect(status().isOk())
+				.andDo(document("check-account-password"));
 	}
 }
