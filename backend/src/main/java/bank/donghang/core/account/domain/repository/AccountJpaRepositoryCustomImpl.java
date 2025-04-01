@@ -7,7 +7,6 @@ import static bank.donghang.core.bank.domain.QBank.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import bank.donghang.core.account.dto.response.AccountPasswordResponse;
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.Tuple;
@@ -17,6 +16,7 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import bank.donghang.core.account.domain.QAccount;
+import bank.donghang.core.account.dto.response.AccountPasswordResponse;
 import bank.donghang.core.account.dto.response.AccountOwnerNameResponse;
 import bank.donghang.core.account.dto.response.AccountSummaryResponse;
 import bank.donghang.core.account.dto.response.BalanceResponse;
