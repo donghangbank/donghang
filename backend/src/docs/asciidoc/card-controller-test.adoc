@@ -1,0 +1,11 @@
+== CardController
+
+=== 은행 생성 (POST /api/v1/banks)
+
+==== 요청
+
+include::{snippets}/card-controller-test/can_check_card_password/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/card-controller-test/can_check_card_password/http-response.adoc[]

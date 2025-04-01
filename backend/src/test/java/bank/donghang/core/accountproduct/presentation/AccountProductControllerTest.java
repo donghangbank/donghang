@@ -106,11 +106,19 @@ class AccountProductControllerTest extends ControllerTest {
 	@Test
 	@DisplayName("상품을 생성한다.")
 	public void create_product() throws Exception {
-		AccountProductCreationRequest creationRequest = new AccountProductCreationRequest("새 상품",
-			// accountProductName
-			"새 상품 설명", 1L, 2.5, "기본 금리", 100, 12L, 1000L, 100000L);
+		AccountProductCreationRequest creationRequest = new AccountProductCreationRequest(
+				"새 상품",
+				"새 상품 설명",
+				1L,
+				2.5,
+				"기본 금리",
+				100,
+				12L,
+				1000L,
+				100000L
+		);
 
-		AccountProductSummary expected = new AccountProductSummary(1L,                 // accountProductId
+		AccountProductSummary expected = new AccountProductSummary(1L,
 			"새 상품", 1L, 2.5, 12L, 1000L, 100000L, "저축 상품", 100);
 
 		when(productService.registerAccountProduct(creationRequest)).thenReturn(expected);
