@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
-
 import bank.donghang.core.account.application.AccountService;
 import bank.donghang.core.account.dto.request.AccountOwnerNameRequest;
 import bank.donghang.core.account.dto.request.BalanceRequest;
