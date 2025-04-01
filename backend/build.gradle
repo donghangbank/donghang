@@ -135,3 +135,7 @@ jib {
         ports = ['8080']
     }
 }
+
+tasks.named('jib') {
+    dependsOn copyDocument
+}
