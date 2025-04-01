@@ -15,7 +15,6 @@ import bank.donghang.core.account.dto.response.AccountOwnerNameResponse;
 import bank.donghang.core.account.dto.response.AccountSummaryResponse;
 import bank.donghang.core.account.dto.response.BalanceResponse;
 import bank.donghang.core.common.dto.PageInfo;
-
 import lombok.RequiredArgsConstructor;
 
 @Repository
