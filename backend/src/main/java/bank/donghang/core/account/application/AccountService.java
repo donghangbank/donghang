@@ -79,7 +79,7 @@ public class AccountService {
 		String branchCode = fullAccountNumber.substring(3, 6);
 		String accountNumber = fullAccountNumber.substring(6);
 
-		if(!accountRepository.existByFullAccountNumber(
+		if (!accountRepository.existByFullAccountNumber(
 				accountTypeCode,
 				branchCode,
 				accountNumber
@@ -93,7 +93,7 @@ public class AccountService {
 				accountNumber
 		);
 
-		if(!request.password().equals(response.password())) {
+		if (!request.password().equals(response.password())) {
 			throw new BadRequestException(ErrorCode.PASSWORD_MISMATCH);
 		}
 	}
