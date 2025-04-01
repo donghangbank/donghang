@@ -34,7 +34,9 @@ public enum ErrorCode {
 	MATURITY_ACCOUNT_IS_NOT_ELIGIBLE_FOR_PAYOUT(8_007, "만기 지급을 받을 수 없는 계좌입니다."),
 	WITHDRAWAL_ACCOUNT_IS_NOT_ACTIVE(8_008, "예금 계좌가 활성화 상태가 아닙니다."),
 	MATURITY_ACCOUNT_IS_NOT_ACTIVE(8_009, "만기 환급 계좌가 활성화 상태가 아닙니다."),
-	PASSWORD_MISMATCH(8_010, "비밀번호가 일치하지 않습니다.");
+	PASSWORD_MISMATCH(8_010, "비밀번호가 일치하지 않습니다."),
+
+	CARD_NOT_FOUND(9_000, "존재하지 않는 카드입니다.");
 
 	private final int code;
 	private final String message;

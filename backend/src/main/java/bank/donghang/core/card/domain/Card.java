@@ -26,7 +26,7 @@ public class Card extends BaseEntity {
     @Column(nullable = false, name = "account_id")
     private Long accountId;
 
-    @Column(nullable = false, name = "card_number", length = 16)
+    @Column(nullable = false, name = "card_number", length = 16, unique = true)
     private String cardNumber;
 
     @Column(name = "description")
