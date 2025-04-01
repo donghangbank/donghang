@@ -17,6 +17,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import bank.donghang.core.account.domain.QAccount;
 import bank.donghang.core.account.dto.response.AccountOwnerNameResponse;
+import bank.donghang.core.account.dto.response.AccountPasswordResponse;
 import bank.donghang.core.account.dto.response.AccountSummaryResponse;
 import bank.donghang.core.account.dto.response.BalanceResponse;
 import bank.donghang.core.accountproduct.domain.QAccountProduct;
@@ -145,5 +146,20 @@ public class AccountJpaRepositoryCustomImpl implements AccountJpaRepositoryCusto
 				.fetchOne();
 
 		return new AccountOwnerNameResponse(ownerName);
+	}
+
+	@Override
+	public AccountPasswordResponse getAccountPassword(String accountTypeCode, String branchCode, String accountNumber) {
+		QAccount account = QAccount.account;
+		String password = queryFactory
+				.select(account.password)
+				.from(account)
+				.where(
+						account.accountTypeCode.eq(accountTypeCode)
+								.and(account.branchCode.eq(branchCode))
+								.and(account.accountNumber.eq(accountNumber))
+				)
+				.fetchOne();
+		return new AccountPasswordResponse(password);
 	}
 }

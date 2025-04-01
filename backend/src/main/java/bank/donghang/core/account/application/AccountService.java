@@ -15,6 +15,7 @@ import bank.donghang.core.account.domain.InstallmentSchedule;
 import bank.donghang.core.account.domain.repository.AccountRepository;
 import bank.donghang.core.account.dto.TransferInfo;
 import bank.donghang.core.account.dto.request.AccountOwnerNameRequest;
+import bank.donghang.core.account.dto.request.AccountPasswordRequest;
 import bank.donghang.core.account.dto.request.BalanceRequest;
 import bank.donghang.core.account.dto.request.DeleteAccountRequest;
 import bank.donghang.core.account.dto.request.DemandAccountRegisterRequest;
@@ -22,6 +23,7 @@ import bank.donghang.core.account.dto.request.DepositAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.InstallmentAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.MyAccountsRequest;
 import bank.donghang.core.account.dto.response.AccountOwnerNameResponse;
+import bank.donghang.core.account.dto.response.AccountPasswordResponse;
 import bank.donghang.core.account.dto.response.AccountRegisterResponse;
 import bank.donghang.core.account.dto.response.AccountSummaryResponse;
 import bank.donghang.core.account.dto.response.BalanceResponse;
@@ -69,6 +71,31 @@ public class AccountService {
 		PageInfo<AccountSummaryResponse> response = accountRepository.getMyAccounts(request.memberId(), cursor);
 		System.out.println(response);
 		return response;
+	}
+
+	public void checkAccountPassword(AccountPasswordRequest request) {
+		String fullAccountNumber = request.accountNumber();
+		String accountTypeCode = fullAccountNumber.substring(0, 3);
+		String branchCode = fullAccountNumber.substring(3, 6);
+		String accountNumber = fullAccountNumber.substring(6);
+
+		if (!accountRepository.existByFullAccountNumber(
+				accountTypeCode,
+				branchCode,
+				accountNumber
+		)) {
+			throw new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND);
+		}
+
+		AccountPasswordResponse response = accountRepository.getAccountPasswordByFullAccountNumber(
+				accountTypeCode,
+				branchCode,
+				accountNumber
+		);
+
+		if (!request.password().equals(response.password())) {
+			throw new BadRequestException(ErrorCode.PASSWORD_MISMATCH);
+		}
 	}
 
 	public AccountRegisterResponse createDemandAccount(DemandAccountRegisterRequest demandAccountRegisterRequest) {

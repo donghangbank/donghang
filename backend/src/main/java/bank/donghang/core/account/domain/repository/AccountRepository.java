@@ -12,6 +12,7 @@ import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.account.domain.InstallmentSchedule;
 import bank.donghang.core.account.domain.enums.InstallmentStatus;
 import bank.donghang.core.account.dto.response.AccountOwnerNameResponse;
+import bank.donghang.core.account.dto.response.AccountPasswordResponse;
 import bank.donghang.core.account.dto.response.AccountSummaryResponse;
 import bank.donghang.core.account.dto.response.BalanceResponse;
 import bank.donghang.core.common.dto.PageInfo;
@@ -152,5 +153,15 @@ public class AccountRepository {
 				branchCode,
 				accountNumber
 		);
+	}
+
+	public AccountPasswordResponse getAccountPasswordByFullAccountNumber(
+			String accountTypeCode,
+			String branchCode,
+			String accountNumber) {
+		return accountJpaRepositoryCustomImpl.getAccountPassword(
+				accountTypeCode,
+				branchCode,
+				accountNumber);
 	}
 }

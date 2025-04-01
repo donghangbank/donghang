@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import bank.donghang.core.account.application.AccountService;
 import bank.donghang.core.account.dto.request.AccountOwnerNameRequest;
+import bank.donghang.core.account.dto.request.AccountPasswordRequest;
 import bank.donghang.core.account.dto.request.BalanceRequest;
 import bank.donghang.core.account.dto.request.DeleteAccountRequest;
 import bank.donghang.core.account.dto.request.DemandAccountRegisterRequest;
@@ -17,6 +18,7 @@ import bank.donghang.core.account.dto.request.DepositAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.InstallmentAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.MyAccountsRequest;
 import bank.donghang.core.account.dto.response.AccountOwnerNameResponse;
+import bank.donghang.core.account.dto.response.AccountPasswordResponse;
 import bank.donghang.core.account.dto.response.AccountRegisterResponse;
 import bank.donghang.core.account.dto.response.AccountSummaryResponse;
 import bank.donghang.core.account.dto.response.BalanceResponse;
@@ -71,5 +73,11 @@ public class AccountController {
 	@PostMapping("/owner")
 	public ResponseEntity<AccountOwnerNameResponse> getAccountOwnerName(@RequestBody AccountOwnerNameRequest request) {
 		return ResponseEntity.ok(accountService.getOwnerName(request));
+	}
+
+	@PostMapping("/check")
+	public ResponseEntity<Void> checkAccountPassword(@RequestBody AccountPasswordRequest request) {
+		accountService.checkAccountPassword(request);
+		return ResponseEntity.ok().build();
 	}
 }
