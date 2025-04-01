@@ -4,5 +4,5 @@ import bank.donghang.core.card.dto.response.CardPasswordResponse;
 
 public interface CardJpaRepositoryCustom {
 
-    CardPasswordResponse checkCardPassword(String cardNumber);
+	CardPasswordResponse checkCardPassword(String cardNumber);
 }
