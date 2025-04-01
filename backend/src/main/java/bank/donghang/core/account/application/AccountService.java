@@ -32,7 +32,6 @@ import bank.donghang.core.common.annotation.MaskApply;
 import bank.donghang.core.common.dto.PageInfo;
 import bank.donghang.core.common.exception.BadRequestException;
 import bank.donghang.core.common.exception.ErrorCode;
-
 import lombok.RequiredArgsConstructor;
 
 @Service

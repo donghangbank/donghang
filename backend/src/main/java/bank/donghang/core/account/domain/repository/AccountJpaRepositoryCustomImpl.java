@@ -23,7 +23,6 @@ import bank.donghang.core.accountproduct.domain.QAccountProduct;
 import bank.donghang.core.bank.domain.QBank;
 import bank.donghang.core.common.dto.PageInfo;
 import bank.donghang.core.member.domain.QMember;
-
 import lombok.RequiredArgsConstructor;
 
 @Repository
