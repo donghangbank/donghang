@@ -5,6 +5,7 @@ import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
 
+import bank.donghang.core.account.dto.response.AccountOwnerNameResponse;
 import org.springframework.stereotype.Repository;
 
 import bank.donghang.core.account.domain.Account;
@@ -127,6 +128,29 @@ public class AccountRepository {
 			accountTypeCode,
 			branchCode,
 			accountNumber
+		);
+	}
+
+	public AccountOwnerNameResponse getAccountOwnerNameByFullAccountNumber(
+			String accountTypeCode,
+			String branchCode,
+			String accountNumber
+	) {
+		return accountJpaRepositoryCustomImpl.getAccountOwnerName(
+				accountTypeCode,
+				branchCode,
+				accountNumber
+		);
+	}
+
+	public boolean existByFullAccountNumber(
+			String accountTypeCode,
+			String branchCode,
+			String accountNumber) {
+		return accountJpaRepository.existsByAccountTypeCodeAndBranchCodeAndAccountNumber(
+				accountTypeCode,
+				branchCode,
+				accountNumber
 		);
 	}
 }

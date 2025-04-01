@@ -7,6 +7,8 @@ import static bank.donghang.core.bank.domain.QBank.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import bank.donghang.core.account.dto.response.AccountOwnerNameResponse;
+import bank.donghang.core.member.domain.QMember;
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.Tuple;
@@ -120,5 +122,28 @@ public class AccountJpaRepositoryCustomImpl implements AccountJpaRepositoryCusto
 			summaries,
 			hasNext
 		);
+	}
+
+	@Override
+	public AccountOwnerNameResponse getAccountOwnerName(
+			String accountTypeCode,
+			String branchCode,
+			String accountNumber
+	) {
+		QAccount account = QAccount.account;
+		QMember member = QMember.member;
+		String ownerName = queryFactory
+				.select(member.name)
+				.from(account)
+				.join(member)
+				.on(account.memberId.eq(member.id))
+				.where(
+						account.accountTypeCode.eq(accountTypeCode)
+								.and(account.branchCode.eq(branchCode))
+								.and(account.accountNumber.eq(accountNumber))
+				)
+				.fetchOne();
+
+		return new AccountOwnerNameResponse(ownerName);
 	}
 }

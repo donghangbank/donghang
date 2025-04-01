@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import bank.donghang.core.account.dto.request.*;
+import bank.donghang.core.account.dto.response.AccountOwnerNameResponse;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -14,12 +16,6 @@ import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.account.domain.InstallmentSchedule;
 import bank.donghang.core.account.domain.repository.AccountRepository;
 import bank.donghang.core.account.dto.TransferInfo;
-import bank.donghang.core.account.dto.request.BalanceRequest;
-import bank.donghang.core.account.dto.request.DeleteAccountRequest;
-import bank.donghang.core.account.dto.request.DemandAccountRegisterRequest;
-import bank.donghang.core.account.dto.request.DepositAccountRegisterRequest;
-import bank.donghang.core.account.dto.request.InstallmentAccountRegisterRequest;
-import bank.donghang.core.account.dto.request.MyAccountsRequest;
 import bank.donghang.core.account.dto.response.AccountRegisterResponse;
 import bank.donghang.core.account.dto.response.AccountSummaryResponse;
 import bank.donghang.core.account.dto.response.BalanceResponse;
@@ -38,10 +34,32 @@ public class AccountService {
 	private final AccountRepository accountRepository;
 	private final AccountProductRepository accountProductRepository;
 
+	@MaskApply(typeValue = AccountOwnerNameResponse.class)
+	public AccountOwnerNameResponse getOwnerName(AccountOwnerNameRequest request) {
+		String fullAccountNumber = request.accountNumber();
+		String accountTypeCode = fullAccountNumber.substring(0, 3);
+		String branchCode = fullAccountNumber.substring(3, 6);
+		String accountNumber = fullAccountNumber.substring(6);
+
+		System.out.println(accountTypeCode + " " + branchCode + " " + accountNumber);
+		if(!accountRepository.existByFullAccountNumber(
+				accountTypeCode,
+				branchCode,
+				accountNumber
+		)) {
+			throw new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND);
+		}
+
+		return accountRepository.getAccountOwnerNameByFullAccountNumber(
+				accountTypeCode,
+				branchCode,
+				accountNumber
+		);
+	}
+
 	@MaskApply(typeValue = PageInfo.class, genericTypeValue = AccountSummaryResponse.class)
 	public PageInfo<AccountSummaryResponse> getMyAccounts(MyAccountsRequest request, String pageToken) {
 		Long cursor = pageToken == null ? null : Long.parseLong(pageToken);
-		System.out.println("In service, memberId: " + request.memberId());
 		PageInfo<AccountSummaryResponse> response = accountRepository.getMyAccounts(request.memberId(), cursor);
 		System.out.println(response);
 		return response;
