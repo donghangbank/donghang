@@ -8,18 +8,18 @@ import bank.donghang.core.common.annotation.Mask;
 import bank.donghang.core.common.enums.MaskingType;
 
 public record AccountDetailResponse(
-	String bankName,
-	@Mask(type = MaskingType.ACCOUNT_NUMBER)
-	String accountNumber,
-	AccountProductType accountProductType,
-	LocalDate openingDate,
-	Long accountBalance,
-	Double interestRate,
-	AccountStatus accountStatus,
-	LocalDate accountExpiryDate,
-	@Mask(type = MaskingType.ACCOUNT_NUMBER)
-	String withdrawalAccountNumber,
-	Long monthlyInstallmentAmount,
-	Integer monthlyInstallmentDate
+		String bankName,
+		@Mask(type = MaskingType.ACCOUNT_NUMBER)
+		String accountNumber,
+		AccountProductType accountProductType,
+		LocalDate openingDate,
+		Long accountBalance,
+		Double interestRate,
+		AccountStatus accountStatus,
+		LocalDate accountExpiryDate,
+		@Mask(type = MaskingType.ACCOUNT_NUMBER)
+		String withdrawalAccountNumber,
+		Long monthlyInstallmentAmount,
+		Integer monthlyInstallmentDate
 ) {
 }

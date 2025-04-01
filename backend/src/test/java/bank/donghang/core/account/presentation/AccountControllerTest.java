@@ -30,12 +30,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import bank.donghang.core.account.application.AccountService;
+import bank.donghang.core.account.dto.request.AccountOwnerNameRequest;
 import bank.donghang.core.account.dto.request.BalanceRequest;
 import bank.donghang.core.account.dto.request.DeleteAccountRequest;
 import bank.donghang.core.account.dto.request.DemandAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.DepositAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.InstallmentAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.MyAccountsRequest;
+import bank.donghang.core.account.dto.response.AccountOwnerNameResponse;
 import bank.donghang.core.account.dto.response.AccountRegisterResponse;
 import bank.donghang.core.account.dto.response.AccountSummaryResponse;
 import bank.donghang.core.account.dto.response.BalanceResponse;
@@ -223,5 +225,29 @@ class AccountControllerTest extends ControllerTest {
 			.andExpect(status().isNoContent());
 
 		verify(accountService).deleteAccount(request);
+	}
+
+	@Test
+	@DisplayName("계좌번호로 예금주 이름을 조회할 수 있다.")
+	void can_find_account_owner_name() throws Exception {
+		// given
+		String fullAccountNumber = "100001123456";
+		AccountOwnerNameRequest request = new AccountOwnerNameRequest(fullAccountNumber);
+
+		// 마스킹된 이름 예시 (실제 마스킹 로직에 따라 달라질 수 있음)
+		String maskedName = "홍*동";
+
+		AccountOwnerNameResponse response = new AccountOwnerNameResponse(maskedName);
+
+		given(accountService.getOwnerName(any(AccountOwnerNameRequest.class)))
+				.willReturn(response);
+
+		// when & then
+		mockMvc.perform(post("/api/v1/accounts/owner")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(request)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.ownerName").value(maskedName))
+				.andDo(document("get-account-owner-name"));
 	}
 }

@@ -58,3 +58,13 @@ include::{snippets}/account-controller-test/can_delete_account/http-request.adoc
 ==== 응답
 
 include::{snippets}/account-controller-test/can_delete_account/http-response.adoc[]
+
+=== 계좌번호로 예금주 이름 조회 (POST /api/v1/accounts/owner)
+
+==== 요청
+
+include::{snippets}/account-controller-test/can_find_account_owner_name/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/account-controller-test/can_find_account_owner_name/http-response.adoc[]

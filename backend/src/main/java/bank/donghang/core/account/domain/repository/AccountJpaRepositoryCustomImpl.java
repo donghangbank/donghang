@@ -16,11 +16,13 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import bank.donghang.core.account.domain.QAccount;
+import bank.donghang.core.account.dto.response.AccountOwnerNameResponse;
 import bank.donghang.core.account.dto.response.AccountSummaryResponse;
 import bank.donghang.core.account.dto.response.BalanceResponse;
 import bank.donghang.core.accountproduct.domain.QAccountProduct;
 import bank.donghang.core.bank.domain.QBank;
 import bank.donghang.core.common.dto.PageInfo;
+import bank.donghang.core.member.domain.QMember;
 import lombok.RequiredArgsConstructor;
 
 @Repository
@@ -32,33 +34,33 @@ public class AccountJpaRepositoryCustomImpl implements AccountJpaRepositoryCusto
 
 	@Override
 	public BalanceResponse getAccountBalance(
-		String accountTypeCode,
-		String branchCode,
-		String accountNumber
+			String accountTypeCode,
+			String branchCode,
+			String accountNumber
 	) {
 		return queryFactory.select(
-				Projections.constructor(
-					BalanceResponse.class,
-					Expressions.stringTemplate(
-						"concat({0}, concat({1}, {2}))",
-						account.accountTypeCode,
-						account.branchCode,
-						account.accountNumber
-					),
-					bank.name,
-					account.accountBalance
-				))
-			.from(account)
-			.leftJoin(accountProduct)
-			.on(account.accountProductId.eq(accountProduct.accountProductId))
-			.leftJoin(bank)
-			.on(accountProduct.bankId.eq(bank.id))
-			.where(
-				account.accountTypeCode.eq(accountTypeCode)
-					.and(account.branchCode.eq(branchCode))
-					.and(account.accountNumber.eq(accountNumber))
-			)
-			.fetchOne();
+						Projections.constructor(
+								BalanceResponse.class,
+								Expressions.stringTemplate(
+										"concat({0}, concat({1}, {2}))",
+										account.accountTypeCode,
+										account.branchCode,
+										account.accountNumber
+								),
+								bank.name,
+								account.accountBalance
+						))
+				.from(account)
+				.leftJoin(accountProduct)
+				.on(account.accountProductId.eq(accountProduct.accountProductId))
+				.leftJoin(bank)
+				.on(accountProduct.bankId.eq(bank.id))
+				.where(
+						account.accountTypeCode.eq(accountTypeCode)
+								.and(account.branchCode.eq(branchCode))
+								.and(account.accountNumber.eq(accountNumber))
+				)
+				.fetchOne();
 	}
 
 	@Override
@@ -77,22 +79,22 @@ public class AccountJpaRepositoryCustomImpl implements AccountJpaRepositoryCusto
 		// limit은 요청 사이즈 + 1(다음 페이지 존재여부 확인용)
 		int pageSize = DEFAULT_PAGE_SIZE;
 		List<Tuple> results = queryFactory
-			.select(
-				account.accountId,
-				bank.name,
-				account.accountTypeCode,
-				account.branchCode,
-				account.accountNumber,
-				accountProduct.accountProductType,
-				account.accountBalance
-			)
-			.from(account)
-			.leftJoin(accountProduct).on(account.accountProductId.eq(accountProduct.accountProductId))
-			.leftJoin(bank).on(accountProduct.bankId.eq(bank.id))
-			.where(predicate)
-			.orderBy(account.accountId.asc())
-			.limit(pageSize + 1)
-			.fetch();
+				.select(
+						account.accountId,
+						bank.name,
+						account.accountTypeCode,
+						account.branchCode,
+						account.accountNumber,
+						accountProduct.accountProductType,
+						account.accountBalance
+				)
+				.from(account)
+				.leftJoin(accountProduct).on(account.accountProductId.eq(accountProduct.accountProductId))
+				.leftJoin(bank).on(accountProduct.bankId.eq(bank.id))
+				.where(predicate)
+				.orderBy(account.accountId.asc())
+				.limit(pageSize + 1)
+				.fetch();
 
 		// 다음 페이지가 있는지 확인 (요청 건수보다 1개 더 조회됨)
 		boolean hasNext = results.size() > pageSize;
@@ -105,20 +107,43 @@ public class AccountJpaRepositoryCustomImpl implements AccountJpaRepositoryCusto
 
 		// 조회 결과를 AccountSummaryResponse로 매핑
 		List<AccountSummaryResponse> summaries = results.stream()
-			.map(tuple -> new AccountSummaryResponse(
-				tuple.get(bank.name),
-				tuple.get(account.accountTypeCode)
-					+ tuple.get(account.branchCode)
-					+ tuple.get(account.accountNumber),
-				tuple.get(accountProduct.accountProductType),
-				tuple.get(account.accountBalance)
-			))
-			.collect(Collectors.toList());
+				.map(tuple -> new AccountSummaryResponse(
+						tuple.get(bank.name),
+						tuple.get(account.accountTypeCode)
+								+ tuple.get(account.branchCode)
+								+ tuple.get(account.accountNumber),
+						tuple.get(accountProduct.accountProductType),
+						tuple.get(account.accountBalance)
+				))
+				.collect(Collectors.toList());
 
 		return PageInfo.of(
-			nextCursor != null ? String.valueOf(nextCursor) : null,
-			summaries,
-			hasNext
+				nextCursor != null ? String.valueOf(nextCursor) : null,
+				summaries,
+				hasNext
 		);
+	}
+
+	@Override
+	public AccountOwnerNameResponse getAccountOwnerName(
+			String accountTypeCode,
+			String branchCode,
+			String accountNumber
+	) {
+		QAccount account = QAccount.account;
+		QMember member = QMember.member;
+		String ownerName = queryFactory
+				.select(member.name)
+				.from(account)
+				.join(member)
+				.on(account.memberId.eq(member.id))
+				.where(
+						account.accountTypeCode.eq(accountTypeCode)
+								.and(account.branchCode.eq(branchCode))
+								.and(account.accountNumber.eq(accountNumber))
+				)
+				.fetchOne();
+
+		return new AccountOwnerNameResponse(ownerName);
 	}
 }
