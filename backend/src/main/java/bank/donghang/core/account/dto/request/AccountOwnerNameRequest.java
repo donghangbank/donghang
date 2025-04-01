@@ -1,14 +1,15 @@
 package bank.donghang.core.account.dto.request;
 
-import bank.donghang.core.common.dto.MaskingDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import bank.donghang.core.common.dto.MaskingDto;
+
 public record AccountOwnerNameRequest(
-        String accountNumber
+		String accountNumber
 ) implements MaskingDto {
-    @Override
-    @JsonIgnore
-    public boolean getDisableMasking() {
-        return false;
-    }
+	@Override
+	@JsonIgnore
+	public boolean getDisableMasking() {
+		return false;
+	}
 }

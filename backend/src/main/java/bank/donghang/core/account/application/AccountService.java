@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import bank.donghang.core.account.dto.request.*;
-import bank.donghang.core.account.dto.response.AccountOwnerNameResponse;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -16,6 +14,14 @@ import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.account.domain.InstallmentSchedule;
 import bank.donghang.core.account.domain.repository.AccountRepository;
 import bank.donghang.core.account.dto.TransferInfo;
+import bank.donghang.core.account.dto.request.AccountOwnerNameRequest;
+import bank.donghang.core.account.dto.request.BalanceRequest;
+import bank.donghang.core.account.dto.request.DeleteAccountRequest;
+import bank.donghang.core.account.dto.request.DemandAccountRegisterRequest;
+import bank.donghang.core.account.dto.request.DepositAccountRegisterRequest;
+import bank.donghang.core.account.dto.request.InstallmentAccountRegisterRequest;
+import bank.donghang.core.account.dto.request.MyAccountsRequest;
+import bank.donghang.core.account.dto.response.AccountOwnerNameResponse;
 import bank.donghang.core.account.dto.response.AccountRegisterResponse;
 import bank.donghang.core.account.dto.response.AccountSummaryResponse;
 import bank.donghang.core.account.dto.response.BalanceResponse;
@@ -42,7 +48,7 @@ public class AccountService {
 		String accountNumber = fullAccountNumber.substring(6);
 
 		System.out.println(accountTypeCode + " " + branchCode + " " + accountNumber);
-		if(!accountRepository.existByFullAccountNumber(
+		if (!accountRepository.existByFullAccountNumber(
 				accountTypeCode,
 				branchCode,
 				accountNumber
@@ -76,22 +82,22 @@ public class AccountService {
 
 		// todo. 은행, 상품 별 accountTypeCode 매핑
 		String nextAccountNumber = accountRepository.getNextAccountNumber(
-			"100",
-			"001"
+				"100",
+				"001"
 		);
 
 		Account account = demandAccountRegisterRequest.toEntity(
-			nextAccountNumber,
-			accountProduct.getInterestRate()
+				nextAccountNumber,
+				accountProduct.getInterestRate()
 		);
 
 		Account savedAccount = accountRepository.saveAccount(account);
 
 		return AccountRegisterResponse.from(
-			savedAccount,
-			accountProduct,
-			null,
-			null
+				savedAccount,
+				accountProduct,
+				null,
+				null
 		);
 	}
 
@@ -100,9 +106,9 @@ public class AccountService {
 	@MaskApply(typeValue = AccountRegisterResponse.class)
 	public AccountRegisterResponse createDepositAccount(DepositAccountRegisterRequest req) {
 		DepositInstallmentAccountData data = getDepositInstallmentAccountData(
-			req.accountProductId(),
-			req.withdrawalAccountNumber(),
-			req.payoutAccountNumber()
+				req.accountProductId(),
+				req.withdrawalAccountNumber(),
+				req.payoutAccountNumber()
 		);
 
 		if (!data.accountProduct.isDepositProduct()) {
@@ -113,81 +119,81 @@ public class AccountService {
 		data.payoutAccount.verifyPayoutAccount(req.memberId());
 
 		String newAccountNumber = accountRepository.getNextAccountNumber(
-			"200",
-			"001"
+				"200",
+				"001"
 		);
 		LocalDate expiryDate = LocalDate.now().plusMonths(data.accountProduct.getSubscriptionPeriod());
 
 		Account newDepositAccount = req.toEntity(
-			newAccountNumber,
-			data.accountProduct.getInterestRate(),
-			data.withdrawalAccount.getAccountId(),
-			data.payoutAccount.getAccountId(),
-			0L,
-			expiryDate
+				newAccountNumber,
+				data.accountProduct.getInterestRate(),
+				data.withdrawalAccount.getAccountId(),
+				data.payoutAccount.getAccountId(),
+				0L,
+				expiryDate
 		);
 
 		Account savedDepositAccount = accountRepository.saveAccount(newDepositAccount);
 		TransferInfo request = new TransferInfo(
-			data.withdrawalAccount,
-			savedDepositAccount,
-			req.initDepositAmount(),
-			"Initial Deposit",
-			LocalDateTime.now()
+				data.withdrawalAccount,
+				savedDepositAccount,
+				req.initDepositAmount(),
+				"Initial Deposit",
+				LocalDateTime.now()
 		);
 
 		transferFacade.transfer(request);
 
 		return AccountRegisterResponse.from(
-			savedDepositAccount,
-			data.accountProduct,
-			req.withdrawalAccountNumber(),
-			req.payoutAccountNumber()
+				savedDepositAccount,
+				data.accountProduct,
+				req.withdrawalAccountNumber(),
+				req.payoutAccountNumber()
 		);
 	}
 
 	@MaskApply(typeValue = AccountRegisterResponse.class)
 	public AccountRegisterResponse createInstallmentAccount(InstallmentAccountRegisterRequest req) {
 		DepositInstallmentAccountData data = getDepositInstallmentAccountData(
-			req.accountProductId(),
-			req.withdrawalAccountNumber(),
-			req.payoutAccountNumber()
+				req.accountProductId(),
+				req.withdrawalAccountNumber(),
+				req.payoutAccountNumber()
 		);
 
 		data.withdrawalAccount.verifyWithdrawalAccount(
-			req.memberId(),
-			req.monthlyInstallmentAmount()
+				req.memberId(),
+				req.monthlyInstallmentAmount()
 		);
 		data.payoutAccount.verifyPayoutAccount(req.memberId());
 
 		String newAccountNumber = accountRepository.getNextAccountNumber(
-			"300",
-			"001"
+				"300",
+				"001"
 		);
 		LocalDate expiryDate = LocalDate.now().plusMonths(data.accountProduct.getSubscriptionPeriod());
 
 		Account newInstallmentAccount = req.toEntity(
-			newAccountNumber,
-			data.accountProduct.getInterestRate(),
-			data.withdrawalAccount.getAccountId(),
-			data.payoutAccount.getAccountId(),
-			expiryDate
+				newAccountNumber,
+				data.accountProduct.getInterestRate(),
+				data.withdrawalAccount.getAccountId(),
+				data.payoutAccount.getAccountId(),
+				expiryDate
 		);
 
 		Account savedInstallmentAccount = accountRepository.saveInstallmentAccount(newInstallmentAccount);
 
 		return AccountRegisterResponse.from(
-			savedInstallmentAccount,
-			data.accountProduct,
-			req.withdrawalAccountNumber(),
-			req.payoutAccountNumber()
+				savedInstallmentAccount,
+				data.accountProduct,
+				req.withdrawalAccountNumber(),
+				req.payoutAccountNumber()
 		);
 	}
 
 	@MaskApply(typeValue = AccountRegisterResponse.class)
 	private DepositInstallmentAccountData getDepositInstallmentAccountData(
-		Long accountProductId,
-		String withdrawalAccountNumber, String payoutAccountNumber
+			Long accountProductId,
+			String withdrawalAccountNumber, String payoutAccountNumber
 	) {
 		if (!accountProductRepository.existsAccountProductById(accountProductId)) {
 			throw new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND);
@@ -196,23 +202,23 @@ public class AccountService {
 		AccountProduct accountProduct = accountProductRepository.getAccountProductById(accountProductId);
 
 		Optional<Account> optWithdrawalAccount = accountRepository.findAccountByFullAccountNumber(
-			withdrawalAccountNumber);
+				withdrawalAccountNumber);
 		Optional<Account> optPayoutAccount = accountRepository.findAccountByFullAccountNumber(payoutAccountNumber);
 		if (optWithdrawalAccount.isEmpty() || optPayoutAccount.isEmpty()) {
 			throw new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND);
 		}
 
 		return new DepositInstallmentAccountData(
-			accountProduct,
-			optWithdrawalAccount.get(),
-			optPayoutAccount.get()
+				accountProduct,
+				optWithdrawalAccount.get(),
+				optPayoutAccount.get()
 		);
 	}
 
 	private record DepositInstallmentAccountData(
-		AccountProduct accountProduct,
-		Account withdrawalAccount,
-		Account payoutAccount
+			AccountProduct accountProduct,
+			Account withdrawalAccount,
+			Account payoutAccount
 	) {
 	}
 
@@ -220,13 +226,13 @@ public class AccountService {
 	private void handleInstallmentAccountSchedule() {
 		LocalDate today = LocalDate.now();
 		List<InstallmentSchedule> installmentSchedules
-			= accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(today);
+				= accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(today);
 
 		for (InstallmentSchedule installmentSchedule : installmentSchedules) {
 			try {
 				processInstallment(
-					installmentSchedule,
-					today
+						installmentSchedule,
+						today
 				);
 			} catch (Exception e) {
 				// 실패한 건에 대해 로깅 및 추가 처리
@@ -236,29 +242,29 @@ public class AccountService {
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void processInstallment(
-		InstallmentSchedule installmentSchedule,
-		LocalDate today
+			InstallmentSchedule installmentSchedule,
+			LocalDate today
 	) {
 		try {
 			Optional<Account> optSendingAccount = accountRepository.findAccountById(
-				installmentSchedule.getWithdrawalAccountId());
+					installmentSchedule.getWithdrawalAccountId());
 			Optional<Account> optInstallAccount = accountRepository.findAccountById(
-				installmentSchedule.getInstallmentAccountId());
+					installmentSchedule.getInstallmentAccountId());
 
 			Account sendingAccount = optSendingAccount.orElseThrow(
-				() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND)
+					() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND)
 			);
 
 			Account installmentAccount = optInstallAccount.orElseThrow(
-				() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND)
+					() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND)
 			);
 
 			TransferInfo command = new TransferInfo(
-				sendingAccount,
-				installmentAccount,
-				installmentSchedule.getInstallmentAmount(),
-				installmentSchedule.getInstallmentSequence() + "번 째 납입",
-				LocalDateTime.now()
+					sendingAccount,
+					installmentAccount,
+					installmentSchedule.getInstallmentAmount(),
+					installmentSchedule.getInstallmentSequence() + "번 째 납입",
+					LocalDateTime.now()
 			);
 
 			transferFacade.transfer(command);
@@ -276,7 +282,7 @@ public class AccountService {
 
 	public void deleteAccount(DeleteAccountRequest request) {
 		Account account = accountRepository.findAccountByFullAccountNumber(request.fullAccountNumber())
-			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
+				.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
 
 		if (!account.getPassword().equals(request.password())) {
 			throw new BadRequestException(ErrorCode.PASSWORD_MISMATCH);
@@ -295,11 +301,11 @@ public class AccountService {
 	}
 
 	private void validateAccountExistenceAndPassword(
-		String fullAccountNumber,
-		String password
+			String fullAccountNumber,
+			String password
 	) {
 		Account account = accountRepository.findAccountByFullAccountNumber(fullAccountNumber)
-			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
+				.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
 
 		if (!account.getPassword().equals(password)) {
 			throw new BadRequestException(ErrorCode.PASSWORD_MISMATCH);
