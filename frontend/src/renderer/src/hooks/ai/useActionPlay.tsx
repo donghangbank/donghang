@@ -13,13 +13,15 @@ export const useActionPlay = (options: {
 	const { playAudioDialogue, isAudioPlaying } = useAudioDialogue(options.audioFile);
 	const hasPlayed = useRef(false);
 
+	const { shouldActivate, dialogue, setDialogue, setAvatarState, avatarState } = options;
+
 	useEffect(() => {
-		if (options.shouldActivate && !hasPlayed.current) {
-			options.setAvatarState(options.avatarState);
-			playAudioDialogue(options.dialogue, options.setDialogue);
+		if (shouldActivate && !hasPlayed.current) {
+			setAvatarState(avatarState);
+			playAudioDialogue(dialogue, setDialogue);
 			hasPlayed.current = true;
 		}
-	}, [options, playAudioDialogue]);
+	}, [shouldActivate, playAudioDialogue, dialogue, avatarState, setDialogue, setAvatarState]);
 
 	return { isAudioPlaying };
 };

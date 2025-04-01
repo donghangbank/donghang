@@ -1,32 +1,53 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const useAudioDialogue = (audioFile: string): any => {
+	const audioRef = useRef(new Audio(audioFile));
 	const [isAudioPlaying, setIsAudioPlaying] = useState(false);
-	const audio = useMemo(() => new Audio(audioFile), [audioFile]);
+	const isPlayingRef = useRef(false);
 
-	const play = useCallback(
-		(dialogue: string, setDialogue: (text: string) => void) => {
-			setDialogue(dialogue);
+	const playAudioDialogue = async (
+		dialogue: string,
+		setDialogue: (text: string) => void
+	): Promise<void> => {
+		const audio = audioRef.current;
+
+		if (!audio.paused) {
+			audio.pause();
 			audio.currentTime = 0;
-			audio.play();
-		},
-		[audio]
-	);
+		}
+
+		try {
+			setDialogue(dialogue);
+			setIsAudioPlaying(true);
+			isPlayingRef.current = true;
+			await audio.play();
+		} catch (error) {
+			console.error("Audio playback failed:", error);
+		} finally {
+			audio.onended = (): void => {
+				setTimeout(() => {
+					setIsAudioPlaying(false);
+					isPlayingRef.current = false;
+				}, 2000);
+			};
+			audio.onerror = (): void => {
+				setIsAudioPlaying(false);
+				isPlayingRef.current = false;
+			};
+		}
+	};
 
 	useEffect(() => {
-		const handlePlay = (): void => setIsAudioPlaying(true);
-		const handleEnd = (): void => setIsAudioPlaying(false);
-
-		audio.addEventListener("play", handlePlay);
-		audio.addEventListener("ended", handleEnd);
+		const audio = audioRef.current;
 
 		return (): void => {
-			audio.removeEventListener("play", handlePlay);
-			audio.removeEventListener("ended", handleEnd);
-			audio.pause();
+			if (!isPlayingRef.current) {
+				audio.pause();
+				audio.currentTime = 0;
+			}
 		};
-	}, [audio]);
+	}, [audioFile]);
 
-	return { isAudioPlaying, playAudioDialogue: play };
+	return { playAudioDialogue, isAudioPlaying };
 };

@@ -11,7 +11,6 @@ import { useVideoAnalysis } from "@renderer/hooks/ai/useVideoAnalysis";
 import { UserContext } from "@renderer/contexts/UserContext";
 import { useContext } from "react";
 import { useMediaStream } from "@renderer/hooks/ai/useMediaStream";
-import { useAudioAnalysis } from "@renderer/hooks/ai/useAudioAnalysis";
 import { AIContext } from "@renderer/contexts/AIContext";
 import Dialogue from "./Dialogue";
 
@@ -19,7 +18,6 @@ export default function AICanvas(): JSX.Element {
 	const { isElderly, isUsingPhone, userMsg, isTalking } = useContext(UserContext);
 	const { dialogue } = useContext(AIContext);
 	const { videoRef, canvasRef } = useMediaStream();
-	useAudioAnalysis();
 	useVideoAnalysis(videoRef, canvasRef);
 
 	return (
