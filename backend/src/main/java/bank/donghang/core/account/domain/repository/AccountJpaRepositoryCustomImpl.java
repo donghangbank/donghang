@@ -7,6 +7,7 @@ import static bank.donghang.core.bank.domain.QBank.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import bank.donghang.core.account.dto.response.AccountPasswordResponse;
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.Tuple;
@@ -145,5 +146,20 @@ public class AccountJpaRepositoryCustomImpl implements AccountJpaRepositoryCusto
 				.fetchOne();
 
 		return new AccountOwnerNameResponse(ownerName);
+	}
+
+	@Override
+	public AccountPasswordResponse getAccountPassword(String accountTypeCode, String branchCode, String accountNumber) {
+		QAccount account = QAccount.account;
+		String password = queryFactory
+				.select(account.password)
+				.from(account)
+				.where(
+						account.accountTypeCode.eq(accountTypeCode)
+								.and(account.branchCode.eq(branchCode))
+								.and(account.accountNumber.eq(accountNumber))
+				)
+				.fetchOne();
+		return new AccountPasswordResponse(password);
 	}
 }

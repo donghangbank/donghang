@@ -5,6 +5,7 @@ import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
 
+import bank.donghang.core.account.dto.response.AccountPasswordResponse;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -152,5 +153,15 @@ public class AccountRepository {
 				branchCode,
 				accountNumber
 		);
+	}
+
+	public AccountPasswordResponse getAccountPasswordByFullAccountNumber(
+			String accountTypeCode,
+			String branchCode,
+			String accountNumber) {
+		return accountJpaRepositoryCustomImpl.getAccountPassword(
+				accountTypeCode,
+				branchCode,
+				accountNumber);
 	}
 }

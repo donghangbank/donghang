@@ -1,6 +1,7 @@
 package bank.donghang.core.account.domain.repository;
 
 import bank.donghang.core.account.dto.response.AccountOwnerNameResponse;
+import bank.donghang.core.account.dto.response.AccountPasswordResponse;
 import bank.donghang.core.account.dto.response.AccountSummaryResponse;
 import bank.donghang.core.account.dto.response.BalanceResponse;
 import bank.donghang.core.common.dto.PageInfo;
@@ -18,6 +19,12 @@ public interface AccountJpaRepositoryCustom {
 	);
 
 	AccountOwnerNameResponse getAccountOwnerName(
+			String accountTypeCode,
+			String branchCode,
+			String accountNumber
+	);
+
+	AccountPasswordResponse getAccountPassword(
 			String accountTypeCode,
 			String branchCode,
 			String accountNumber
