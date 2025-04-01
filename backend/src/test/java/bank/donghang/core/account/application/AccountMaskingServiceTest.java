@@ -21,8 +21,8 @@ import bank.donghang.core.account.dto.response.AccountRegisterResponse;
 import bank.donghang.core.accountproduct.domain.AccountProduct;
 import bank.donghang.core.accountproduct.domain.enums.AccountProductType;
 import bank.donghang.core.accountproduct.domain.repository.AccountProductRepository;
-import bank.donghang.core.common.exception.BadRequestException;
 import bank.donghang.core.common.dto.PageInfo;
+import bank.donghang.core.common.exception.BadRequestException;
 
 @ActiveProfiles("test")
 @TestPropertySource(locations = "file:${user.dir}/test.env")
