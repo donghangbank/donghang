@@ -2,6 +2,9 @@ package bank.donghang.core.account.application;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import bank.donghang.core.account.dto.request.AccountOwnerNameRequest;
+import bank.donghang.core.account.dto.response.AccountOwnerNameResponse;
+import bank.donghang.core.common.exception.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -265,5 +268,53 @@ class AccountMaskingServiceTest {
 
 	private boolean isMasked(String accountNumber) {
 		return accountNumber != null && accountNumber.contains("*****");
+	}
+
+//	@Test
+//	@DisplayName("getOwnerName: 마스킹 처리된 소유자 이름 반환")
+//	void getAccountOwnerName_shouldReturnMaskedOwnerName() {
+//		// Given
+//		String accountTypeCode = "100";
+//		String branchCode = "001";
+//		String accountNumber = "12345678";
+//		String fullAccountNumber = accountTypeCode + branchCode + accountNumber;
+//
+//		Account account = Account.builder()
+//				.memberId(1L)
+//				.accountProductId(demandProduct.getAccountProductId())  // 실제 등록된 상품 ID
+//				.password("0000")
+//				.accountTypeCode(accountTypeCode)
+//				.branchCode(branchCode)
+//				.accountNumber(accountNumber)
+//				.accountStatus(AccountStatus.ACTIVE)
+//				.dailyTransferLimit(1_000_000L)
+//				.singleTransferLimit(1_000_000L)
+//				.accountBalance(100_000L)
+//				.interestRate(1.0)
+//				.build();
+//
+//		accountRepository.saveAccount(account);
+//
+//		// When
+//		AccountOwnerNameRequest request = new AccountOwnerNameRequest(fullAccountNumber);
+//		AccountOwnerNameResponse response = accountService.getOwnerName(request);
+//
+//		// Then
+//		assertNotNull(response, "응답이 null이 아니어야 함");
+//		assertNotNull(response.ownerName(), "ownerName이 null이 아니어야 함");
+//		assertTrue(response.ownerName().contains("*"), "마스킹된 이름이어야 함");
+//	}
+
+	@Test
+	@DisplayName("존재하지 않는 계좌번호로 소유자명을 조회하면 예외가 발생한다.")
+	void getAccountOwnerName_shouldThrowException_whenAccountNotFound() {
+		// given
+		String nonExistentAccountNumber = "999999999999";
+		AccountOwnerNameRequest request = new AccountOwnerNameRequest(nonExistentAccountNumber);
+
+		// when & then
+		assertThrows(BadRequestException.class, () -> {
+			accountService.getOwnerName(request);
+		});
 	}
 }
