@@ -17,6 +17,8 @@ import WithDrawalCardInputPage from "./pages/general/withdrawal/WithDrawalCardIn
 import WithDrawalCardAuthPage from "./pages/general/withdrawal/WithDrawalCardAuthPage";
 import GeneralMain from "./pages/GeneralMain";
 import SeniorLayout from "./layouts/SeniorLayout";
+import TransferCheck from "./pages/senior/transfer/transferCheck";
+import SeniorMain from "./pages/SeniorMain";
 
 const router = createHashRouter([
 	{
@@ -81,7 +83,11 @@ const router = createHashRouter([
 			},
 			{
 				path: "senior",
-				children: [{ path: "", element: <SeniorLayout /> }]
+				element: <SeniorLayout />,
+				children: [
+					{ path: "", element: <SeniorMain /> },
+					{ path: "transfer-check", element: <TransferCheck /> }
+				]
 			}
 		]
 	}

@@ -1,7 +1,7 @@
 import { createContext } from "react";
 
 export type AvatarState = "idle" | "walk" | "bow";
-export type Construction = "etc" | "입금" | "출금" | "이체";
+export type Construction = "etc" | "입금" | "출금" | "이체" | "긍정" | "부정";
 
 export const AIContext = createContext<{
 	avatarState: AvatarState;

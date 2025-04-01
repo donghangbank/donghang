@@ -1,31 +1,24 @@
 import AICanvas from "@renderer/components/banker/AICanvas";
 import Simulator from "@renderer/components/common/simulator/Simulator";
-import { useActionPlay } from "@renderer/hooks/ai/useActionPlay";
 import { Outlet } from "react-router-dom";
-import intro2 from "@renderer/assets/audios/intro2.mp3?url";
-import { AIContext } from "@renderer/contexts/AIContext";
-import { useContext, useEffect, useState } from "react";
+import { useVADSTT } from "@renderer/hooks/ai/useVADSTT";
+import { useHandleSTTResult } from "@renderer/hooks/ai/useHandleSTTResult";
+import { useEffect } from "react";
 
 export const SeniorLayout = (): JSX.Element => {
-	const { setAvatarState, setDialogue } = useContext(AIContext);
-	const [isReady, setIsReady] = useState(false);
+	const { transcript, start, stop } = useVADSTT();
+	const { handleSTT } = useHandleSTTResult();
 
 	useEffect(() => {
-		const timer = setTimeout(() => {
-			setIsReady(true);
-		}, 100);
+		start();
+		return (): void => stop();
+	}, [start, stop]);
 
-		return (): void => clearTimeout(timer);
-	}, []);
-
-	useActionPlay({
-		audioFile: intro2,
-		dialogue: "필요한게 있으시면 편하게 말씀해주세요.",
-		setDialogue,
-		setAvatarState,
-		shouldActivate: isReady,
-		avatarState: "idle"
-	});
+	useEffect(() => {
+		if (transcript.trim()) {
+			handleSTT(transcript);
+		}
+	}, [transcript, handleSTT]);
 
 	return (
 		<div className="w-screen h-screen flex flex-col">
