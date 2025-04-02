@@ -15,7 +15,7 @@ vectorstore = FAISS.load_local(
 )
 
 
-async def predict_action(text: str):
+def predict_action(text: str):
     """텍스트 기반 FAISS을 통한 행동 예측"""
     result = vectorstore.similarity_search_with_score(text, k=1)
     similarity_score = result[0][1]
