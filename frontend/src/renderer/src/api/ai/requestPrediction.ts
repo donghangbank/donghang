@@ -1,4 +1,4 @@
-import { Construction } from "@renderer/contexts/AIContext";
+import { Construction, CONSTRUCTION_VALUES } from "@renderer/contexts/AIContext";
 
 type PredictionResponse = {
 	user_text: string;
@@ -27,11 +27,12 @@ export async function requestPrediction(
 		}
 
 		const result: PredictionResponse = await response.json();
-		console.log("python 예측 결과:", result);
 
-		const validActions: Construction[] = ["입금", "출금", "이체"];
-		const construction = validActions.includes(result.predicted_action as Construction)
-			? (result.predicted_action as Construction)
+		const isValidConstruction = (value: string): value is Construction =>
+			CONSTRUCTION_VALUES.includes(value as Construction);
+
+		const construction = isValidConstruction(result.predicted_action)
+			? result.predicted_action
 			: "etc";
 
 		return { construction, response: result };
