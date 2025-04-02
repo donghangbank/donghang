@@ -7,7 +7,7 @@ function createWindow(): void {
 	// Create the browser window.
 	const mainWindow = new BrowserWindow({
 		width: 1920,
-		height: 1080,
+		height: 2160,
 		title: "donghang",
 		show: false,
 		autoHideMenuBar: true,

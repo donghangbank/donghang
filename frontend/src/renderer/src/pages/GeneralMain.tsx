@@ -1,20 +1,32 @@
-import AICanvas from "@renderer/components/banker/AICanvas";
-import VoiceCommandPanel from "@renderer/components/common/VoiceCommandPanel";
+import { Link } from "react-router-dom";
 
 export const GeneralMain = (): JSX.Element => {
-	const prompts = [
-		{ prompt: "돈을 넣고 싶어", link: "/general/deposit" },
-		{ prompt: "돈을 꺼내고 싶어", link: "/general/withdrawal" },
-		{ prompt: "내가 손녀한테 돈을 보내고 싶어", link: "/general/transfer" }
-	];
-
 	return (
-		<div className="flex h-full">
-			<div className="h-full" style={{ width: "33.33vw" }}>
-				<AICanvas />
-			</div>
-			<div className="h-full" style={{ width: "66.67vw" }}>
-				<VoiceCommandPanel title="원하시는 업무를 말씀해 주세요" prompts={prompts} />
+		<div className="flex flex-col bg-white rounded-3xl p-10 shadow-custom gap-10">
+			<span className="text-6xl font-bold text-center">
+				<span className="text-blue">어떤 업무</span>를 도와드릴까요?
+			</span>
+			<div className="grid grid-cols-2 grid-rows-2 gap-10 font-bold text-6xl text-center">
+				<Link to="/general/deposit">
+					<div className="h-[200px] leading-[200px] bg-cloudyBlue shadow-custom rounded-3xl">
+						입금
+					</div>
+				</Link>
+				<Link to="/general/withdrawal">
+					<div className="h-[200px] leading-[200px] bg-cloudyBlue shadow-custom rounded-3xl">
+						출금
+					</div>
+				</Link>
+				<Link to="/general/transfer/warning/scam">
+					<div className="h-[200px] leading-[200px] bg-cloudyBlue shadow-custom rounded-3xl">
+						이체
+					</div>
+				</Link>
+				<Link to="/general/retrieve">
+					<div className="h-[200px] leading-[200px] bg-cloudyBlue shadow-custom rounded-3xl">
+						조회
+					</div>
+				</Link>
 			</div>
 		</div>
 	);

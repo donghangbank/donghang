@@ -1,22 +1,30 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import PropTypes from "prop-types";
 
 interface InputPanelProps {
 	inputValue: string;
 	mainLabel: string;
-	subLabel: string;
+	subLabel?: string;
 	format: (value: string) => string;
+	isCount?: boolean;
+	onResetTimer?: () => void;
 }
 
 export const InputPanel = ({
 	inputValue,
 	mainLabel,
-	subLabel,
-	format
+	format,
+	isCount = true,
+	onResetTimer
 }: InputPanelProps): JSX.Element => {
 	const navigate = useNavigate();
 	const [timeLeft, setTimeLeft] = useState(60);
+
+	useEffect(() => {
+		if (onResetTimer) {
+			setTimeLeft(60);
+		}
+	}, [onResetTimer]);
 
 	useEffect((): void | (() => void) => {
 		const interval = setInterval(() => {
@@ -37,49 +45,24 @@ export const InputPanel = ({
 	const formattedTime = `${minutes}:${seconds.toString().padStart(2, "0")}`;
 
 	return (
-		<div className="flex flex-col h-full">
-			<div className="flex flex-col flex-1 justify-between m-10 p-10 bg-white rounded-2xl shadow-custom">
-				<div className="text-right flex flex-col justify-center flex-1">
-					<span className="text-8xl leading-snug">
-						<span className="font-bold">{mainLabel}</span>
-						{mainLabel === "금액" ? "을" : "를"} 입력하시고
-						<br />
-						<span className="text-green font-bold">확인</span>을 눌러주십시오
-						{(mainLabel === "비밀번호" || mainLabel === "주민등록번호") && (
-							<>
-								<br />
-								<span className="text-6xl text-red font-bold">* 입력하실 때 주의하세요!</span>
-							</>
-						)}
+		<div className="bg-white shadow-custom flex flex-col rounded-3xl p-2.5 font-bold">
+			<div className="pr-4 pb-3 pl-4 pt-1.5 rounded-3xl flex text-3xl justify-between text-blue">
+				<span className="">{mainLabel}</span>
+				{isCount && (
+					<span className={`${timeLeft < 10 ? "text-red shake" : "text-blue"}`}>
+						{formattedTime}
 					</span>
-				</div>
-				<div className="flex flex-col p-10 gap-16 bg-background rounded-2xl">
-					<div className="flex justify-between">
-						<span className="text-8xl text-blue font-bold">{subLabel}</span>
-						<span
-							className={`text-8xl font-bold ${timeLeft < 10 ? "text-red shake" : "text-blue"}`}
-						>
-							{formattedTime}
-						</span>
-					</div>
-					<div className="flex flex-col">
-						<input
-							className="flex-1 text-8xl rounded-2xl border-2 border-black text-right px-2.5 font-bold"
-							value={format(inputValue)}
-							readOnly
-						/>
-					</div>
-				</div>
+				)}
+			</div>
+			<div className="flex flex-col justify-center items-center rounded-3xl bg-cloudyBlue">
+				<input
+					className="flex-1 p-2.5 rounded-3xl text-4xl bg-cloudyBlue text-right px-2.5 focus:border-none"
+					value={format(inputValue)}
+					readOnly
+				/>
 			</div>
 		</div>
 	);
-};
-
-InputPanel.propTypes = {
-	inputValue: PropTypes.string.isRequired,
-	mainLabel: PropTypes.string.isRequired,
-	subLabel: PropTypes.string.isRequired,
-	format: PropTypes.func.isRequired
 };
 
 export default InputPanel;

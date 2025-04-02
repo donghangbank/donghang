@@ -1,4 +1,3 @@
-import AICanvas from "@renderer/components/banker/AICanvas";
 import { AIContext } from "@renderer/contexts/AIContext";
 import { UserContext } from "@renderer/contexts/UserContext";
 import { useContext, useEffect } from "react";
@@ -27,13 +26,7 @@ export const App = (): JSX.Element => {
 		}
 	}, [isAudioPlaying, isUserExist, isElderly, navigate]);
 
-	return (
-		<div className="w-full h-full flex items-center justify-center">
-			<div className="w-full flex items-start justify-center gap-5">
-				<AICanvas />
-			</div>
-		</div>
-	);
+	return <></>;
 };
 
 export default App;

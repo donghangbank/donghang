@@ -21,7 +21,7 @@ export default function AICanvas(): JSX.Element {
 	useVideoAnalysis(videoRef, canvasRef);
 
 	return (
-		<div className="relative w-full h-[90vh]">
+		<div className="relative w-full h-full">
 			<div>
 				<video ref={videoRef} autoPlay playsInline width={640} height={640} className="hidden" />
 				<canvas ref={canvasRef} width={640} height={640} className="hidden" />
