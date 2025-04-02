@@ -23,14 +23,17 @@ export function useVideoAnalysis(
 					// Age detection logic
 					if (!ageConfirmed && data.predicted_age !== undefined) {
 						const ageIndex = Number(data.predicted_age);
+						if (ageIndex === 0) {
+							return;
+						}
 
 						if (!isNaN(ageIndex)) {
 							const nextBuffer = [...ageBufferRef.current, ageIndex].slice(-5); // Keep last 5 readings
 							ageBufferRef.current = nextBuffer;
 
-							if (nextBuffer.length >= 3) {
+							if (nextBuffer.length >= 5) {
 								const medianAge = calculateMedianAge(nextBuffer);
-								if (medianAge >= 8) {
+								if (medianAge >= 6.8) {
 									setIsElderly(2);
 								} else {
 									setIsElderly(1);

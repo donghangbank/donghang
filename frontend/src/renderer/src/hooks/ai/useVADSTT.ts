@@ -1,8 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { UserContext } from "@renderer/contexts/UserContext";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
+
+const MINIMUM_RECORDING_DURATION = 1500;
 
 export function useVADSTT(): {
-	transcript;
-	isDetecting;
+	transcript: string;
+	isDetecting: boolean;
 	start: () => void;
 	stop: () => void;
 } {
@@ -11,12 +14,14 @@ export function useVADSTT(): {
 	const audioChunks = useRef<Blob[]>([]);
 	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 	const vadTimerRef = useRef<NodeJS.Timeout | null>(null);
+	const startTimeRef = useRef<number | null>(null); // 녹음 시작 시점 저장
+	const { setIsTalking } = useContext(UserContext);
 
 	const startRecording = useCallback((stream: MediaStream): void => {
 		const mediaRecorder = new MediaRecorder(stream);
 		mediaRecorderRef.current = mediaRecorder;
-
 		audioChunks.current = [];
+		startTimeRef.current = Date.now();
 
 		mediaRecorder.ondataavailable = (event): void => {
 			if (event.data.size > 0) {
@@ -25,28 +30,37 @@ export function useVADSTT(): {
 		};
 
 		mediaRecorder.onstop = async (): Promise<void> => {
+			const duration = startTimeRef.current ? Date.now() - startTimeRef.current : 0;
+			startTimeRef.current = null;
+
 			const audioBlob = new Blob(audioChunks.current, { type: "audio/webm" });
 			audioChunks.current = [];
 
+			// 짧은 음성 무시
+			if (duration < MINIMUM_RECORDING_DURATION) {
+				console.log(`음성 길이 ${duration}ms — 무시됨 (최소 ${MINIMUM_RECORDING_DURATION}ms 필요)`);
+				return;
+			}
+
 			const formData = new FormData();
 			formData.append("file", audioBlob, "audio.webm");
-			formData.append("model", "gpt-4o-mini-transcribe");
+			formData.append("model", "gpt-4o-transcribe");
 			formData.append("language", "ko");
-			formData.append(
-				"prompt",
-				"The following conversation is about banking services. Please provide a summary of the conversation in Korean."
-			);
 
-			const response = await fetch("https://api.openai.com/v1/audio/transcriptions", {
-				method: "POST",
-				headers: {
-					Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY as string}`
-				},
-				body: formData
-			});
+			try {
+				const response = await fetch("https://api.openai.com/v1/audio/transcriptions", {
+					method: "POST",
+					headers: {
+						Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY as string}`
+					},
+					body: formData
+				});
 
-			const data = await response.json();
-			setTranscript(data.text || "결과 없음");
+				const data = await response.json();
+				setTranscript(data.text || "결과 없음");
+			} catch (err) {
+				console.error("음성 인식 요청 실패:", err);
+			}
 		};
 
 		mediaRecorder.start();
@@ -71,26 +85,25 @@ export function useVADSTT(): {
 			analyser.getByteTimeDomainData(data);
 			const avg = data.reduce((sum, v) => sum + Math.abs(v - 128), 0) / data.length;
 
-			if (avg > 5) {
-				// 감지 시작
+			if (avg > 8) {
 				if (!mediaRecorderRef.current || mediaRecorderRef.current.state === "inactive") {
 					startRecording(stream);
+					setIsTalking(true);
 				}
 
-				// 타이머 초기화
 				if (vadTimerRef.current) clearTimeout(vadTimerRef.current);
 
-				// 일정 시간 무음이면 종료
 				vadTimerRef.current = setTimeout(() => {
 					stopRecording();
-				}, 2000); // 2초 무음
+					setIsTalking(false);
+				}, 2500); // 2.5초 무음 시 종료
 			}
 
 			requestAnimationFrame(detectVoice);
 		};
 
 		detectVoice();
-	}, [startRecording, stopRecording]);
+	}, [startRecording, stopRecording, setIsTalking]);
 
 	useEffect(() => {
 		if (isDetecting) {
