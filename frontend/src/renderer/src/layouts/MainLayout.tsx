@@ -4,9 +4,11 @@ import MainNumberPad from "@renderer/components/common/MainNumberPad";
 import Simulator from "@renderer/components/common/simulator/Simulator";
 import inputLinkMapping from "@renderer/config/inputLinkMapping";
 import { InputContext } from "@renderer/contexts/InputContext";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import logo from "@renderer/assets/logo.png";
+import { useVADSTT } from "@renderer/hooks/ai/useVADSTT";
+import { useHandleSTTResult } from "@renderer/hooks/ai/useHandleSTTResult";
 
 export const MainLayout = (): JSX.Element => {
 	const location = useLocation();
@@ -39,13 +41,27 @@ export const MainLayout = (): JSX.Element => {
 		setConfirmTrigger(-1);
 	};
 
+	const { transcript, start, stop } = useVADSTT();
+	const { handleSTT } = useHandleSTTResult();
+
+	useEffect(() => {
+		start();
+		return (): void => stop();
+	}, [start, stop]);
+
+	useEffect(() => {
+		if (transcript.trim()) {
+			handleSTT(transcript);
+		}
+	}, [transcript, handleSTT]);
+
 	return (
 		<div className="w-screen h-screen flex flex-col">
 			{/* 상단 화면 */}
 			<div className="w-full h-1/2 relative">
 				{isSenior ? (
 					<div className="w-full h-[90%] shadow-md">
-						<div className="absolute w-full h-full">
+						<div className="absolute w-full h-full -z-10">
 							<AICanvas />
 						</div>
 						<Outlet />

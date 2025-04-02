@@ -49,5 +49,12 @@ export const useAudioDialogue = (audioFile: string): any => {
 		};
 	}, [audioFile]);
 
+	if (!audioFile) {
+		return {
+			playAudioDialogue: () => Promise.resolve(),
+			isAudioPlaying: false
+		};
+	}
+
 	return { playAudioDialogue, isAudioPlaying };
 };
