@@ -21,19 +21,19 @@ public class CardJpaRepositoryCustomImpl implements CardJpaRepositoryCustom {
 	@Override
 	public CardPasswordResponse checkCardPassword(String cardNumber) {
 		return queryFactory.select(
-						Projections.constructor(
-								CardPasswordResponse.class,
-								card.cardNumber,
-								card.password,
-								account.accountId,
-								member.name
-						))
-				.from(card)
-				.leftJoin(account)
-				.on(card.accountId.eq(account.accountId))
-				.leftJoin(member)
-				.on(card.ownerId.eq(member.id))
-				.where(card.cardNumber.eq(cardNumber))
-				.fetchOne();
+				Projections.constructor(
+					CardPasswordResponse.class,
+					card.cardNumber,
+					card.password,
+					account.accountId,
+					member.name
+				))
+			.from(card)
+			.leftJoin(account)
+			.on(card.accountId.eq(account.accountId))
+			.leftJoin(member)
+			.on(card.ownerId.eq(member.id))
+			.where(card.cardNumber.eq(cardNumber))
+			.fetchOne();
 	}
 }
