@@ -6,7 +6,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 MODEL_DIR = BASE_DIR / "models/calling_detection"
 yolo_model_path = str(MODEL_DIR / "best.pt")
 yolo_model = YOLO(yolo_model_path)
-yolo_model.overrides['verbose'] = False
+yolo_model.overrides["verbose"] = False
 phone_class_index = 0
 
 
