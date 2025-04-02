@@ -101,7 +101,8 @@ class TransactionControllerTest extends ControllerTest {
 			accountNumber,
 			amount,
 			accountBalance,
-			TransactionType.DEPOSIT
+			TransactionType.DEPOSIT,
+			LocalDateTime.of(2025, 3, 20, 10, 0, 0)
 		);
 
 		given(transactionService.deposit(any()))
@@ -133,7 +134,8 @@ class TransactionControllerTest extends ControllerTest {
 			accountNumber,
 			amount,
 			accountBalance,
-			TransactionType.DEPOSIT
+			TransactionType.DEPOSIT,
+			LocalDateTime.of(2025, 3, 20, 10, 0, 0)
 		);
 
 		given(transactionService.withdraw(any()))
