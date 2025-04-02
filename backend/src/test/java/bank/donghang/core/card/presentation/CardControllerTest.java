@@ -34,24 +34,24 @@ class CardControllerTest extends ControllerTest {
 		Long cardId = 1L;
 
 		var request = new CardPasswordRequest(
-				"1234123412341234",
-				"1234"
+			"1234123412341234",
+			"1234"
 		);
 
 		var expect = new CardPasswordResponse(
-				"1234123412341234",
-				"1234",
-				1L,
-				"박종하"
+			"1234123412341234",
+			"1234",
+			"110110123456",
+			"박종하"
 		);
 
 		given(cardService.checkCardPassword(request))
-				.willReturn(expect);
+			.willReturn(expect);
 
 		mockMvc.perform(post("/api/v1/cards/check")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(request)))
-				.andDo(print())
-				.andExpect(status().isOk());
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andDo(print())
+			.andExpect(status().isOk());
 	}
 }
