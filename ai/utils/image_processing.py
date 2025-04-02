@@ -5,6 +5,7 @@ import logging
 
 logger = logging.getLogger("logger")
 
+
 def decode_image(image_base64: str) -> np.ndarray | None:
     """Base64로 인코딩된 문자열을 이미지로 변환"""
     try:
