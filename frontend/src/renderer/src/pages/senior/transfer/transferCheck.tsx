@@ -5,8 +5,7 @@ import { AIContext } from "@renderer/contexts/AIContext";
 import { useNavigate } from "react-router-dom";
 
 export default function TransferCheck(): JSX.Element {
-	const { setAvatarState, setDialogue } = useContext(AIContext);
-	const { construction } = useContext(AIContext);
+	const { setAvatarState, setDialogue, construction } = useContext(AIContext);
 	const navigate = useNavigate();
 
 	useActionPlay({
@@ -19,12 +18,12 @@ export default function TransferCheck(): JSX.Element {
 	});
 
 	useEffect(() => {
-		switch (construction) {
-			case "긍정":
-				navigate("/senior/transfer-check");
-				break;
+		if (construction === "긍정") {
+			navigate("/senior/transfer-scam-warning");
+		} else if (construction === "부정" || construction === "홈") {
+			navigate("/senior");
 		}
 	}, [construction, navigate]);
 
-	return <>이체확인</>;
+	return <></>;
 }

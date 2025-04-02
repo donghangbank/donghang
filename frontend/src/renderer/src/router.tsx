@@ -16,7 +16,6 @@ import WithDrawalPage from "./pages/general/withdrawal/WithDrawalPage";
 import WithDrawalCardInputPage from "./pages/general/withdrawal/WithDrawalCardInputPage";
 import WithDrawalCardAuthPage from "./pages/general/withdrawal/WithDrawalCardAuthPage";
 import GeneralMain from "./pages/GeneralMain";
-import SeniorLayout from "./layouts/SeniorLayout";
 import TransferCheck from "./pages/senior/transfer/transferCheck";
 import SeniorMain from "./pages/SeniorMain";
 import TransferScamWarningPage from "./pages/general/transfer/TransferScamWarningPage";
@@ -28,6 +27,7 @@ import TransferCardPasswordPage from "./pages/general/transfer/TransferCardPassw
 import TransferInfoAccountPage from "./pages/general/transfer/TransferInfoAccountPage";
 import TransferInfoAmountPage from "./pages/general/transfer/TransferInfoAmountPage";
 import TransferInfoSpecSheetPage from "./pages/general/transfer/TransferInfoSpecSheetPage";
+import TransferScamWarning from "./pages/senior/transfer/transferScamWarning";
 
 const router = createHashRouter([
 	{
@@ -148,10 +148,11 @@ const router = createHashRouter([
 			},
 			{
 				path: "senior",
-				element: <SeniorLayout />,
 				children: [
 					{ path: "", element: <SeniorMain /> },
-					{ path: "transfer-check", element: <TransferCheck /> }
+					{ path: "transfer-check", element: <TransferCheck /> },
+					{ path: "transfer-scam-warning", element: <TransferScamWarning /> },
+					{ path: "transfer-card-warning", element: <TransferCardWarningPage /> }
 				]
 			}
 		]
