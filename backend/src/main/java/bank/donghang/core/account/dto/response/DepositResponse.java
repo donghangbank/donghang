@@ -1,5 +1,7 @@
 package bank.donghang.core.account.dto.response;
 
+import java.time.LocalDateTime;
+
 import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.account.domain.Transaction;
 import bank.donghang.core.account.domain.enums.TransactionType;
@@ -11,7 +13,8 @@ public record DepositResponse(
 	String accountNumber,
 	Long amount,
 	Long balance,
-	TransactionType transactionType
+	TransactionType transactionType,
+	LocalDateTime transactionTime
 ) {
 	public static DepositResponse of(
 		Account account,
@@ -21,7 +24,8 @@ public record DepositResponse(
 			account.getAccountTypeCode() + account.getBranchCode() + account.getAccountNumber(),
 			transaction.getAmount(),
 			account.getAccountBalance(),
-			TransactionType.DEPOSIT
+			TransactionType.DEPOSIT,
+			transaction.getSessionStartTime()
 		);
 	}
 }
