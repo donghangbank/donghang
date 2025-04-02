@@ -216,7 +216,8 @@ public class TransactionService {
 		Account receivingAccount,
 		String description,
 		Long amount,
-		LocalDateTime sessionStartTime) {
+		LocalDateTime sessionStartTime
+	) {
 
 		validateBalance(amount, sendingAccount);
 

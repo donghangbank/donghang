@@ -1,5 +1,7 @@
 package bank.donghang.core.account.dto.response;
 
+import java.time.LocalDateTime;
+
 import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.account.domain.Transaction;
 import bank.donghang.core.account.domain.enums.TransactionStatus;
@@ -14,7 +16,8 @@ public record TransactionResponse(
 	Long sendingAccountBalance,
 	Long amount,
 	TransactionStatus status,
-	Long transactionId
+	Long transactionId,
+	LocalDateTime transactionTime
 ) {
 	public static TransactionResponse of(
 		TransactionRequest request,
@@ -23,13 +26,17 @@ public record TransactionResponse(
 		Transaction transaction
 	) {
 		return new TransactionResponse(
-			sendingAccount.getAccountTypeCode() + sendingAccount.getBranchCode() + sendingAccount.getAccountNumber(),
-			receivingAccount.getAccountTypeCode() + receivingAccount.getBranchCode()
+			sendingAccount.getAccountTypeCode()
+				+ sendingAccount.getBranchCode()
+				+ sendingAccount.getAccountNumber(),
+			receivingAccount.getAccountTypeCode()
+				+ receivingAccount.getBranchCode()
 				+ receivingAccount.getAccountNumber(),
 			sendingAccount.getAccountBalance(),
 			request.amount(),
 			transaction.getStatus(),
-			transaction.getId()
+			transaction.getId(),
+			transaction.getCreatedAt()
 		);
 	}
 }
