@@ -5,14 +5,15 @@ from transformers import ViTFeatureExtractor, ViTForImageClassification
 from pathlib import Path
 
 
-BASE_DIR = Path(__file__).resolve().parent.parent  
+BASE_DIR = Path(__file__).resolve().parent.parent
 MODEL_DIR = BASE_DIR / "models/age_prediction"
 model_path = str(MODEL_DIR)
 
 model = ViTForImageClassification.from_pretrained(model_path)
 feature_extractor = ViTFeatureExtractor.from_pretrained(model_path)
 
-def predict_age(image:Image) -> int:
+
+def predict_age(image: Image) -> int:
     """얼굴 이미지로 연령대 예측"""
     im = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
     inputs = feature_extractor(im, return_tensors='pt')
