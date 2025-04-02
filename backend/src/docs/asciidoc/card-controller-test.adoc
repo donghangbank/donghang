@@ -1,6 +1,6 @@
 == CardController
 
-=== 은행 생성 (POST /api/v1/banks)
+=== 카드 비밀번호 (POST /api/v1/cards/check)
 
 ==== 요청
 
