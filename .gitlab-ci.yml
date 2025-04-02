@@ -2,6 +2,7 @@ stages:
   - check_infrastructure
   - check_frontend
   - build_backend
+  - check_ai
   - aws_ecr_login
   - publish_backend
   - deploy_backend
@@ -59,6 +60,26 @@ build_backend:
   script:
     - chmod +x ./gradlew
     - ./gradlew build --build-cache -Dspring.profiles.active=dev
+
+check_ai:
+  stage: check_ai
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      changes:
+        - ai/**/*
+      when: always
+  image: python:3.12.8-alpine
+  cache:
+    paths:
+      - ai/venv
+    key: $CI_PROJECT_NAME-ai-cache
+  before_script:
+    - cd ai
+    - python -m venv venv
+    - source venv/bin/activate
+    - pip install -r requirements.dev.txt
+  script:
+    - flake8
 
 aws_ecr_login:
   stage: aws_ecr_login
