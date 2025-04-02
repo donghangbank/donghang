@@ -69,7 +69,8 @@ class TransactionControllerTest extends ControllerTest {
 			sendingAccountBalance + amount,
 			amount,
 			TransactionStatus.COMPLETED,
-			transactionId
+			transactionId,
+			LocalDateTime.of(2025, 3, 20, 10, 0, 0)
 		);
 
 		given(transactionService.transferByAccount(any()))
