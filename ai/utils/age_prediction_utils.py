@@ -16,7 +16,7 @@ feature_extractor = ViTFeatureExtractor.from_pretrained(model_path)
 def predict_age(image: Image) -> int:
     """얼굴 이미지로 연령대 예측"""
     im = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-    inputs = feature_extractor(im, return_tensors='pt')
+    inputs = feature_extractor(im, return_tensors="pt")
     with torch.no_grad():
         output = model(**inputs)
     preds = output.logits.softmax(dim=1).argmax(dim=1).item()

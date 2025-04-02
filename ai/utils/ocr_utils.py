@@ -10,7 +10,7 @@ import easyocr
 logger = logging.getLogger("logger")
 
 gpu_available = torch.cuda.is_available()
-reader = easyocr.Reader(['ko'], gpu=gpu_available)
+reader = easyocr.Reader(["ko"], gpu=gpu_available)
 
 EXCLUDED_KEYWORDS = ["주민등록증", "(재외국민)"]
 
