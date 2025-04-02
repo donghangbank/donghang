@@ -10,8 +10,7 @@ public record AccountProductSummary(
 	Long subscriptionPeriod,
 	Long minSubscriptionBalance,
 	Long maxSubscriptionBalance,
-	String accountProductType,
-	Integer accountProductTypeCode
+	String accountProductType
 ) {
 	public static AccountProductSummary from(AccountProduct accountProduct) {
 		return new AccountProductSummary(
@@ -22,8 +21,7 @@ public record AccountProductSummary(
 			accountProduct.getSubscriptionPeriod(),
 			accountProduct.getMinSubscriptionBalance(),
 			accountProduct.getMaxSubscriptionBalance(),
-			accountProduct.getAccountProductType().name(),
-			accountProduct.getAccountProductType().getCode()
+			accountProduct.getAccountProductType().name()
 		);
 	}
 }
