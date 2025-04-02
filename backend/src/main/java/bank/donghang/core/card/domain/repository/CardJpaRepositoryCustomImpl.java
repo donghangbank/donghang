@@ -6,10 +6,10 @@ import static bank.donghang.core.member.domain.QMember.*;
 
 import org.springframework.stereotype.Repository;
 
-import bank.donghang.core.card.dto.response.CardPasswordResponse;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+
+import bank.donghang.core.card.dto.response.CardPasswordResponse;
 import lombok.RequiredArgsConstructor;
 
 @Repository
@@ -25,12 +25,7 @@ public class CardJpaRepositoryCustomImpl implements CardJpaRepositoryCustom {
 					CardPasswordResponse.class,
 					card.cardNumber,
 					card.password,
-					Expressions.stringTemplate(
-						"concat({0}, concat({1}, {2}))",
-						account.accountTypeCode,
-						account.branchCode,
-						account.accountNumber
-					),
+					account.accountId,
 					member.name
 				))
 			.from(card)
