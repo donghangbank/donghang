@@ -19,6 +19,15 @@ import GeneralMain from "./pages/GeneralMain";
 import SeniorLayout from "./layouts/SeniorLayout";
 import TransferCheck from "./pages/senior/transfer/transferCheck";
 import SeniorMain from "./pages/SeniorMain";
+import TransferScamWarningPage from "./pages/general/transfer/TransferScamWarningPage";
+import TransferCardWarningPage from "./pages/general/transfer/TransferCardWarningPage";
+import TransferOptionPage from "./pages/general/transfer/TransferOptionPage";
+import TransferCardInputPage from "./pages/general/transfer/TransferCardInputPage";
+import { TransferCardAuthPage } from "./pages/general/transfer/TransferCardAuthPage";
+import TransferCardPasswordPage from "./pages/general/transfer/TransferCardPasswordPage";
+import TransferInfoAccountPage from "./pages/general/transfer/TransferInfoAccountPage";
+import TransferInfoAmountPage from "./pages/general/transfer/TransferInfoAmountPage";
+import TransferInfoSpecSheetPage from "./pages/general/transfer/TransferInfoSpecSheetPage";
 
 const router = createHashRouter([
 	{
@@ -73,6 +82,62 @@ const router = createHashRouter([
 									{
 										path: "auth",
 										element: <WithDrawalCardAuthPage />
+									}
+								]
+							}
+						]
+					},
+					{
+						path: "transfer",
+						children: [
+							{
+								path: "warning",
+								children: [
+									{
+										path: "scam",
+										element: <TransferScamWarningPage />
+									},
+									{
+										path: "card",
+										element: <TransferCardWarningPage />
+									}
+								]
+							},
+							{
+								path: "option",
+								element: <TransferOptionPage />
+							},
+							{
+								path: "card",
+								children: [
+									{
+										path: "input",
+										element: <TransferCardInputPage />
+									},
+									{
+										path: "auth",
+										element: <TransferCardAuthPage />
+									},
+									{
+										path: "password",
+										element: <TransferCardPasswordPage />
+									}
+								]
+							},
+							{
+								path: "info",
+								children: [
+									{
+										path: "account",
+										element: <TransferInfoAccountPage />
+									},
+									{
+										path: "amount",
+										element: <TransferInfoAmountPage />
+									},
+									{
+										path: "specsheet",
+										element: <TransferInfoSpecSheetPage />
 									}
 								]
 							}
