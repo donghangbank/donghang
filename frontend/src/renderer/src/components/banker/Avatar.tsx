@@ -16,6 +16,19 @@ export const Avatar = forwardRef<THREE.Group, any>((props, ref) => {
 	const { scene } = useGLTF(avatar);
 	const clone = React.useMemo(() => SkeletonUtils.clone(scene), [scene]);
 	const { nodes, materials } = useGraph(clone);
+	const originalWarn = console.warn;
+
+	console.warn = function (...args): void {
+		const message = args[0];
+		if (
+			typeof message === "string" &&
+			message.includes("THREE.PropertyBinding: No target node found for track")
+		) {
+			return;
+		}
+
+		originalWarn.apply(console, args);
+	};
 
 	return (
 		<group ref={ref} {...props} dispose={null}>
