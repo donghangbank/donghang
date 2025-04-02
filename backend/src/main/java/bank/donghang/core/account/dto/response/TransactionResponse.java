@@ -14,6 +14,7 @@ public record TransactionResponse(
 	@Mask(type = MaskingType.ACCOUNT_NUMBER)
 	String receivingAccountNumber,
 	Long sendingAccountBalance,
+	String recipientName,
 	Long amount,
 	TransactionStatus status,
 	Long transactionId,
@@ -23,7 +24,8 @@ public record TransactionResponse(
 		TransactionRequest request,
 		Account sendingAccount,
 		Account receivingAccount,
-		Transaction transaction
+		Transaction transaction,
+		String recipientName
 	) {
 		return new TransactionResponse(
 			sendingAccount.getAccountTypeCode()
@@ -33,6 +35,7 @@ public record TransactionResponse(
 				+ receivingAccount.getBranchCode()
 				+ receivingAccount.getAccountNumber(),
 			sendingAccount.getAccountBalance(),
+			recipientName,
 			request.amount(),
 			transaction.getStatus(),
 			transaction.getId(),

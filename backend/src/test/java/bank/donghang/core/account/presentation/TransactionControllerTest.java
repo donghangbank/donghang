@@ -67,6 +67,7 @@ class TransactionControllerTest extends ControllerTest {
 			sendingAccountNumber,
 			receivingAccountNumber,
 			sendingAccountBalance + amount,
+			"박종하",
 			amount,
 			TransactionStatus.COMPLETED,
 			transactionId,

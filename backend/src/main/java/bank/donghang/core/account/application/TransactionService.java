@@ -24,6 +24,8 @@ import bank.donghang.core.common.annotation.TransferDistributedLock;
 import bank.donghang.core.common.dto.PageInfo;
 import bank.donghang.core.common.exception.BadRequestException;
 import bank.donghang.core.common.exception.ErrorCode;
+import bank.donghang.core.member.domain.Member;
+import bank.donghang.core.member.domain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,6 +36,7 @@ public class TransactionService {
 
 	private final TransactionRepository transactionRepository;
 	private final AccountRepository accountRepository;
+	private final MemberRepository memberRepository;
 
 	@TransferDistributedLock(
 		key1 = "#request.sendingAccountNumber",
@@ -71,11 +74,17 @@ public class TransactionService {
 			request.sessionStartTime()
 		);
 
+		Long ownerId = receivingAccount.getMemberId();
+
+		Member recipient = memberRepository.findById(ownerId)
+			.orElseThrow(() -> new BadRequestException(ErrorCode.MEMBER_NOT_FOUND));
+
 		return TransactionResponse.of(
 			request,
 			sendingAccount,
 			receivingAccount,
-			senderTransaction
+			senderTransaction,
+			recipient.getName()
 		);
 	}
 
