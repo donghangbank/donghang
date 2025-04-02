@@ -1,8 +1,14 @@
+import { useInputReset } from "@renderer/hooks/useInputReset";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const FinalPage = (): JSX.Element => {
 	const navigate = useNavigate();
+	const { resetInputContext } = useInputReset();
+
+	useEffect(() => {
+		resetInputContext();
+	}, [resetInputContext]);
 
 	useEffect(() => {
 		setTimeout(() => {
@@ -13,7 +19,7 @@ export const FinalPage = (): JSX.Element => {
 	return (
 		<div className="flex flex-col h-full  p-10">
 			<div className="flex-1 flex flex-col items-center justify-center w-full bg-white p-10 rounded-2xl shadow-custom">
-				<span className="text-8xl font-bold text-center leading-snug">
+				<span className="text-6xl font-bold text-center leading-snug">
 					감사합니다
 					<br />
 					놓고 가신 물건이 없는지
