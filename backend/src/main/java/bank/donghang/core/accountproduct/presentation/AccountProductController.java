@@ -25,7 +25,7 @@ public class AccountProductController {
 
 	@GetMapping()
 	public ResponseEntity<List<AccountProductSummary>> getAccountProducts() {
-		return ResponseEntity.ok(productService.getAllAccountProductByQueryDSL());
+		return ResponseEntity.ok(productService.getAllAccountProductsByQueryDSL());
 	}
 
 	@GetMapping("/{productId}")

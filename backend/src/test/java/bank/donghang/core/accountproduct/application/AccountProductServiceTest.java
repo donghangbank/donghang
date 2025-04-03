@@ -63,9 +63,13 @@ class AccountProductServiceTest {
 				.build()
 		);
 
-		when(accountProductRepository.getAccountProducts()).thenReturn(mockProducts);
+		List<AccountProductSummary> mockSummaries = mockProducts.stream()
+			.map(AccountProductSummary::from)
+			.toList();
 
-		List<AccountProductSummary> response = accountProductService.getAllAccountProducts();
+		when(accountProductRepository.getAccountProductsByQueryDSL()).thenReturn(mockSummaries);
+
+		List<AccountProductSummary> response = accountProductService.getAllAccountProductsByQueryDSL();
 
 		assertThat(response).hasSize(2);
 		assertThat(response.get(0).accountProductName()).isEqualTo("Saving Account");
