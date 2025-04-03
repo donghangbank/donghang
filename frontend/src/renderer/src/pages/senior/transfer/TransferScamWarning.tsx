@@ -1,13 +1,10 @@
-import ScamWarning from "@renderer/components/senior/commons/ScamWarning";
+import ScamWarning from "@renderer/components/common/senior/ScamWarning";
 import { useActionPlay } from "@renderer/hooks/ai/useActionPlay";
-import transfer_check from "@renderer/assets/audios/transfer_check.mp3?url";
+import TestButton from "@renderer/components/common/senior/TestButton";
 
 export default function TransferScamWarning(): JSX.Element {
 	useActionPlay({
-		audioFile: transfer_check,
-		dialogue: "금융사기를 조심하시길 바랍니다",
-		setDialogue: () => {},
-		setAvatarState: () => {},
+		dialogue: "아래 화면을 확인해주세요.",
 		shouldActivate: true,
 		avatarState: "idle"
 	});
@@ -15,6 +12,7 @@ export default function TransferScamWarning(): JSX.Element {
 	return (
 		<div className="w-full h-full flex justify-center items-center">
 			<ScamWarning link="senior/" />
+			<TestButton prevRoute="/senior/transfer-check" nextRoute="/senior/transfer-card-warning" />
 		</div>
 	);
 }

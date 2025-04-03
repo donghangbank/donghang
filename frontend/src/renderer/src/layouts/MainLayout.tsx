@@ -9,12 +9,17 @@ import { Outlet, useLocation } from "react-router-dom";
 import logo from "@renderer/assets/logo.png";
 import { useVADSTT } from "@renderer/hooks/ai/useVADSTT";
 import { useHandleSTTResult } from "@renderer/hooks/ai/useHandleSTTResult";
+import TestButton from "@renderer/components/common/senior/TestButton";
+import { PageContext } from "@renderer/contexts/PageContext";
+import { motion } from "framer-motion";
 
 export const MainLayout = (): JSX.Element => {
 	const location = useLocation();
 	const isSenior = location.pathname === "/" || location.pathname.includes("/senior");
+	const isSeniorTest = location.pathname.includes("/senior");
 	const { setPassword, setAccount, setAmount, setResidentNumber, setConfirmTrigger } =
 		useContext(InputContext);
+	const { currentJob } = useContext(PageContext);
 
 	const inputLink = inputLinkMapping[location.pathname] || "";
 
@@ -60,12 +65,22 @@ export const MainLayout = (): JSX.Element => {
 			{/* 상단 화면 */}
 			<div className="w-full h-1/2 relative">
 				{isSenior ? (
-					<div className="w-full h-[90%] shadow-md">
+					<motion.div
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 100 }}
+						exit={{ opacity: 0 }}
+						className="w-full h-[90%] shadow-md"
+					>
+						{currentJob && (
+							<div className="fixed top-4 left-4 py-4 px-8 rounded-xl w-44 h-12 bg-blue text-white font-semibold flex justify-center items-center text-2xl z-10">
+								{currentJob}
+							</div>
+						)}
 						<div className="absolute w-full h-full -z-10">
 							<AICanvas />
 						</div>
 						<Outlet />
-					</div>
+					</motion.div>
 				) : (
 					<div className="w-full h-[90%] flex flex-col">
 						<Header />
@@ -100,6 +115,7 @@ export const MainLayout = (): JSX.Element => {
 					</div>
 				)}
 			</div>
+			{!isSeniorTest && <TestButton prevRoute="/" nextRoute="/senior" />}
 		</div>
 	);
 };

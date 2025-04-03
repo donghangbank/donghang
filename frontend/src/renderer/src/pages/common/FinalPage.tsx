@@ -1,3 +1,4 @@
+import { useContextReset } from "@renderer/hooks/useContextReset";
 import { useInputReset } from "@renderer/hooks/useInputReset";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -5,10 +6,12 @@ import { useNavigate } from "react-router-dom";
 export const FinalPage = (): JSX.Element => {
 	const navigate = useNavigate();
 	const { resetInputContext } = useInputReset();
+	const { resetContext } = useContextReset();
 
 	useEffect(() => {
 		resetInputContext();
-	}, [resetInputContext]);
+		resetContext();
+	}, [resetInputContext, resetContext]);
 
 	useEffect(() => {
 		setTimeout(() => {

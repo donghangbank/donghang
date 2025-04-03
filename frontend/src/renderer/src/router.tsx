@@ -16,10 +16,10 @@ import WithDrawalPage from "./pages/general/withdrawal/WithDrawalPage";
 import WithDrawalCardInputPage from "./pages/general/withdrawal/WithDrawalCardInputPage";
 import WithDrawalCardAuthPage from "./pages/general/withdrawal/WithDrawalCardAuthPage";
 import GeneralMain from "./pages/GeneralMain";
-import TransferCheck from "./pages/senior/transfer/transferCheck";
+import TransferCheck from "./pages/senior/transfer/TransferCheck";
 import SeniorMain from "./pages/SeniorMain";
 import TransferScamWarningPage from "./pages/general/transfer/TransferScamWarningPage";
-import TransferCardWarningPage from "./pages/general/transfer/TransferCardWarningPage";
+import TransferCardWarningPage from "./pages/senior/transfer/TransferCardWarning";
 import TransferOptionPage from "./pages/general/transfer/TransferOptionPage";
 import TransferCardInputPage from "./pages/general/transfer/TransferCardInputPage";
 import { TransferCardAuthPage } from "./pages/general/transfer/TransferCardAuthPage";
@@ -27,7 +27,8 @@ import TransferCardPasswordPage from "./pages/general/transfer/TransferCardPassw
 import TransferInfoAccountPage from "./pages/general/transfer/TransferInfoAccountPage";
 import TransferInfoAmountPage from "./pages/general/transfer/TransferInfoAmountPage";
 import TransferInfoSpecSheetPage from "./pages/general/transfer/TransferInfoSpecSheetPage";
-import TransferScamWarning from "./pages/senior/transfer/transferScamWarning";
+import TransferScamWarning from "./pages/senior/transfer/TransferScamWarning";
+import TransferOptionSeniorPage from "./pages/senior/transfer/TransferOptionPage";
 
 const router = createHashRouter([
 	{
@@ -152,7 +153,8 @@ const router = createHashRouter([
 					{ path: "", element: <SeniorMain /> },
 					{ path: "transfer-check", element: <TransferCheck /> },
 					{ path: "transfer-scam-warning", element: <TransferScamWarning /> },
-					{ path: "transfer-card-warning", element: <TransferCardWarningPage /> }
+					{ path: "transfer-card-warning", element: <TransferCardWarningPage /> },
+					{ path: "transfer-option", element: <TransferOptionSeniorPage /> }
 				]
 			}
 		]

@@ -1,33 +1,129 @@
-import { useEffect, useRef } from "react";
-import { useAudioDialogue } from "@renderer/hooks/ai/useAudioDialogue";
-import { AvatarState } from "@renderer/contexts/AIContext";
+// useActionPlay.ts
+import { useState, useRef, useEffect, useContext, useCallback } from "react";
+import { AvatarState, AIContext } from "@renderer/contexts/AIContext";
 
-export const useActionPlay = (options: {
+interface UseActionPlayOptions {
 	audioFile?: string;
 	dialogue?: string;
-	setDialogue?: (text: string) => void;
-	setAvatarState?: (value: AvatarState) => void;
 	shouldActivate?: boolean;
 	avatarState?: AvatarState;
-}): { isAudioPlaying: boolean } => {
-	const { playAudioDialogue, isAudioPlaying } = useAudioDialogue(options.audioFile || "");
-	const hasPlayed = useRef(false);
+	animationDelay?: number;
+	onComplete?: () => void;
+}
 
-	const {
-		shouldActivate = false,
-		dialogue,
-		setDialogue,
-		setAvatarState,
-		avatarState = "idle"
-	} = options;
+export const useActionPlay = ({
+	audioFile = "",
+	dialogue = "",
+	shouldActivate = false,
+	avatarState = "idle",
+	animationDelay = 0,
+	onComplete
+}: UseActionPlayOptions): { isAudioPlaying: boolean } => {
+	const { setAvatarState, setDialogue } = useContext(AIContext);
+	const audioRef = useRef<HTMLAudioElement | null>(audioFile ? new Audio(audioFile) : null);
+	const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+	const isPlayingRef = useRef(false);
+	const hasPlayed = useRef(false);
+	const prevAudioFile = useRef<string>(audioFile);
+
+	// Handle audio file changes
+	useEffect(() => {
+		if (prevAudioFile.current !== audioFile) {
+			if (audioRef.current) {
+				audioRef.current.pause();
+				audioRef.current = null;
+			}
+			if (audioFile) {
+				audioRef.current = new Audio(audioFile);
+			}
+			prevAudioFile.current = audioFile;
+		}
+	}, [audioFile]);
+
+	// Play audio function
+	const playAudio = useCallback(async (): Promise<void> => {
+		if (!audioFile || !audioRef.current) return;
+
+		const audio = audioRef.current;
+
+		try {
+			if (!audio.paused) {
+				audio.pause();
+				audio.currentTime = 0;
+			}
+			setIsAudioPlaying(true);
+			isPlayingRef.current = true;
+			await audio.play();
+		} catch (error) {
+			console.error("Audio playback failed:", error);
+			setIsAudioPlaying(false);
+			isPlayingRef.current = false;
+		}
+	}, [audioFile]);
+
+	// Handle audio events and cleanup
+	useEffect(() => {
+		const audio = audioRef.current;
+		if (!audio) return;
+
+		const handleEnded = (): void => {
+			setTimeout(() => {
+				setIsAudioPlaying(false);
+				isPlayingRef.current = false;
+				if (onComplete) onComplete();
+			}, 2000);
+		};
+
+		const handleError = (): void => {
+			setIsAudioPlaying(false);
+			isPlayingRef.current = false;
+		};
+
+		audio.addEventListener("ended", handleEnded);
+		audio.addEventListener("error", handleError);
+
+		return (): void => {
+			audio.removeEventListener("ended", handleEnded);
+			audio.removeEventListener("error", handleError);
+			if (!isPlayingRef.current) {
+				audio.pause();
+				audio.currentTime = 0;
+			}
+		};
+	}, [audioFile, onComplete]);
 
 	useEffect(() => {
 		if (shouldActivate && !hasPlayed.current) {
-			if (setAvatarState) setAvatarState(avatarState);
-			if (dialogue && setDialogue) playAudioDialogue(dialogue, setDialogue);
+			if (audioFile) {
+				playAudio();
+			}
+
+			if (dialogue) setDialogue(dialogue);
+
+			const timer = setTimeout(() => {
+				setAvatarState(avatarState);
+				if (!audioFile && onComplete) {
+					setTimeout(onComplete, 2000);
+				}
+			}, animationDelay);
+
 			hasPlayed.current = true;
+
+			return (): void => clearTimeout(timer);
 		}
-	}, [shouldActivate, playAudioDialogue, dialogue, avatarState, setDialogue, setAvatarState]);
+
+		return (): void => {};
+	}, [
+		shouldActivate,
+		audioFile,
+		dialogue,
+		avatarState,
+		animationDelay,
+		playAudio,
+		setAvatarState,
+		setDialogue,
+		onComplete
+	]);
 
 	return { isAudioPlaying };
 };
