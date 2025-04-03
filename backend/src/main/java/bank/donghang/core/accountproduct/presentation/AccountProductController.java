@@ -1,5 +1,7 @@
 package bank.donghang.core.accountproduct.presentation;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,8 +24,8 @@ public class AccountProductController {
 	private final AccountProductService productService;
 
 	@GetMapping()
-	public ResponseEntity<AccountProductListResponse> getAccountProducts() {
-		return ResponseEntity.ok(productService.getAllAccountProducts());
+	public ResponseEntity<List<AccountProductSummary>> getAccountProducts() {
+		return ResponseEntity.ok(productService.getAllAccountProductByQueryDSL());
 	}
 
 	@GetMapping("/{productId}")

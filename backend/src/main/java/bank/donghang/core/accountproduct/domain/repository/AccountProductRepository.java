@@ -5,12 +5,14 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 import bank.donghang.core.accountproduct.domain.AccountProduct;
+import bank.donghang.core.accountproduct.dto.response.AccountProductSummary;
 import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
 public class AccountProductRepository {
 	private final AccountProductJpaRepository accountProductJpaRepository;
+	private final AccountProductJpaRepositoryCustomImpl accountProductJpaRepositoryCustomImpl;
 
 	public List<AccountProduct> getAccountProducts() {
 		return accountProductJpaRepository.findAll();
@@ -30,5 +32,9 @@ public class AccountProductRepository {
 
 	public void deleteAll() {
 		accountProductJpaRepository.deleteAll();
+	}
+
+	public List<AccountProductSummary> getAccountProductsByQueryDSL() {
+		return accountProductJpaRepositoryCustomImpl.getAccountProductsByQueryDSL();
 	}
 }

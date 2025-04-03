@@ -19,21 +19,19 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AccountProductService {
 	private final AccountProductRepository accountProductRepository;
-	private final AccountProductJpaRepositoryCustomImpl accountProductJpaRepositoryCustomImpl;
 
-	// todo. queryDSL 로 구현 예정
-	public AccountProductListResponse getAllAccountProducts() {
+	public List<AccountProductSummary> getAllAccountProducts() {
 		List<AccountProduct> accountProducts = accountProductRepository.getAccountProducts();
 		List<AccountProductSummary> accountProductInfos = accountProducts.stream()
 			.map(AccountProductSummary::from)
 			.toList();
 
-		return new AccountProductListResponse(accountProductInfos);
+		return accountProductInfos;
 	}
 
-	// queryDSL 버전
-	public List<AccountProductSummary> getAllAccountProductSummary() {
-		return accountProductJpaRepositoryCustomImpl.getAccountProductSummaries();
+	// geAllAccountProducts queryDSL 버전
+	public List<AccountProductSummary> getAllAccountProductByQueryDSL() {
+		return accountProductRepository.getAccountProductsByQueryDSL();
 	}
 
 	public AccountProductDetail getAccountProductDetail(Long id) {

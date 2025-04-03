@@ -16,13 +16,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MvcResult;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import bank.donghang.core.accountproduct.application.AccountProductService;
 import bank.donghang.core.accountproduct.domain.enums.AccountProductType;
 import bank.donghang.core.accountproduct.dto.request.AccountProductCreationRequest;
 import bank.donghang.core.accountproduct.dto.response.AccountProductDetail;
-import bank.donghang.core.accountproduct.dto.response.AccountProductListResponse;
 import bank.donghang.core.accountproduct.dto.response.AccountProductSummary;
 import bank.donghang.core.common.controller.ControllerTest;
 
@@ -47,13 +47,10 @@ class AccountProductControllerTest extends ControllerTest {
 				null,
 				0L,
 				0L,
-				AccountProductType.DEMAND.name(),
-				AccountProductType.DEMAND.getCode())
+				AccountProductType.DEMAND.name())
 		);
 
-		AccountProductListResponse expected = AccountProductListResponse.from(summaries);
-
-		when(productService.getAllAccountProducts()).thenReturn(expected);
+		when(productService.getAllAccountProducts()).thenReturn(summaries);
 
 		MvcResult result = mockMvc.perform(get("/api/v1/accountproducts")
 				.contentType(MediaType.APPLICATION_JSON))
@@ -61,12 +58,12 @@ class AccountProductControllerTest extends ControllerTest {
 			.andExpect(status().isOk())
 			.andReturn();
 
-		AccountProductListResponse response = objectMapper.readValue(
+		List<AccountProductSummary> response = objectMapper.readValue(
 			result.getResponse().getContentAsString(),
-			AccountProductListResponse.class
+			new TypeReference<>() {}
 		);
 
-		Assertions.assertThat(response).usingRecursiveComparison().isEqualTo(expected);
+		Assertions.assertThat(response).usingRecursiveComparison().isEqualTo(summaries);
 	}
 
 	@Test
@@ -107,26 +104,36 @@ class AccountProductControllerTest extends ControllerTest {
 	@DisplayName("상품을 생성한다.")
 	public void create_product() throws Exception {
 		AccountProductCreationRequest creationRequest = new AccountProductCreationRequest(
-				"새 상품",
-				"새 상품 설명",
-				1L,
-				2.5,
-				"기본 금리",
-				100,
-				12L,
-				1000L,
-				100000L
+			"새 상품",
+			"새 상품 설명",
+			1L,
+			2.5,
+			"기본 금리",
+			100,
+			12L,
+			1000L,
+			100000L
 		);
 
-		AccountProductSummary expected = new AccountProductSummary(1L,
-			"새 상품", 1L, 2.5, 12L, 1000L, 100000L, "저축 상품", 100);
+		AccountProductSummary expected = new AccountProductSummary(
+			1L,
+			"새 상품",
+			1L,
+			2.5,
+			12L,
+			1000L,
+			100000L,
+			"수시입출금 계좌"
+		);
 
 		when(productService.registerAccountProduct(creationRequest)).thenReturn(expected);
 
 		String jsonRequest = objectMapper.writeValueAsString(creationRequest);
 
 		MvcResult result = mockMvc.perform(
-				post("/api/v1/accountproducts").content(jsonRequest).contentType(MediaType.APPLICATION_JSON))
+				post("/api/v1/accountproducts")
+					.content(jsonRequest)
+					.contentType(MediaType.APPLICATION_JSON))
 			.andDo(print())
 			.andExpect(status().isOk())
 			.andReturn();
