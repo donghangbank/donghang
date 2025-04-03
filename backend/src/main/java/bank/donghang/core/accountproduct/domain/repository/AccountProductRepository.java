@@ -34,7 +34,7 @@ public class AccountProductRepository {
 		accountProductJpaRepository.deleteAll();
 	}
 
-	public List<AccountProductSummary> getAccountProductsByQueryDSL() {
+	public List<AccountProductSummary> getAccountProductsByQueryDsl() {
 		return accountProductJpaRepositoryCustomImpl.getAccountProductsByQueryDSL();
 	}
 }

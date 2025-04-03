@@ -30,8 +30,8 @@ public class AccountProductService {
 	}
 
 	// geAllAccountProducts queryDSL 버전
-	public List<AccountProductSummary> getAllAccountProductsByQueryDSL() {
-		return accountProductRepository.getAccountProductsByQueryDSL();
+	public List<AccountProductSummary> getAllAccountProductsByQueryDsl() {
+		return accountProductRepository.getAccountProductsByQueryDsl();
 	}
 
 	public AccountProductDetail getAccountProductDetail(Long id) {

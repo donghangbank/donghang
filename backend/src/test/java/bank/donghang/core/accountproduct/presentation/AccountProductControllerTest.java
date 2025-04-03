@@ -50,7 +50,7 @@ class AccountProductControllerTest extends ControllerTest {
 				AccountProductType.DEMAND.name())
 		);
 
-		when(productService.getAllAccountProductsByQueryDSL()).thenReturn(summaries);
+		when(productService.getAllAccountProductsByQueryDsl()).thenReturn(summaries);
 
 		MvcResult result = mockMvc.perform(get("/api/v1/accountproducts")
 				.contentType(MediaType.APPLICATION_JSON))

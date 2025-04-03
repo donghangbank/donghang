@@ -4,10 +4,11 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
-import bank.donghang.core.accountproduct.domain.QAccountProduct;
-import bank.donghang.core.accountproduct.dto.response.AccountProductSummary;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+
+import bank.donghang.core.accountproduct.domain.QAccountProduct;
+import bank.donghang.core.accountproduct.dto.response.AccountProductSummary;
 import lombok.RequiredArgsConstructor;
 
 @Repository
