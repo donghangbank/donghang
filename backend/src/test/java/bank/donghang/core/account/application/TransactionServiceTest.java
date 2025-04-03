@@ -1,5 +1,6 @@
 package bank.donghang.core.account.application;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDate;
@@ -25,6 +26,7 @@ import bank.donghang.core.account.dto.request.TransactionRequest;
 import bank.donghang.core.account.dto.response.TransactionHistoryResponse;
 import bank.donghang.core.common.dto.PageInfo;
 import bank.donghang.core.common.exception.BadRequestException;
+import bank.donghang.core.common.exception.ErrorCode;
 
 @ExtendWith(MockitoExtension.class)
 class TransactionServiceTest {
@@ -164,9 +166,33 @@ class TransactionServiceTest {
 			pageToken);
 
 		Assertions.assertNotNull(actualResponse);
-		Assertions.assertEquals(expectedResponse.data().size(), actualResponse.data().size());
-		Assertions.assertEquals(expectedResponse.hasNext(), actualResponse.hasNext());
+		assertEquals(expectedResponse.data().size(), actualResponse.data().size());
+		assertEquals(expectedResponse.hasNext(), actualResponse.hasNext());
 		verify(accountRepository, times(1)).findAccountByFullAccountNumber(accountNumber);
 		verify(transactionRepository, times(1)).getTransactionHistoryByFullAccountNumber(accountNumber, pageToken);
+	}
+
+	@Test
+	@DisplayName("출금 계좌와 수신 계좌가 동일할 수 없다.")
+	void can_not_transfer_to_same_account() {
+
+		String sameAccountNumber = "110257063096";
+		Long amount = 100L;
+
+		var request = new TransactionRequest(
+			sameAccountNumber,
+			sameAccountNumber,
+			amount,
+			"테스트 이체",
+			LocalDateTime.of(2025, 3, 20, 10, 0, 0),
+			true
+		);
+
+		BadRequestException exception = assertThrows(BadRequestException.class,
+			() -> transactionService.transferByAccount(request));
+
+		assertEquals(ErrorCode.SAME_ACCOUNT_TRANSFER.getMessage(), exception.getMessage());
+
+		verify(accountRepository, never()).findAccountByFullAccountNumber(any());
 	}
 }
