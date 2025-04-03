@@ -63,13 +63,17 @@ class AccountProductServiceTest {
 				.build()
 		);
 
-		when(accountProductRepository.getAccountProducts()).thenReturn(mockProducts);
+		List<AccountProductSummary> mockSummaries = mockProducts.stream()
+			.map(AccountProductSummary::from)
+			.toList();
 
-		AccountProductListResponse response = accountProductService.getAllAccountProducts();
+		when(accountProductRepository.getAccountProductsByQueryDsl()).thenReturn(mockSummaries);
 
-		assertThat(response.products()).hasSize(2);
-		assertThat(response.products().get(0).accountProductName()).isEqualTo("Saving Account");
-		assertThat(response.products().get(1).accountProductName()).isEqualTo("Checking Account");
+		List<AccountProductSummary> response = accountProductService.getAllAccountProductsByQueryDsl();
+
+		assertThat(response).hasSize(2);
+		assertThat(response.get(0).accountProductName()).isEqualTo("Saving Account");
+		assertThat(response.get(1).accountProductName()).isEqualTo("Checking Account");
 	}
 
 	@Test

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import bank.donghang.core.accountproduct.domain.AccountProduct;
+import bank.donghang.core.accountproduct.domain.repository.AccountProductJpaRepositoryCustomImpl;
 import bank.donghang.core.accountproduct.domain.repository.AccountProductRepository;
 import bank.donghang.core.accountproduct.dto.request.AccountProductCreationRequest;
 import bank.donghang.core.accountproduct.dto.response.AccountProductDetail;
@@ -19,14 +20,18 @@ import lombok.RequiredArgsConstructor;
 public class AccountProductService {
 	private final AccountProductRepository accountProductRepository;
 
-	// todo. queryDSL 로 구현 예정
-	public AccountProductListResponse getAllAccountProducts() {
+	public List<AccountProductSummary> getAllAccountProducts() {
 		List<AccountProduct> accountProducts = accountProductRepository.getAccountProducts();
 		List<AccountProductSummary> accountProductInfos = accountProducts.stream()
 			.map(AccountProductSummary::from)
 			.toList();
 
-		return new AccountProductListResponse(accountProductInfos);
+		return accountProductInfos;
+	}
+
+	// geAllAccountProducts queryDSL 버전
+	public List<AccountProductSummary> getAllAccountProductsByQueryDsl() {
+		return accountProductRepository.getAccountProductsByQueryDsl();
 	}
 
 	public AccountProductDetail getAccountProductDetail(Long id) {
