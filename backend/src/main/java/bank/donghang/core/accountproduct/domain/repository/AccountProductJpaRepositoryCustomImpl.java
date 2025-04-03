@@ -18,7 +18,7 @@ public class AccountProductJpaRepositoryCustomImpl implements AccountProductJpaR
 	private final JPAQueryFactory queryFactory;
 
 	@Override
-	public List<AccountProductSummary> getAccountProductsByQueryDSL() {
+	public List<AccountProductSummary> getAccountProductsByQueryDsl() {
 		QAccountProduct accountProduct = QAccountProduct.accountProduct;
 
 		return queryFactory

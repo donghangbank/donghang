@@ -5,5 +5,5 @@ import java.util.List;
 import bank.donghang.core.accountproduct.dto.response.AccountProductSummary;
 
 public interface AccountProductJpaRepositoryCustom {
-	List<AccountProductSummary> getAccountProductsByQueryDSL();
+	List<AccountProductSummary> getAccountProductsByQueryDsl();
 }

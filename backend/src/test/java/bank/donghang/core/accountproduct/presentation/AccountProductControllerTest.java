@@ -60,7 +60,8 @@ class AccountProductControllerTest extends ControllerTest {
 
 		List<AccountProductSummary> response = objectMapper.readValue(
 			result.getResponse().getContentAsString(),
-			new TypeReference<>() {}
+			new TypeReference<>() {
+			}
 		);
 
 		Assertions.assertThat(response).usingRecursiveComparison().isEqualTo(summaries);

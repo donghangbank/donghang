@@ -35,6 +35,6 @@ public class AccountProductRepository {
 	}
 
 	public List<AccountProductSummary> getAccountProductsByQueryDsl() {
-		return accountProductJpaRepositoryCustomImpl.getAccountProductsByQueryDSL();
+		return accountProductJpaRepositoryCustomImpl.getAccountProductsByQueryDsl();
 	}
 }
