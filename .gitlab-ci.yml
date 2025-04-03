@@ -6,6 +6,7 @@ stages:
   - aws_ecr_login
   - publish_backend
   - deploy_backend
+  - deploy_ai
 
 check_infrastructure:
   stage: check_infrastructure
@@ -136,3 +137,22 @@ deploy_backend:
     AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
   script:
     - aws ecs update-service --cluster $AWS_ECS_CLUSTER_NAME --service $AWS_ECS_SERVICE_NAME --force-new-deployment
+
+deploy_ai:
+  stage: deploy_ai
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^release.*/'
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_IMAGE_NAME: $DOCKER_HUB_USER/donghang-ai
+  before_script:
+    - cd ai
+    - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
+  script:
+    - docker build --pull -t DOCKER_IMAGE_NAME:latest .
+    - docker push DOCKER_IMAGE_NAME:latest
