@@ -47,6 +47,10 @@ public class TransactionService {
 	@MaskApply(typeValue = TransactionResponse.class)
 	public TransactionResponse transferByAccount(TransactionRequest request) {
 
+		if (request.sendingAccountNumber().equals(request.receivingAccountNumber())) {
+			throw new BadRequestException(ErrorCode.SAME_ACCOUNT_TRANSFER);
+		}
+
 		Account sendingAccount = accountRepository.findAccountByFullAccountNumber(request.sendingAccountNumber())
 			.orElseThrow(() -> new BadRequestException(ErrorCode.ACCOUNT_NOT_FOUND));
 		Account receivingAccount = accountRepository.findAccountByFullAccountNumber(request.receivingAccountNumber())
