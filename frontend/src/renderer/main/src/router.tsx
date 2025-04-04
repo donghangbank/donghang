@@ -2,17 +2,12 @@ import { createHashRouter } from "react-router-dom";
 import App from "./pages/App";
 import DepositConfirmPage from "./pages/general/deposit/DepositConfirmPage";
 import MainLayout from "./layouts/MainLayout";
-import DepositAccountPage from "./pages/general/deposit/DepositAccountPage";
 import { NotFoundPage } from "./pages/common/NotFoundPage";
-import DepositPasswordPage from "./pages/general/deposit/DepositPasswordPage";
 import DepositOptionPage from "./pages/general/deposit/DepositOptionPage";
-import { DepositAuthPage } from "./pages/general/deposit/DepositAuthPage";
 import DepositCashInputPage from "./pages/general/deposit/DepositCashInputPage";
 import DepositCashCountingPage from "./pages/general/deposit/DepositCashCountingPage";
 import DepositSpecSheetPage from "./pages/general/deposit/DepositSpecSheetPage";
 import FinalPage from "./pages/common/FinalPage";
-import WithDrawalPage from "./pages/general/withdrawal/WithDrawalPage";
-import WithDrawalCardInputPage from "./pages/general/withdrawal/WithDrawalCardInputPage";
 import WithDrawalCardAuthPage from "./pages/general/withdrawal/WithDrawalCardAuthPage";
 import GeneralMain from "./pages/GeneralMain";
 import SeniorMain from "./pages/SeniorMain";
@@ -42,6 +37,14 @@ import DepositCardInputPage from "./pages/general/deposit/DepositCardInputPage";
 import DepositCardAuthPage from "./pages/general/deposit/DepositCardAuthPage";
 import DepositCardPasswordPage from "./pages/general/deposit/DepositCardPasswordPage";
 import DepositPaymentPage from "./pages/general/deposit/DepositPaymentPage";
+import WithDrawalScamWarningPage from "./pages/general/withdrawal/WithDrawalScamWarningPage";
+import WithDrawalCardWarningPage from "./pages/general/withdrawal/WithDrawalCardWarningPage";
+import WithDrawalOptionPage from "./pages/general/withdrawal/WithDrawalOptionPage";
+import WithDrawalCardPasswordPage from "./pages/general/withdrawal/WithDrawalCardPasswordPage";
+import WithDrawalCashOutputPage from "./pages/general/withdrawal/WithDrawalCashOutputPage";
+import WithDrawalInfoAmountPage from "./pages/general/withdrawal/WithDrawalInfoAmountPage";
+import WithDrawalSpecSheetPage from "./pages/general/withdrawal/WithDrawalSpecSheetPage";
+import WithDrawalCardInputPage from "./pages/general/withdrawal/WithDrawalCardInputPage";
 
 const router = createHashRouter([
 	{
@@ -111,17 +114,36 @@ const router = createHashRouter([
 									}
 								]
 							},
-							{ path: "account", element: <DepositAccountPage /> },
-							{ path: "confirm", element: <DepositConfirmPage /> },
-							{ path: "password", element: <DepositPasswordPage /> },
-							{ path: "auth", element: <DepositAuthPage /> },
-							{ path: "specsheet", element: <DepositSpecSheetPage /> }
+							{
+								path: "confirm",
+								element: <DepositConfirmPage />
+							},
+							{
+								path: "specsheet",
+								element: <DepositSpecSheetPage />
+							}
 						]
 					},
 					{
 						path: "withdrawal",
 						children: [
-							{ index: true, element: <WithDrawalPage /> },
+							{
+								path: "warning",
+								children: [
+									{
+										path: "scam",
+										element: <WithDrawalScamWarningPage />
+									},
+									{
+										path: "card",
+										element: <WithDrawalCardWarningPage />
+									}
+								]
+							},
+							{
+								path: "option",
+								element: <WithDrawalOptionPage />
+							},
 							{
 								path: "card",
 								children: [
@@ -132,6 +154,32 @@ const router = createHashRouter([
 									{
 										path: "auth",
 										element: <WithDrawalCardAuthPage />
+									},
+									{
+										path: "password",
+										element: <WithDrawalCardPasswordPage />
+									}
+								]
+							},
+							{
+								path: "cash",
+								children: [
+									{
+										path: "output",
+										element: <WithDrawalCashOutputPage />
+									}
+								]
+							},
+							{
+								path: "info",
+								children: [
+									{
+										path: "amount",
+										element: <WithDrawalInfoAmountPage />
+									},
+									{
+										path: "specsheet",
+										element: <WithDrawalSpecSheetPage />
 									}
 								]
 							}
