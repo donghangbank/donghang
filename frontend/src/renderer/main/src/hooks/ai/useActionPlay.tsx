@@ -1,4 +1,3 @@
-// useActionPlay.ts
 import { useState, useRef, useEffect, useContext, useCallback } from "react";
 import { AvatarState, AIContext } from "@renderer/contexts/AIContext";
 
@@ -26,17 +25,24 @@ export const useActionPlay = ({
 	const hasPlayed = useRef(false);
 	const prevAudioFile = useRef<string>(audioFile);
 
-	// Handle audio file changes
+	// Handle audio file changes and interrupt current playback
 	useEffect(() => {
 		if (prevAudioFile.current !== audioFile) {
 			if (audioRef.current) {
-				audioRef.current.pause();
+				// Immediately stop current audio if playing
+				if (!audioRef.current.paused) {
+					audioRef.current.pause();
+					audioRef.current.currentTime = 0;
+					setIsAudioPlaying(false);
+					isPlayingRef.current = false;
+				}
 				audioRef.current = null;
 			}
 			if (audioFile) {
 				audioRef.current = new Audio(audioFile);
 			}
 			prevAudioFile.current = audioFile;
+			hasPlayed.current = false; // Reset so new audio can play
 		}
 	}, [audioFile]);
 
@@ -47,13 +53,15 @@ export const useActionPlay = ({
 		const audio = audioRef.current;
 
 		try {
+			// If already playing, stop it immediately
 			if (!audio.paused) {
 				audio.pause();
 				audio.currentTime = 0;
 			}
+
+			await audio.play();
 			setIsAudioPlaying(true);
 			isPlayingRef.current = true;
-			await audio.play();
 		} catch (error) {
 			console.error("Audio playback failed:", error);
 			setIsAudioPlaying(false);
@@ -71,7 +79,7 @@ export const useActionPlay = ({
 				setIsAudioPlaying(false);
 				isPlayingRef.current = false;
 				if (onComplete) onComplete();
-			}, 2000);
+			}, 1000);
 		};
 
 		const handleError = (): void => {
@@ -85,13 +93,11 @@ export const useActionPlay = ({
 		return (): void => {
 			audio.removeEventListener("ended", handleEnded);
 			audio.removeEventListener("error", handleError);
-			if (!isPlayingRef.current) {
-				audio.pause();
-				audio.currentTime = 0;
-			}
+			// No need to pause here; handled by audioFile change
 		};
 	}, [audioFile, onComplete]);
 
+	// Trigger playback when shouldActivate is true
 	useEffect(() => {
 		if (shouldActivate && !hasPlayed.current) {
 			if (audioFile) {
@@ -102,12 +108,11 @@ export const useActionPlay = ({
 
 			const timer = setTimeout(() => {
 				setAvatarState(avatarState);
+				hasPlayed.current = true;
 				if (!audioFile && onComplete) {
 					setTimeout(onComplete, 2000);
 				}
 			}, animationDelay);
-
-			hasPlayed.current = true;
 
 			return (): void => clearTimeout(timer);
 		}
@@ -124,6 +129,13 @@ export const useActionPlay = ({
 		setDialogue,
 		onComplete
 	]);
+
+	// Reset hasPlayed when shouldActivate toggles off
+	useEffect(() => {
+		if (!shouldActivate) {
+			hasPlayed.current = false;
+		}
+	}, [shouldActivate]);
 
 	return { isAudioPlaying };
 };

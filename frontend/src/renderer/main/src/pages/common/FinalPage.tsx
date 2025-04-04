@@ -1,5 +1,6 @@
 import { InputContext } from "@renderer/contexts/InputContext";
 import { SpecSheetContext } from "@renderer/contexts/SpecSheetContext";
+import { useActionPlay } from "@renderer/hooks/ai/useActionPlay";
 import { useContextReset } from "@renderer/hooks/useContextReset";
 import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -27,6 +28,14 @@ export const FinalPage = (): JSX.Element => {
 
 		return (): void => clearTimeout(timer);
 	}, [navigate, resetAll, resetSpecSheet, resetContext]);
+
+	useActionPlay({
+		audioFile: "thank_you.mp3",
+		dialogue: "감사합니다.",
+		shouldActivate: true,
+		avatarState: "bow"
+	});
+
 	return (
 		<div className="flex flex-col h-full  p-10">
 			<div className="flex-1 flex flex-col items-center justify-center w-full bg-white p-10 rounded-2xl shadow-custom">

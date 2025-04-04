@@ -28,13 +28,13 @@ export default function SeniorMain(): JSX.Element {
 	useEffect(() => {
 		switch (construction) {
 			case "이체":
-				navigate("/senior/transfer-check");
+				navigate("/senior/transfer/check");
 				break;
 		}
 	}, [construction, navigate]);
 	return (
 		<>
-			<TestButton prevRoute="/" nextRoute="/senior/transfer-check" />
+			<TestButton prevRoute="/" nextRoute="/senior/transfer/check" />
 		</>
 	);
 }

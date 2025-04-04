@@ -42,3 +42,7 @@ export const formatTransactionTime = (transactionTime: string): string => {
 
 	return `${year}년 ${month}월 ${day}일 ${period} ${hour}시 ${minute}분 ${second}초`;
 };
+
+export const formatDefault = (value: string): string => {
+	return value;
+};
