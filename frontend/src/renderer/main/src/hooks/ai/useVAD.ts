@@ -96,7 +96,7 @@ export function useVAD({
 		return (): void => {
 			audioContext.current?.close();
 		};
-	}, []);
+	}, [minSpeechTime, silenceDuration, threshold, onSpeechEnd, setIsTalking]);
 
 	return { isTalking };
 }

@@ -7,7 +7,7 @@ export const DepositCashInputPage = (): JSX.Element => {
 	useEffect(() => {
 		setTimeout(() => {
 			navigate("/general/deposit/cash/counting");
-		}, 1000);
+		}, 3000);
 	}, [navigate]);
 
 	return (
