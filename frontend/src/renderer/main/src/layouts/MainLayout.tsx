@@ -68,7 +68,7 @@ export const MainLayout = (): JSX.Element => {
 	}, [location.pathname]);
 
 	return (
-		<div className="w-screen h-screen flex flex-col">
+		<div className="w-screen h-screen flex flex-col overflow-hidden">
 			<div className="w-full h-full relative">
 				{isSenior ? (
 					<motion.div

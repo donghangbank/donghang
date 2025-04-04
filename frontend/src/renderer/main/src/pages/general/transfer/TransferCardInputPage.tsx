@@ -8,7 +8,7 @@ export const TransferCardInputPage = (): JSX.Element => {
 	useEffect(() => {
 		setTimeout(() => {
 			navigate("/general/transfer/card/auth");
-		}, 2000);
+		}, 3000);
 	}, [navigate]);
 
 	return (
