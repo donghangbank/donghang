@@ -1,13 +1,69 @@
-import ConfirmPanel from "@renderer/components/common/ConfirmPanel";
+import { depositAPI } from "@renderer/api/deposit";
+import { InputContext } from "@renderer/contexts/InputContext";
+import { SpecSheetContext } from "@renderer/contexts/SpecSheetContext";
+import useKoreaTime from "@renderer/hooks/useKoreaTime";
+import { formatAmount } from "@renderer/utils/formatters";
+import { useMutation } from "@tanstack/react-query";
+import { AxiosError } from "axios";
+import { useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
-const DepositConfirmPage = (): JSX.Element => {
-	const items = [
-		{ text: "수표", value: "0 원" },
-		{ text: "현금", value: "50,000 원" },
-		{ text: "총 금액", value: "50,000 원" }
-	];
+export const DepositConfirmPage = (): JSX.Element => {
+	const navigate = useNavigate();
+	const { amount, receivingAccountNumber } = useContext(InputContext);
+	const {
+		setAmount: setSpecSheetAmount,
+		setReceivingAccountNumber: setSpecSheetReceivingAccountNumber,
+		setSendingAccountBalance,
+		setTransactionTime
+	} = useContext(SpecSheetContext);
 
-	return <ConfirmPanel title="내용이 맞나요?" items={items} link={"/general/deposit/specsheet"} />;
+	const sessionStartTime = useKoreaTime();
+	const disableMasking = true;
+
+	const { mutate: deposit } = useMutation({
+		mutationFn: () =>
+			depositAPI({
+				receivingAccountNumber,
+				amount,
+				sessionStartTime,
+				disableMasking
+			}),
+		onSuccess: (data) => {
+			setSpecSheetAmount(data.amount);
+			setSpecSheetReceivingAccountNumber(data.accountNumber);
+			setSendingAccountBalance(data.balance);
+			setTransactionTime(data.transactionTime);
+		},
+		onError: (error: AxiosError) => {
+			console.log(error);
+		}
+	});
+
+	const handleConfirm = (): void => {
+		deposit();
+		navigate("/general/deposit/specsheet");
+	};
+
+	return (
+		<div className="flex flex-col gap-6 bg-white p-10 rounded-3xl shadow-custom">
+			<span className="text-5xl font-bold text-center">내용을 확인해주세요</span>
+			<div className="flex justify-between gap-20 items-center">
+				<span className="text-blue text-3xl font-bold">금액</span>
+				<div className="bg-cloudyBlue text-3xl p-5 text-right rounded-3xl font-bold w-[510px]">
+					<span>{formatAmount(String(amount))}</span>
+				</div>
+			</div>
+			<div className="grid grid-cols-2 gap-5 text-white text-3xl font-bold">
+				<button type="button" className="p-8 bg-green rounded-3xl" onClick={handleConfirm}>
+					거래 확인
+				</button>
+				<button type="button" className="p-8 bg-red rounded-3xl">
+					<Link to="/general/final">거래 취소</Link>
+				</button>
+			</div>
+		</div>
+	);
 };
 
 export default DepositConfirmPage;
