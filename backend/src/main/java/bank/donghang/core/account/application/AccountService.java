@@ -267,7 +267,10 @@ public class AccountService {
 				);
 				success++;
 			} catch (Exception e) {
-				failedAccounts.add(new InstallmentPaymentFailedAccount(installmentSchedule.getInstallmentAccountId(), e.getMessage()));
+				failedAccounts.add(new InstallmentPaymentFailedAccount(
+					installmentSchedule.getInstallmentAccountId(),
+					e.getMessage())
+				);
 			}
 		}
 
