@@ -1,0 +1,35 @@
+@import "./base.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+	background-color: #f1f2f5;
+	font-family: "SamsungOne", sans-serif;
+}
+
+@keyframes shake {
+	0% {
+		transform: translate(0, 0) rotate(0deg);
+	}
+	20% {
+		transform: translate(-2px, 2px) rotate(-1deg);
+	}
+	40% {
+		transform: translate(-2px, -2px) rotate(1deg);
+	}
+	60% {
+		transform: translate(2px, 2px) rotate(0deg);
+	}
+	80% {
+		transform: translate(2px, -2px) rotate(1deg);
+	}
+	100% {
+		transform: translate(0, 0) rotate(0deg);
+	}
+}
+
+.shake {
+	animation: shake 0.5s infinite;
+}
