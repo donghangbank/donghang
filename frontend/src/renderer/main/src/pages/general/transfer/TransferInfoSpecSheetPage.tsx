@@ -1,5 +1,9 @@
 import { SpecSheetContext } from "@renderer/contexts/SpecSheetContext";
-import { formatAccountNumber, formatAmount } from "@renderer/utils/formatters";
+import {
+	formatAccountNumber,
+	formatAmount,
+	formatTransactionTime
+} from "@renderer/utils/formatters";
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 
@@ -13,7 +17,7 @@ export const TransferInfoSpecSheetPage = (): JSX.Element => {
 			<div className="flex justify-between gap-20 items-center">
 				<span className="text-blue text-3xl font-bold">거래 일시</span>
 				<div className="bg-cloudyBlue text-3xl p-5 text-right rounded-3xl font-bold w-[350px]">
-					<span>{transactionTime}</span>
+					<span>{formatTransactionTime(transactionTime)}</span>
 				</div>
 			</div>
 			<div className="flex justify-between gap-20 items-center">

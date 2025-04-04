@@ -25,3 +25,20 @@ export const formatAmount = (value: string): string => {
 	const number = Number.parseInt(value.replace(/,/g, ""), 10);
 	return Number.isNaN(number) ? "" : `${number.toLocaleString()} 원`;
 };
+
+export const formatTransactionTime = (transactionTime: string): string => {
+	const date = new Date(transactionTime);
+
+	const year = date.getFullYear();
+	const month = date.getMonth() + 1;
+	const day = date.getDate();
+
+	let hour = date.getHours();
+	const minute = `${date.getMinutes()}`.padStart(2, "0");
+	const second = `${`0${date.getSeconds()}`.slice(-2)}`;
+
+	const period = hour < 12 ? "오전" : "오후";
+	hour = hour % 12 || 12;
+
+	return `${year}년 ${month}월 ${day}일 ${period} ${hour}시 ${minute}분 ${second}초`;
+};
