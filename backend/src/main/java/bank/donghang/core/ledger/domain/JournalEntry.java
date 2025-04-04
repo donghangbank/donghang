@@ -1,7 +1,10 @@
 package bank.donghang.core.ledger.domain;
 
+import org.hibernate.annotations.Type;
+
 import bank.donghang.core.common.entity.BaseEntity;
 import bank.donghang.core.ledger.domain.enums.ReconciliationStatus;
+import com.vladmihalcea.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -29,24 +32,29 @@ public class JournalEntry extends BaseEntity {
 	@Column(name = "reconciliation_status", nullable = false)
 	private ReconciliationStatus reconciliationStatus;
 
-	@Column(nullable = false, name = "description", length = 256)
-	private String description;
+	@Type(JsonType.class)
+	@Column(columnDefinition = "json")
+	private JournalEntryInfo journalEntryInfo;
 
 	public static JournalEntry create(
+		Long transactionId,
 		ReconciliationStatus reconciliationStatus,
-		String description
+		JournalEntryInfo journalEntryInfo
 	) {
 		return new JournalEntry(
+			transactionId,
 			reconciliationStatus,
-			description
+			journalEntryInfo
 		);
 	}
 
 	private JournalEntry(
+		Long transactionId,
 		ReconciliationStatus reconciliationStatus,
-		String description
+		JournalEntryInfo journalEntryInfo
 	) {
+		this.transactionId = transactionId;
 		this.reconciliationStatus = reconciliationStatus;
-		this.description = description;
+		this.journalEntryInfo = journalEntryInfo;
 	}
 }
