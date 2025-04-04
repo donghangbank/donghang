@@ -107,7 +107,6 @@ public class AccountService {
 
 		AccountProduct accountProduct = accountProductRepository.getAccountProductById(productId);
 
-		// todo. 은행, 상품 별 accountTypeCode 매핑
 		String nextAccountNumber = accountRepository.getNextAccountNumber(
 				"100",
 				"001"
