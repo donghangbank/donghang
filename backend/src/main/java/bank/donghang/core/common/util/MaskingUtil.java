@@ -18,6 +18,14 @@ public class MaskingUtil {
 	}
 
 	private static String nameMaskOf(String value) {
+		if (value == null || value.length() < 2) {
+			return value; // 마스킹 불가능
+		}
+		if (value.length() == 2) {
+			// 두 글자면 두 번째 글자만 마스킹
+			return value.charAt(0) + "*";
+		}
+		// 세 글자 이상이면 중간 문자들 마스킹
 		String regex = "(?<=.{1})(.*)(?=.$)";
 		String maskedValue = value.replaceFirst(
 			regex,
