@@ -36,7 +36,7 @@ public class AccountRepository {
 
 	// 적금 게좌 저장 + 적금 납입 스케줄 저장
 	@Transactional
-	public Account saveInstallmentAccount(Account account) {
+	public Account saveInstallmentAccount(Account account, int subscriptionPeriod) {
 		Account savedAccount = saveAccount(account);
 		LocalDate nextInstallmentDate = LocalDate.now()
 			.plusMonths(1)
@@ -51,12 +51,14 @@ public class AccountRepository {
 
 		InstallmentSchedule installmentSchedule =
 			InstallmentSchedule
-				.builder().installmentAccountId(savedAccount.getAccountId())
+				.builder()
+				.installmentAccountId(savedAccount.getAccountId())
 				.withdrawalAccountId(savedAccount.getWithdrawalAccountId())
 				.installmentAmount(savedAccount.getMonthlyInstallmentAmount())
 				.installmentSequence(1)
 				.installmentStatus(InstallmentStatus.SCHEDULED)
 				.installmentScheduledDate(nextInstallmentDate)
+				.subscriptionPeriod(subscriptionPeriod)
 				.build();
 
 		installmentScheduleJpaRepository.save(installmentSchedule);

@@ -50,6 +50,9 @@ public class InstallmentSchedule {
 	@Column(nullable = false, name = "installment_sequence")
 	private int installmentSequence;
 
+	@Column(nullable = false, name = "subscription_period")
+	private int subscriptionPeriod;
+
 	public InstallmentSchedule reassignInstallmentSchedule() {
 		LocalDate nextInstallmentScheduleDate = createNextInstallmentScheduleDate();
 		setInstallmentStatus(InstallmentStatus.FAILED);
@@ -60,6 +63,7 @@ public class InstallmentSchedule {
 			.installmentScheduledDate(nextInstallmentScheduleDate)
 			.installmentAmount(installmentAmount)
 			.installmentSequence(this.getInstallmentSequence())
+			.subscriptionPeriod(this.getSubscriptionPeriod())
 			.build();
 		return newInstallmentSchedule;
 	}
@@ -75,6 +79,7 @@ public class InstallmentSchedule {
 			.installmentScheduledDate(nextInstallmentScheduleDate)
 			.installmentAmount(installmentAmount)
 			.installmentSequence(installmentSequence + 1)
+			.subscriptionPeriod(this.getSubscriptionPeriod())
 			.build();
 	}
 

@@ -208,7 +208,7 @@ public class AccountService {
 			expiryDate
 		);
 
-		Account savedInstallmentAccount = accountRepository.saveInstallmentAccount(newInstallmentAccount);
+		Account savedInstallmentAccount = accountRepository.saveInstallmentAccount(newInstallmentAccount, data.accountProduct.getSubscriptionPeriod());
 
 		return AccountRegisterResponse.from(
 			savedInstallmentAccount,
@@ -221,7 +221,8 @@ public class AccountService {
 	@MaskApply(typeValue = AccountRegisterResponse.class)
 	private DepositInstallmentAccountData getDepositInstallmentAccountData(
 		Long accountProductId,
-		String withdrawalAccountNumber, String payoutAccountNumber
+		String withdrawalAccountNumber,
+		String payoutAccountNumber
 	) {
 		if (!accountProductRepository.existsAccountProductById(accountProductId)) {
 			throw new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND);
