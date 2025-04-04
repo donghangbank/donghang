@@ -13,7 +13,7 @@ export const CashSlot = (): JSX.Element => {
 
 	useEffect(() => {
 		if (isInfiniteMode) {
-			const runCycle = () => {
+			const runCycle = (): void => {
 				// 투입구 열림
 				setIsOpen(true);
 				// 300ms 후 돈 넣는 애니메이션 실행
@@ -32,19 +32,20 @@ export const CashSlot = (): JSX.Element => {
 			runCycle();
 			intervalRef.current = setInterval(runCycle, 3000);
 
-			return () => {
+			return (): void => {
 				if (intervalRef.current) {
 					clearInterval(intervalRef.current);
 					intervalRef.current = null;
 				}
-				timeoutsRef.current.forEach((t) => clearTimeout(t));
+				for (const t of timeoutsRef.current) {
+					clearTimeout(t);
+				}
 				timeoutsRef.current = [];
 			};
-		} else {
-			// 무한 모드가 아닐 경우 (화면 전환 등) 즉시 애니메이션을 초기 상태로 (닫힘) 설정
-			setIsOpen(false);
-			setIsInserted(false);
 		}
+
+		setIsOpen(false);
+		setIsInserted(false);
 	}, [isInfiniteMode]);
 
 	return (

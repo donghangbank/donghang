@@ -39,7 +39,7 @@ export function useAudioAnalysis(): {
 		[setUserMsg]
 	);
 
-	const { send, readyState } = useWebSocket("ws://localhost:8001/ws/audio", wsOptions);
+	const { send } = useWebSocket("ws://localhost:8001/ws/audio", wsOptions);
 
 	const processQueue = useCallback(() => {
 		if (isProcessingRef.current || audioQueueRef.current.length === 0) return;
@@ -73,7 +73,7 @@ export function useAudioAnalysis(): {
 		};
 
 		reader.readAsArrayBuffer(blob);
-	}, [send, readyState]);
+	}, [send]);
 
 	const handleSpeechEnd = useCallback(
 		(blob: Blob) => {

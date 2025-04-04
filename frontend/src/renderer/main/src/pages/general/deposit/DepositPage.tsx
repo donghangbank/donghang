@@ -1,4 +1,3 @@
-import AICanvas from "@renderer/components/banker/AICanvas";
 import VoiceCommandPanel from "@renderer/components/common/VoiceCommandPanel";
 
 export const DepositPage = (): JSX.Element => {
