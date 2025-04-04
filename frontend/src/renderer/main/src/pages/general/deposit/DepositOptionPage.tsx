@@ -1,23 +1,15 @@
-import AICanvas from "@renderer/components/banker/AICanvas";
-import VoiceCommandPanel from "@renderer/components/common/VoiceCommandPanel";
+import card from "@renderer/assets/images/card.png";
+import bankbook from "@renderer/assets/images/bankbook.png";
+import numberpad from "@renderer/assets/images/numberpad.png";
+import Option from "@renderer/components/common/general/Option";
 
 export const DepositOptionPage = (): JSX.Element => {
 	const prompts = [
-		{ prompt: "현금", link: "/general/deposit/cash/input" },
-		{ prompt: "수표", link: "/general/deposit/cash/input" },
-		{ prompt: "현금+수표", link: "/general/deposit/cash/input" }
+		{ prompt: "카드", link: "/general/deposit/card/input", imageUrl: card },
+		{ prompt: "통장", link: "/general/deposit/card/input", imageUrl: bankbook },
+		{ prompt: "계좌번호", link: "/general/deposit/card/input", imageUrl: numberpad }
 	];
-
-	return (
-		<div className="flex h-full">
-			<div className="h-full" style={{ width: "33.33vw" }}>
-				<AICanvas />
-			</div>
-			<div className="h-full" style={{ width: "66.67vw" }}>
-				<VoiceCommandPanel title="무엇으로 돈을 넣으시겠습니까?" prompts={prompts} />
-			</div>
-		</div>
-	);
+	return <Option prompts={prompts} title="무엇을 가져오셨나요?" />;
 };
 
 export default DepositOptionPage;
