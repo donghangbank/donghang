@@ -1,6 +1,5 @@
 import { createHashRouter } from "react-router-dom";
 import App from "./pages/App";
-import DepositPage from "./pages/general/deposit/DepositPage";
 import DepositConfirmPage from "./pages/general/deposit/DepositConfirmPage";
 import MainLayout from "./layouts/MainLayout";
 import DepositAccountPage from "./pages/general/deposit/DepositAccountPage";
@@ -37,6 +36,12 @@ import SeniorTransferInfoAccountPage from "./pages/senior/transfer/SeniorTransfe
 import SeniorTransferInfoAmountPage from "./pages/senior/transfer/SeniorTransferInfoAmountPage";
 import SeniorTransferInfoSpecSheetPage from "./pages/senior/transfer/SeniorTransferInfoSpecSheetPage";
 import { SeniorFinalPage } from "./pages/senior/common/SeniorFinalPage";
+import DepositScamWarningPage from "./pages/general/deposit/DepositScamWarningPage";
+import DepositCardWarningPage from "./pages/general/deposit/DepositCardWarning";
+import DepositCardInputPage from "./pages/general/deposit/DepositCardInputPage";
+import DepositCardAuthPage from "./pages/general/deposit/DepositCardAuthPage";
+import DepositCardPasswordPage from "./pages/general/deposit/DepositCardPasswordPage";
+import DepositPaymentPage from "./pages/general/deposit/DepositPaymentPage";
 
 const router = createHashRouter([
 	{
@@ -55,13 +60,44 @@ const router = createHashRouter([
 					{
 						path: "deposit",
 						children: [
-							{ index: true, element: <DepositPage /> },
-							{ path: "account", element: <DepositAccountPage /> },
-							{ path: "confirm", element: <DepositConfirmPage /> },
-							{ path: "password", element: <DepositPasswordPage /> },
-							{ path: "option", element: <DepositOptionPage /> },
-							{ path: "auth", element: <DepositAuthPage /> },
-							{ path: "specsheet", element: <DepositSpecSheetPage /> },
+							{
+								path: "warning",
+								children: [
+									{
+										path: "scam",
+										element: <DepositScamWarningPage />
+									},
+									{
+										path: "card",
+										element: <DepositCardWarningPage />
+									}
+								]
+							},
+							{
+								path: "option",
+								element: <DepositOptionPage />
+							},
+							{
+								path: "card",
+								children: [
+									{
+										path: "input",
+										element: <DepositCardInputPage />
+									},
+									{
+										path: "auth",
+										element: <DepositCardAuthPage />
+									},
+									{
+										path: "password",
+										element: <DepositCardPasswordPage />
+									}
+								]
+							},
+							{
+								path: "payment",
+								element: <DepositPaymentPage />
+							},
 							{
 								path: "cash",
 								children: [
@@ -74,7 +110,12 @@ const router = createHashRouter([
 										element: <DepositCashCountingPage />
 									}
 								]
-							}
+							},
+							{ path: "account", element: <DepositAccountPage /> },
+							{ path: "confirm", element: <DepositConfirmPage /> },
+							{ path: "password", element: <DepositPasswordPage /> },
+							{ path: "auth", element: <DepositAuthPage /> },
+							{ path: "specsheet", element: <DepositSpecSheetPage /> }
 						]
 					},
 					{
