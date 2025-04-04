@@ -83,6 +83,6 @@ public class AccountController {
 
 	@PostMapping("/installments/payments/due")
 	public ResponseEntity<InstallmentPaymentProcessingResult> processInstallmentPayment() {
-		return ResponseEntity.ok(accountService.handleInstallmentAccountSchedule());
+		return ResponseEntity.ok(accountService.handleInstallmentAccountSchedule(null));
 	}
 }

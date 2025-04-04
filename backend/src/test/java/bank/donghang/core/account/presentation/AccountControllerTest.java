@@ -294,7 +294,7 @@ class AccountControllerTest extends ControllerTest {
 		InstallmentPaymentProcessingResult expectedResult =
 			new InstallmentPaymentProcessingResult(15, 9, failedAccounts);
 
-		when(accountService.handleInstallmentAccountSchedule())
+		when(accountService.handleInstallmentAccountSchedule(null))
 			.thenReturn(expectedResult);
 
 		// when & then
@@ -335,7 +335,7 @@ class AccountControllerTest extends ControllerTest {
 		InstallmentPaymentProcessingResult expectedResult =
 			new InstallmentPaymentProcessingResult(1, 1, failedAccounts);
 
-		when(accountService.handleInstallmentAccountSchedule())
+		when(accountService.handleInstallmentAccountSchedule(null))
 			.thenReturn(expectedResult);
 
 		// when & then

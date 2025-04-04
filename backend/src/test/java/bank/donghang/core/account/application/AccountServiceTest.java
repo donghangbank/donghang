@@ -11,7 +11,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
-import org.assertj.core.api.AbstractBigDecimalAssert;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -740,7 +739,7 @@ class AccountServiceTest {
 			.willReturn(Optional.of(createAccount(4L, 0L)));
 
 		// when
-		InstallmentPaymentProcessingResult result = accountService.handleInstallmentAccountSchedule();
+		InstallmentPaymentProcessingResult result = accountService.handleInstallmentAccountSchedule(null);
 
 		// then
 		assertThat(result.total()).isEqualTo(2);
@@ -766,7 +765,7 @@ class AccountServiceTest {
 			.willReturn(Optional.empty());
 
 		// when
-		InstallmentPaymentProcessingResult result = accountService.handleInstallmentAccountSchedule();
+		InstallmentPaymentProcessingResult result = accountService.handleInstallmentAccountSchedule(null);
 
 		// then
 		assertThat(result.total()).isEqualTo(1);
@@ -796,7 +795,7 @@ class AccountServiceTest {
 			.willReturn(Optional.empty());
 
 		// when
-		InstallmentPaymentProcessingResult result = accountService.handleInstallmentAccountSchedule();
+		InstallmentPaymentProcessingResult result = accountService.handleInstallmentAccountSchedule(null);
 
 		// then
 		assertThat(result.total()).isEqualTo(1);
@@ -829,7 +828,7 @@ class AccountServiceTest {
 			.when(transferFacade).transfer(any(TransferInfo.class));
 
 		// when
-		InstallmentPaymentProcessingResult result = accountService.handleInstallmentAccountSchedule();
+		InstallmentPaymentProcessingResult result = accountService.handleInstallmentAccountSchedule(null);
 
 		// then
 		assertThat(result.total()).isEqualTo(1);
@@ -861,7 +860,7 @@ class AccountServiceTest {
 			.when(transferFacade).transfer(any(TransferInfo.class));
 
 		// when
-		InstallmentPaymentProcessingResult result = accountService.handleInstallmentAccountSchedule();
+		InstallmentPaymentProcessingResult result = accountService.handleInstallmentAccountSchedule(null);
 
 		// then
 		assertThat(result.total()).isEqualTo(1);
@@ -894,7 +893,7 @@ class AccountServiceTest {
 			.when(transferFacade).transfer(any(TransferInfo.class));
 
 		// when
-		InstallmentPaymentProcessingResult result = accountService.handleInstallmentAccountSchedule();
+		InstallmentPaymentProcessingResult result = accountService.handleInstallmentAccountSchedule(null);
 
 		// then
 		assertThat(result.total()).isEqualTo(1);
@@ -931,7 +930,7 @@ class AccountServiceTest {
 		doNothing().when(accountRepository).saveInstallmentSchedule(any(InstallmentSchedule.class));
 
 		// when
-		InstallmentPaymentProcessingResult result = accountService.handleInstallmentAccountSchedule();
+		InstallmentPaymentProcessingResult result = accountService.handleInstallmentAccountSchedule(null);
 
 		// then
 		assertThat(result.total()).isEqualTo(1);

@@ -198,6 +198,10 @@ public class AccountService {
 			"300",
 			"001"
 		);
+
+		if(data.accountProduct.getSubscriptionPeriod() == null) {
+			System.out.println(data.accountProduct.getAccountProductId());
+		}
 		LocalDate expiryDate = LocalDate.now().plusMonths(data.accountProduct.getSubscriptionPeriod());
 
 		Account newInstallmentAccount = req.toEntity(
@@ -251,8 +255,13 @@ public class AccountService {
 	) {
 	}
 
-	public InstallmentPaymentProcessingResult handleInstallmentAccountSchedule() {
-		LocalDate today = LocalDate.now();
+	public InstallmentPaymentProcessingResult handleInstallmentAccountSchedule(LocalDate dueDate) {
+		LocalDate today;
+		if(dueDate == null) {
+			today = LocalDate.now();
+		} else {
+			today = dueDate;
+		}
 		List<InstallmentSchedule> installmentSchedules
 			= accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(today);
 
