@@ -4,7 +4,8 @@ import cash from "@renderer/assets/images/cash.png";
 
 export const CashSlot = (): JSX.Element => {
 	const location = useLocation();
-	const isInfiniteMode = location.pathname.includes("/cash/input");
+	const isInfiniteMode =
+		location.pathname.includes("/cash/input") || location.pathname.includes("/cash/output");
 
 	const [isOpen, setIsOpen] = useState(false);
 	const [isInserted, setIsInserted] = useState(false);
