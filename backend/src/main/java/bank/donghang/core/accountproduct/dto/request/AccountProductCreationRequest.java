@@ -10,7 +10,7 @@ public record AccountProductCreationRequest(
 	Double interestRate,
 	String rateDescription,
 	Integer accountProductTypeCode,
-	Long subscriptionPeriod,
+	Integer subscriptionPeriod,
 	Long minSubscriptionBalance,
 	Long maxSubscriptionBalance
 ) {

@@ -124,7 +124,7 @@ class AccountProductServiceTest {
 			0.1,
 			"Standard Rate",
 			1,
-			12L,
+			12,
 			1000L,
 			100000L
 		);

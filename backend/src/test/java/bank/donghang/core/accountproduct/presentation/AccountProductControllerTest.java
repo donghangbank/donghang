@@ -80,7 +80,7 @@ class AccountProductControllerTest extends ControllerTest {
 			"변동 금리",
 			"저축 상품",
 			100,
-			12L,
+			12,
 			1000L,
 			100000L
 		);
@@ -111,7 +111,7 @@ class AccountProductControllerTest extends ControllerTest {
 			2.5,
 			"기본 금리",
 			100,
-			12L,
+			12,
 			1000L,
 			100000L
 		);
@@ -121,7 +121,7 @@ class AccountProductControllerTest extends ControllerTest {
 			"새 상품",
 			1L,
 			2.5,
-			12L,
+			12,
 			1000L,
 			100000L,
 			"수시입출금 계좌"

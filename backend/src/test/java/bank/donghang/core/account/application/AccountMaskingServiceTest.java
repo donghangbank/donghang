@@ -78,7 +78,7 @@ class AccountMaskingServiceTest {
 				.accountProductDescription("Demand Product 1 for Test")
 				.accountProductType(AccountProductType.DEMAND)
 				.interestRate(0.5)
-				.subscriptionPeriod(0L)
+				.subscriptionPeriod(0)
 				.build()
 		);
 
@@ -89,7 +89,7 @@ class AccountMaskingServiceTest {
 				.accountProductDescription("Deposit Product 1 for Test")
 				.accountProductType(AccountProductType.DEPOSIT)
 				.interestRate(2.5)
-				.subscriptionPeriod(12L)
+				.subscriptionPeriod(12)
 				.minSubscriptionBalance(1L)
 				.maxSubscriptionBalance(100_000_000L)
 				.build()
@@ -102,7 +102,7 @@ class AccountMaskingServiceTest {
 				.accountProductDescription("Installment Account 1 for Test")
 				.accountProductType(AccountProductType.INSTALLMENT)
 				.interestRate(3.5)
-				.subscriptionPeriod(24L)
+				.subscriptionPeriod(24)
 				.minSubscriptionBalance(1L)
 				.maxSubscriptionBalance(10_000_000L)
 				.build()
