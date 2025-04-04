@@ -26,9 +26,17 @@ import TransferCardPasswordPage from "./pages/general/transfer/TransferCardPassw
 import TransferInfoAccountPage from "./pages/general/transfer/TransferInfoAccountPage";
 import TransferInfoAmountPage from "./pages/general/transfer/TransferInfoAmountPage";
 import TransferInfoSpecSheetPage from "./pages/general/transfer/TransferInfoSpecSheetPage";
-import TransferScamWarning from "./pages/senior/transfer/TransferScamWarning";
-import TransferOptionSeniorPage from "./pages/senior/transfer/TransferOptionPage";
-import TransferCheck from "./pages/senior/transfer/transferCheck";
+import SeniorTransferScamWarningPage from "./pages/senior/transfer/SeniorTransferScamWarningPage";
+import SeniorTransferOptionSeniorPage from "./pages/senior/transfer/SeniorTransferOptionPage";
+import SeniorTransferCheckPage from "./pages/senior/transfer/SeniorTransferCheckPage";
+import SeniorTransferCardWaringPage from "./pages/senior/transfer/SeniorTransferCardWarningPage";
+import SeniorTransferCardInputPage from "./pages/senior/transfer/SeniorTransferCardInputPage";
+import SeniorTransferCheckCardPage from "./pages/senior/transfer/SeniorTransferCheckCardPage";
+import SeniorTransferCardPasswordPage from "./pages/senior/transfer/SeniorTransferCardPasswordPage";
+import SeniorTransferInfoAccountPage from "./pages/senior/transfer/SeniorTransferInfoAccountPage";
+import SeniorTransferInfoAmountPage from "./pages/senior/transfer/SeniorTransferInfoAmountPage";
+import SeniorTransferInfoSpecSheetPage from "./pages/senior/transfer/SeniorTransferInfoSpecSheetPage";
+import { SeniorFinalPage } from "./pages/senior/common/SeniorFinalPage";
 
 const router = createHashRouter([
 	{
@@ -150,11 +158,71 @@ const router = createHashRouter([
 			{
 				path: "senior",
 				children: [
-					{ path: "", element: <SeniorMain /> },
-					{ path: "transfer-check", element: <TransferCheck /> },
-					{ path: "transfer-scam-warning", element: <TransferScamWarning /> },
-					{ path: "transfer-card-warning", element: <TransferCardWarningPage /> },
-					{ path: "transfer-option", element: <TransferOptionSeniorPage /> }
+					{
+						path: "",
+						element: <SeniorMain />
+					},
+					{
+						path: "transfer",
+						children: [
+							{
+								path: "check",
+								element: <SeniorTransferCheckPage />
+							},
+							{
+								path: "warning",
+								children: [
+									{
+										path: "scam",
+										element: <SeniorTransferScamWarningPage />
+									},
+									{
+										path: "card",
+										element: <SeniorTransferCardWaringPage />
+									}
+								]
+							},
+							{
+								path: "option",
+								element: <SeniorTransferOptionSeniorPage />
+							},
+							{
+								path: "card",
+								children: [
+									{
+										path: "input",
+										element: <SeniorTransferCardInputPage />
+									},
+									{
+										path: "check",
+										element: <SeniorTransferCheckCardPage />
+									},
+									{
+										path: "password",
+										element: <SeniorTransferCardPasswordPage />
+									}
+								]
+							},
+							{
+								path: "info",
+								children: [
+									{
+										path: "account",
+										element: <SeniorTransferInfoAccountPage />
+									},
+									{
+										path: "amount",
+										element: <SeniorTransferInfoAmountPage />
+									},
+									{
+										path: "specsheet",
+										element: <SeniorTransferInfoSpecSheetPage />
+									}
+								]
+							}
+						]
+					},
+					{ path: "final", element: <SeniorFinalPage /> }
 				]
 			}
 		]
