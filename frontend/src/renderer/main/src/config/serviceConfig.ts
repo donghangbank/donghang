@@ -39,9 +39,8 @@ const SERVICE_CONFIG: Record<string, ServiceConfig> = {
 			{ path: "warning", name: "금융 사기" },
 			{ path: "option", name: "인증 수단 선택" },
 			{ path: "password", name: "비밀번호 입력" },
-			{ path: "payment", name: "출금 수단 선택" },
+			{ path: "amount", name: "금액 입력" },
 			{ path: "cash", name: "현금 출금" },
-			{ path: "confirm", name: "내용 확인" },
 			{ path: "specsheet", name: "명세표 확인" },
 			{ path: "final", name: "출금 완료" }
 		]

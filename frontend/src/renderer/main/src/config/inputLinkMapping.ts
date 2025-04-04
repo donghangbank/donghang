@@ -3,6 +3,8 @@ export const inputLinkMapping: Record<string, string> = {
 	"/general/transfer/info/account": "/general/transfer/info/amount",
 	"/general/transfer/info/amount": "/general/transfer/info/specsheet",
 	"/general/deposit/card/password": "/general/deposit/payment",
+	"/general/withdrawal/card/password": "/general/withdrawal/payment",
+	"/general/withdrawal/info/amount": "/general/drawal/cash/output",
 	"/senior/transfer/card/password": "/senior/transfer/info/account",
 	"/senior/transfer/info/account": "/senior/transfer/info/amount",
 	"/senior/transfer/info/amount": "/senior/transfer/info/specsheet"
