@@ -22,8 +22,11 @@ public class JournalEntry extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(name = "transaction_id", nullable = false)
+	private Long transactionId;
+
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, name = "reconciliation_status")
+	@Column(name = "reconciliation_status", nullable = false)
 	private ReconciliationStatus reconciliationStatus;
 
 	@Column(nullable = false, name = "description", length = 256)

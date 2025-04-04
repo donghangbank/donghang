@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 import bank.donghang.core.account.dto.request.*;
 import bank.donghang.core.account.dto.response.*;
+
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import bank.donghang.core.account.domain.Account;
@@ -18,6 +20,7 @@ import bank.donghang.core.common.annotation.TransferDistributedLock;
 import bank.donghang.core.common.dto.PageInfo;
 import bank.donghang.core.common.exception.BadRequestException;
 import bank.donghang.core.common.exception.ErrorCode;
+import bank.donghang.core.ledger.dto.event.LedgerCreateEvent;
 import bank.donghang.core.member.domain.Member;
 import bank.donghang.core.member.domain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +34,7 @@ public class TransactionService {
 	private final TransactionRepository transactionRepository;
 	private final AccountRepository accountRepository;
 	private final MemberRepository memberRepository;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@TransferDistributedLock(
 		key1 = "#request.sendingAccountNumber",
@@ -182,11 +186,6 @@ public class TransactionService {
 		);
 
 		return response;
-	}
-
-	public BankLedgerCheckResponse checkTransactions (BankLedgerCheckRequest request) {
-		LocalDateTime startTime = request.checkRequestTime().minusDays(1);
-		LocalDateTime endTime = request.checkRequestTime();
 	}
 
 	private void validateBalance(Long amount, Account account) {
