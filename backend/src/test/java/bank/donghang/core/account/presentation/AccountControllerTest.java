@@ -7,6 +7,8 @@ import static org.mockito.BDDMockito.when;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -42,6 +44,8 @@ import bank.donghang.core.account.dto.response.AccountOwnerNameResponse;
 import bank.donghang.core.account.dto.response.AccountRegisterResponse;
 import bank.donghang.core.account.dto.response.AccountSummaryResponse;
 import bank.donghang.core.account.dto.response.BalanceResponse;
+import bank.donghang.core.account.dto.response.InstallmentPaymentFailedAccount;
+import bank.donghang.core.account.dto.response.InstallmentPaymentProcessingResult;
 import bank.donghang.core.accountproduct.domain.enums.AccountProductType;
 import bank.donghang.core.common.controller.ControllerTest;
 import bank.donghang.core.common.dto.PageInfo;
@@ -241,15 +245,15 @@ class AccountControllerTest extends ControllerTest {
 		AccountOwnerNameResponse response = new AccountOwnerNameResponse(maskedName);
 
 		given(accountService.getOwnerName(any(AccountOwnerNameRequest.class)))
-				.willReturn(response);
+			.willReturn(response);
 
 		// when & then
 		mockMvc.perform(post("/api/v1/accounts/owner")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(request)))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.ownerName").value(maskedName))
-				.andDo(document("get-account-owner-name"));
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.ownerName").value(maskedName))
+			.andDo(document("get-account-owner-name"));
 	}
 
 	@Test
@@ -265,9 +269,82 @@ class AccountControllerTest extends ControllerTest {
 
 		// when & then
 		mockMvc.perform(post("/api/v1/accounts/check")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(request)))
-				.andExpect(status().isOk())
-				.andDo(document("check-account-password"));
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isOk())
+			.andDo(document("check-account-password"));
+	}
+
+	@Test
+	@DisplayName("적금 납입일이 도래한 계좌에 대해 자동 이체 처리 - 다양한 실패 케이스 포함")
+	void processInstallmentPayment_withMultipleFailureReasons() throws Exception {
+		// given
+		LocalDate today = LocalDate.now();
+
+		// 다양한 실패 케이스 설정
+		List<InstallmentPaymentFailedAccount> failedAccounts = List.of(
+			new InstallmentPaymentFailedAccount(3L, "계좌가 존재하지 않습니다"),
+			new InstallmentPaymentFailedAccount(5L, "잔액이 부족합니다"),
+			new InstallmentPaymentFailedAccount(7L, "동일 계좌로 이체 시도"),
+			new InstallmentPaymentFailedAccount(9L, "일일 이체 한도 초과"),
+			new InstallmentPaymentFailedAccount(11L, "계좌가 비활성화 상태입니다"),
+			new InstallmentPaymentFailedAccount(13L, "시스템 오류 발생")
+		);
+
+		InstallmentPaymentProcessingResult expectedResult =
+			new InstallmentPaymentProcessingResult(15, 9, failedAccounts);
+
+		when(accountService.handleInstallmentAccountSchedule())
+			.thenReturn(expectedResult);
+
+		// when & then
+		mockMvc.perform(post("/api/v1/accounts/installments/payments/due")
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.total").value(15))
+			.andExpect(jsonPath("$.success").value(9))
+			.andExpect(jsonPath("$.failed.length()").value(6))
+			.andExpect(jsonPath("$.failed[0].accountId").value(3L))
+			.andExpect(jsonPath("$.failed[0].reason").value("계좌가 존재하지 않습니다"))
+			.andExpect(jsonPath("$.failed[1].accountId").value(5L))
+			.andExpect(jsonPath("$.failed[1].reason").value("잔액이 부족합니다"))
+			.andExpect(jsonPath("$.failed[2].accountId").value(7L))
+			.andExpect(jsonPath("$.failed[2].reason").value("동일 계좌로 이체 시도"))
+			.andExpect(jsonPath("$.failed[3].accountId").value(9L))
+			.andExpect(jsonPath("$.failed[3].reason").value("일일 이체 한도 초과"))
+			.andExpect(jsonPath("$.failed[4].accountId").value(11L))
+			.andExpect(jsonPath("$.failed[4].reason").value("계좌가 비활성화 상태입니다"))
+			.andExpect(jsonPath("$.failed[5].accountId").value(13L))
+			.andExpect(jsonPath("$.failed[5].reason").value("시스템 오류 발생"))
+			.andDo(document("process-installment-payment",
+				responseFields(
+					fieldWithPath("total").description("전체 처리 건수"),
+					fieldWithPath("success").description("성공 건수"),
+					fieldWithPath("failed[].accountId").description("실패 계좌 ID"),
+					fieldWithPath("failed[].reason").description("실패 사유")
+				)));
+	}
+
+	@Test
+	@DisplayName("적금 납입 처리 중 예외 발생 - 실패 결과 포함된 응답 확인")
+	void processInstallmentPayment_withServiceException() throws Exception {
+		// given
+		List<InstallmentPaymentFailedAccount> failedAccounts = List.of(
+			new InstallmentPaymentFailedAccount(3L, "내부 서버 오류")
+		);
+		InstallmentPaymentProcessingResult expectedResult =
+			new InstallmentPaymentProcessingResult(1, 1, failedAccounts);
+
+		when(accountService.handleInstallmentAccountSchedule())
+			.thenReturn(expectedResult);
+
+		// when & then
+		mockMvc.perform(post("/api/v1/accounts/installments/payments/due")
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.total").value(1))
+			.andExpect(jsonPath("$.success").value(1))
+			.andExpect(jsonPath("$.failed[0].accountId").value(3L))
+			.andExpect(jsonPath("$.failed[0].reason").value("내부 서버 오류"));
 	}
 }

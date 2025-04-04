@@ -78,3 +78,23 @@ include::{snippets}/account-controller-test/can_check_account_password/http-requ
 ==== 응답
 
 include::{snippets}/account-controller-test/can_check_account_password/http-response.adoc[]
+
+=== 적금 납입일이 도래한 계좌에 대해 자동 이체 처리 - 성공 및 실패 결과 반환 (POST /api/v1/accounts/installments/payments/due)
+
+==== 요청
+
+include::{snippets}/account-controller-test/process-installment-payment_with-multiple-failure-reasons/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/account-controller-test/process-installment-payment_with-multiple-failure-reasons/http-response.adoc[]
+
+=== 적금 납입 처리 중 예외 발생 - 실패 결과 포함된 응답 확인 (POST /api/v1/accounts/installments/payment/due)
+
+==== 요청
+
+include::{snippets}/account-controller-test/process-installment-payment_with-service-exception/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/account-controller-test/process-installment-payment_with-service-exception/http-response.adoc[]

@@ -18,10 +18,10 @@ import bank.donghang.core.account.dto.request.DepositAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.InstallmentAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.MyAccountsRequest;
 import bank.donghang.core.account.dto.response.AccountOwnerNameResponse;
-import bank.donghang.core.account.dto.response.AccountPasswordResponse;
 import bank.donghang.core.account.dto.response.AccountRegisterResponse;
 import bank.donghang.core.account.dto.response.AccountSummaryResponse;
 import bank.donghang.core.account.dto.response.BalanceResponse;
+import bank.donghang.core.account.dto.response.InstallmentPaymentProcessingResult;
 import bank.donghang.core.common.dto.PageInfo;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -79,5 +79,10 @@ public class AccountController {
 	public ResponseEntity<Void> checkAccountPassword(@RequestBody AccountPasswordRequest request) {
 		accountService.checkAccountPassword(request);
 		return ResponseEntity.ok().build();
+	}
+
+	@PostMapping("/installments/payments/due")
+	public ResponseEntity<InstallmentPaymentProcessingResult> processInstallmentPayment() {
+		return ResponseEntity.ok(accountService.handleInstallmentAccountSchedule());
 	}
 }
