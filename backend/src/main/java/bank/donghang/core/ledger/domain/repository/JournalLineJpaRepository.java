@@ -4,5 +4,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import bank.donghang.core.ledger.domain.JournalLine;
 
-public interface JournalLineJpaRepository extends JpaRepository<JournalLine, Long> {
+public interface JournalLineJpaRepository extends JpaRepository<JournalLine, Long>, JournalLineJpaRepositoryCustom {
 }
