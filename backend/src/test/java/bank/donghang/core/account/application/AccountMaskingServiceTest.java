@@ -2,6 +2,8 @@ package bank.donghang.core.account.application;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,12 +19,15 @@ import bank.donghang.core.account.dto.request.AccountOwnerNameRequest;
 import bank.donghang.core.account.dto.request.DemandAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.DepositAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.InstallmentAccountRegisterRequest;
+import bank.donghang.core.account.dto.response.AccountOwnerNameResponse;
 import bank.donghang.core.account.dto.response.AccountRegisterResponse;
 import bank.donghang.core.accountproduct.domain.AccountProduct;
 import bank.donghang.core.accountproduct.domain.enums.AccountProductType;
 import bank.donghang.core.accountproduct.domain.repository.AccountProductRepository;
 import bank.donghang.core.common.dto.PageInfo;
-import bank.donghang.core.common.exception.BadRequestException;
+import bank.donghang.core.member.domain.Member;
+import bank.donghang.core.member.domain.enums.MemberStatus;
+import bank.donghang.core.member.domain.repository.MemberRepository;
 
 @ActiveProfiles("test")
 @TestPropertySource(locations = "file:${user.dir}/test.env")
@@ -38,52 +43,87 @@ class AccountMaskingServiceTest {
 	@Autowired
 	private AccountProductRepository accountProductRepository;
 
+	@Autowired
+	private MemberRepository memberRepository;
+
+	private Account testAccount;
 	private AccountProduct demandProduct;
 	private AccountProduct depositProduct;
 	private AccountProduct installmentProduct;
+	private Member testMember;
 
 	@BeforeEach
 	void setUp() {
 		// Clear any existing data
 		accountRepository.deleteAll();
 		accountProductRepository.deleteAll();
+		memberRepository.deleteAll();
 
-		// Setup account products without manually assigning IDs
-		AccountProduct tempDemand = AccountProduct.builder()
-			.bankId(1L)
-			.accountProductName("Demand Product 1")
-			.accountProductDescription("Demand Product 1 for Test")
-			.accountProductType(AccountProductType.DEMAND)
-			.interestRate(0.5)
-			.subscriptionPeriod(0L)
-			.build();
+		// 테스트 회원 생성 및 저장
+		testMember = memberRepository.save(Member.of(
+			"홍길동",
+			"hong@example.com",
+			"010-1234-5678",
+			LocalDateTime.of(1990, 1, 1, 0, 0),
+			"서울시 강남구",
+			"12345",
+			MemberStatus.ACTIVE
+		));
 
-		AccountProduct tempDeposit = AccountProduct.builder()
-			.bankId(1L)
-			.accountProductName("Deposit Product 1")
-			.accountProductDescription("Deposit Product 1 for Test")
-			.accountProductType(AccountProductType.DEPOSIT)
-			.interestRate(2.5)
-			.subscriptionPeriod(12L)
-			.minSubscriptionBalance(1L)
-			.maxSubscriptionBalance(100_000_000L)
-			.build();
+		// Setup account products
+		demandProduct = accountProductRepository.saveAccountProduct(
+			AccountProduct.builder()
+				.bankId(1L)
+				.accountProductName("Demand Product 1")
+				.accountProductDescription("Demand Product 1 for Test")
+				.accountProductType(AccountProductType.DEMAND)
+				.interestRate(0.5)
+				.subscriptionPeriod(0L)
+				.build()
+		);
 
-		AccountProduct tempInstallment = AccountProduct.builder()
-			.bankId(1L)
-			.accountProductName("Installment Account 1")
-			.accountProductDescription("Installment Account 1 for Test")
-			.accountProductType(AccountProductType.INSTALLMENT)
-			.interestRate(3.5)
-			.subscriptionPeriod(24L)
-			.minSubscriptionBalance(1L)
-			.maxSubscriptionBalance(10_000_000L)
-			.build();
+		depositProduct = accountProductRepository.saveAccountProduct(
+			AccountProduct.builder()
+				.bankId(1L)
+				.accountProductName("Deposit Product 1")
+				.accountProductDescription("Deposit Product 1 for Test")
+				.accountProductType(AccountProductType.DEPOSIT)
+				.interestRate(2.5)
+				.subscriptionPeriod(12L)
+				.minSubscriptionBalance(1L)
+				.maxSubscriptionBalance(100_000_000L)
+				.build()
+		);
 
-		// Save products and capture generated IDs
-		demandProduct = accountProductRepository.saveAccountProduct(tempDemand);
-		depositProduct = accountProductRepository.saveAccountProduct(tempDeposit);
-		installmentProduct = accountProductRepository.saveAccountProduct(tempInstallment);
+		installmentProduct = accountProductRepository.saveAccountProduct(
+			AccountProduct.builder()
+				.bankId(1L)
+				.accountProductName("Installment Account 1")
+				.accountProductDescription("Installment Account 1 for Test")
+				.accountProductType(AccountProductType.INSTALLMENT)
+				.interestRate(3.5)
+				.subscriptionPeriod(24L)
+				.minSubscriptionBalance(1L)
+				.maxSubscriptionBalance(10_000_000L)
+				.build()
+		);
+
+		// 테스트 계좌 생성 및 저장
+		testAccount = accountRepository.saveAccount(
+			Account.builder()
+				.memberId(testMember.getId()) // 저장된 회원의 ID 사용
+				.accountProductId(demandProduct.getAccountProductId())
+				.password("0000")
+				.accountTypeCode("100")
+				.branchCode("001")
+				.accountNumber("12345678")
+				.accountStatus(AccountStatus.ACTIVE)
+				.dailyTransferLimit(1_000_000L)
+				.singleTransferLimit(1_000_000L)
+				.accountBalance(100_000L)
+				.interestRate(1.0)
+				.build()
+		);
 	}
 
 	@Test
@@ -97,7 +137,7 @@ class AccountMaskingServiceTest {
 		assertNotNull(result);
 		// 조회된 계좌 목록이 있다면 각 계좌의 accountNumber에 마스킹 처리가 되어있는지 확인
 		result.data().forEach(summary -> {
-			String accountNumber = ((bank.donghang.core.account.dto.response.AccountSummaryResponse) summary)
+			String accountNumber = ((bank.donghang.core.account.dto.response.AccountSummaryResponse)summary)
 				.accountNumber();
 			if (accountNumber != null) {
 				assertTrue(isMasked(accountNumber));
@@ -269,51 +309,73 @@ class AccountMaskingServiceTest {
 		return accountNumber != null && accountNumber.contains("*****");
 	}
 
-//	@Test
-//	@DisplayName("getOwnerName: 마스킹 처리된 소유자 이름 반환")
-//	void getAccountOwnerName_shouldReturnMaskedOwnerName() {
-//		// Given
-//		String accountTypeCode = "100";
-//		String branchCode = "001";
-//		String accountNumber = "12345678";
-//		String fullAccountNumber = accountTypeCode + branchCode + accountNumber;
-//
-//		Account account = Account.builder()
-//				.memberId(1L)
-//				.accountProductId(demandProduct.getAccountProductId())  // 실제 등록된 상품 ID
-//				.password("0000")
-//				.accountTypeCode(accountTypeCode)
-//				.branchCode(branchCode)
-//				.accountNumber(accountNumber)
-//				.accountStatus(AccountStatus.ACTIVE)
-//				.dailyTransferLimit(1_000_000L)
-//				.singleTransferLimit(1_000_000L)
-//				.accountBalance(100_000L)
-//				.interestRate(1.0)
-//				.build();
-//
-//		accountRepository.saveAccount(account);
-//
-//		// When
-//		AccountOwnerNameRequest request = new AccountOwnerNameRequest(fullAccountNumber);
-//		AccountOwnerNameResponse response = accountService.getOwnerName(request);
-//
-//		// Then
-//		assertNotNull(response, "응답이 null이 아니어야 함");
-//		assertNotNull(response.ownerName(), "ownerName이 null이 아니어야 함");
-//		assertTrue(response.ownerName().contains("*"), "마스킹된 이름이어야 함");
-//	}
+	@Test
+	@DisplayName("계좌 소유자명 조회 - 정상 케이스")
+	void getOwnerName_success() {
+		// given
+		String fullAccountNumber = "10000112345678";
+		AccountOwnerNameRequest request = new AccountOwnerNameRequest(fullAccountNumber);
+
+		// when
+		AccountOwnerNameResponse response = accountService.getOwnerName(request);
+
+		// then
+		assertNotNull(response);
+		assertEquals("홍*동", response.ownerName()); // 마스킹 적용 확인
+	}
 
 	@Test
-	@DisplayName("존재하지 않는 계좌번호로 소유자명을 조회하면 예외가 발생한다.")
-	void getAccountOwnerName_shouldThrowException_whenAccountNotFound() {
+	@DisplayName("계좌 소유자명 마스킹 - 다양한 이름 길이 테스트")
+	void getOwnerName_masking_variousNameLengths() {
 		// given
-		String nonExistentAccountNumber = "999999999999";
-		AccountOwnerNameRequest request = new AccountOwnerNameRequest(nonExistentAccountNumber);
+		String fullAccountNumber = "10000112345678";
+		AccountOwnerNameRequest request = new AccountOwnerNameRequest(fullAccountNumber);
 
-		// when & then
-		assertThrows(BadRequestException.class, () -> {
-			accountService.getOwnerName(request);
-		});
+		// 2글자 이름 테스트
+		Member twoCharMember = memberRepository.save(createTestMember("이순"));
+		Account twoCharAccount = accountRepository.saveAccount(
+			createTestAccount(twoCharMember.getId(), "10000187654321")
+		);
+		assertEquals("이*", accountService.getOwnerName(
+			new AccountOwnerNameRequest("10000187654321")).ownerName());
+
+		// 3글자 이름 테스트 (기본 테스트 계정 사용)
+		assertEquals("홍*동", accountService.getOwnerName(request).ownerName());
+
+		// 4글자 이상 이름 테스트
+		Member longNameMember = memberRepository.save(createTestMember("남궁토마스"));
+		Account longNameAccount = accountRepository.saveAccount(
+			createTestAccount(longNameMember.getId(), "10000111223344")
+		);
+		assertEquals("남***스", accountService.getOwnerName(
+			new AccountOwnerNameRequest("10000111223344")).ownerName());
+	}
+
+	private Member createTestMember(String name) {
+		return Member.of(
+			name,
+			"test@example.com",
+			"010-0000-0000",
+			LocalDateTime.now(),
+			"주소",
+			"12345",
+			MemberStatus.ACTIVE
+		);
+	}
+
+	private Account createTestAccount(Long memberId, String fullAccountNumber) {
+		return Account.builder()
+			.memberId(memberId)
+			.accountProductId(demandProduct.getAccountProductId())
+			.password("0000")
+			.accountTypeCode(fullAccountNumber.substring(0, 3))
+			.branchCode(fullAccountNumber.substring(3, 6))
+			.accountNumber(fullAccountNumber.substring(6))
+			.accountStatus(AccountStatus.ACTIVE)
+			.dailyTransferLimit(1_000_000L)
+			.singleTransferLimit(1_000_000L)
+			.accountBalance(100_000L)
+			.interestRate(1.0)
+			.build();
 	}
 }
