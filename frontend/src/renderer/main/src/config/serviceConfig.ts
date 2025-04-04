@@ -28,6 +28,7 @@ const SERVICE_CONFIG: Record<string, ServiceConfig> = {
 			{ path: "password", name: "비밀번호 입력" },
 			{ path: "payment", name: "입금 수단 선택" },
 			{ path: "cash", name: "현금 투입" },
+			{ path: "confirm", name: "내용 확인" },
 			{ path: "specsheet", name: "명세표 확인" },
 			{ path: "final", name: "입금 완료" }
 		]
@@ -40,6 +41,7 @@ const SERVICE_CONFIG: Record<string, ServiceConfig> = {
 			{ path: "password", name: "비밀번호 입력" },
 			{ path: "payment", name: "출금 수단 선택" },
 			{ path: "cash", name: "현금 출금" },
+			{ path: "confirm", name: "내용 확인" },
 			{ path: "specsheet", name: "명세표 확인" },
 			{ path: "final", name: "출금 완료" }
 		]
