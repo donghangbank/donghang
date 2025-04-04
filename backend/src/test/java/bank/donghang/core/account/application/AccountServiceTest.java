@@ -1,5 +1,6 @@
 package bank.donghang.core.account.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
@@ -10,6 +11,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
+import org.assertj.core.api.AbstractBigDecimalAssert;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,7 +21,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import bank.donghang.core.account.domain.Account;
+import bank.donghang.core.account.domain.InstallmentSchedule;
+import bank.donghang.core.account.domain.enums.AccountStatus;
 import bank.donghang.core.account.domain.repository.AccountRepository;
+import bank.donghang.core.account.dto.TransferInfo;
 import bank.donghang.core.account.dto.request.BalanceRequest;
 import bank.donghang.core.account.dto.request.DemandAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.DepositAccountRegisterRequest;
@@ -28,6 +33,7 @@ import bank.donghang.core.account.dto.request.MyAccountsRequest;
 import bank.donghang.core.account.dto.response.AccountRegisterResponse;
 import bank.donghang.core.account.dto.response.AccountSummaryResponse;
 import bank.donghang.core.account.dto.response.BalanceResponse;
+import bank.donghang.core.account.dto.response.InstallmentPaymentProcessingResult;
 import bank.donghang.core.accountproduct.domain.AccountProduct;
 import bank.donghang.core.accountproduct.domain.enums.AccountProductType;
 import bank.donghang.core.accountproduct.domain.repository.AccountProductRepository;
@@ -706,5 +712,263 @@ class AccountServiceTest {
 
 		verify(accountRepository).findAccountByFullAccountNumber(accountNumber);
 		verify(accountRepository, never()).getAccountBalance(any());
+	}
+
+	@Test
+	@DisplayName("할부 납입일이 도래한 계좌 정상 처리 - 성공 결과만 반환")
+	void handleInstallmentAccountSchedule_success() {
+		// given
+		LocalDate today = LocalDate.now();
+		InstallmentSchedule schedule1 = createInstallmentSchedule(1L, 2L, 10000L, 1, 15);
+		InstallmentSchedule schedule2 = createInstallmentSchedule(3L, 4L, 20000L, 2, 15);
+
+		given(accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(today))
+			.willReturn(List.of(schedule1, schedule2));
+
+		// 계좌 조회 성공
+		given(accountRepository.findAccountById(1L))
+			.willReturn(Optional.of(createAccount(1L, 10000L)));
+		given(accountRepository.findAccountById(2L))
+			.willReturn(Optional.of(createAccount(2L, 0L)));
+		given(accountRepository.findAccountById(3L))
+			.willReturn(Optional.of(createAccount(3L, 20000L)));
+		given(accountRepository.findAccountById(4L))
+			.willReturn(Optional.of(createAccount(4L, 0L)));
+
+		// when
+		InstallmentPaymentProcessingResult result = accountService.handleInstallmentAccountSchedule();
+
+		// then
+		assertThat(result.total()).isEqualTo(2);
+		assertThat(result.success()).isEqualTo(2);
+		assertThat(result.failed()).isEmpty();
+
+		// verify
+		then(transferFacade).should(times(2)).transfer(any(TransferInfo.class));
+		then(accountRepository).should(times(2)).saveInstallmentSchedule(any(InstallmentSchedule.class));
+	}
+
+	@Test
+	@DisplayName("출금 계좌 조회 실패 - ACCOUNT_NOT_FOUND 에러 발생")
+	void handleInstallmentAccountSchedule_withdrawalAccountNotFound() {
+		// given
+		LocalDate today = LocalDate.now();
+		InstallmentSchedule schedule = createInstallmentSchedule(1L, 2L, 10000L, 1, 15);
+
+		given(accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(today))
+			.willReturn(List.of(schedule));
+
+		given(accountRepository.findAccountById(1L))
+			.willReturn(Optional.empty());
+
+		// when
+		InstallmentPaymentProcessingResult result = accountService.handleInstallmentAccountSchedule();
+
+		// then
+		assertThat(result.total()).isEqualTo(1);
+		assertThat(result.success()).isEqualTo(0);
+		assertThat(result.failed()).hasSize(1);
+		assertThat(result.failed().get(0).accountId()).isEqualTo(2L);
+		assertThat(result.failed().get(0).reason()).isEqualTo(ErrorCode.ACCOUNT_NOT_FOUND.getMessage());
+
+		// verify
+		then(transferFacade).should(never()).transfer(any());
+		then(accountRepository).should(times(1)).saveInstallmentSchedule(any(InstallmentSchedule.class));
+	}
+
+	@Test
+	@DisplayName("적금 계좌 조회 실패 - ACCOUNT_NOT_FOUND 에러 발생")
+	void handleInstallmentAccountSchedule_installmentAccountNotFound() {
+		// given
+		LocalDate today = LocalDate.now();
+		InstallmentSchedule schedule = createInstallmentSchedule(1L, 2L, 10000L, 1, 15);
+
+		given(accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(today))
+			.willReturn(List.of(schedule));
+
+		given(accountRepository.findAccountById(1L))
+			.willReturn(Optional.of(createAccount(1L, 10000L)));
+		given(accountRepository.findAccountById(2L))
+			.willReturn(Optional.empty());
+
+		// when
+		InstallmentPaymentProcessingResult result = accountService.handleInstallmentAccountSchedule();
+
+		// then
+		assertThat(result.total()).isEqualTo(1);
+		assertThat(result.success()).isEqualTo(0);
+		assertThat(result.failed()).hasSize(1);
+		assertThat(result.failed().get(0).accountId()).isEqualTo(2L);
+		assertThat(result.failed().get(0).reason()).isEqualTo(ErrorCode.ACCOUNT_NOT_FOUND.getMessage());
+
+		// verify
+		then(transferFacade).should(never()).transfer(any());
+		then(accountRepository).should(times(1)).saveInstallmentSchedule(any(InstallmentSchedule.class));
+	}
+
+	@Test
+	@DisplayName("잔액 부족으로 이체 실패 - NOT_ENOUGH_BALANCE 에러 발생")
+	void handleInstallmentAccountSchedule_insufficientBalance() {
+		// given
+		LocalDate today = LocalDate.now();
+		InstallmentSchedule schedule = createInstallmentSchedule(1L, 2L, 10000L, 1, 15);
+
+		given(accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(today))
+			.willReturn(List.of(schedule));
+
+		given(accountRepository.findAccountById(1L))
+			.willReturn(Optional.of(createAccount(1L, 5000L))); // 잔액 부족
+		given(accountRepository.findAccountById(2L))
+			.willReturn(Optional.of(createAccount(2L, 0L)));
+
+		doThrow(new BadRequestException(ErrorCode.NOT_ENOUGH_BALANCE))
+			.when(transferFacade).transfer(any(TransferInfo.class));
+
+		// when
+		InstallmentPaymentProcessingResult result = accountService.handleInstallmentAccountSchedule();
+
+		// then
+		assertThat(result.total()).isEqualTo(1);
+		assertThat(result.success()).isEqualTo(0);
+		assertThat(result.failed()).hasSize(1);
+		assertThat(result.failed().get(0).accountId()).isEqualTo(2L);
+		assertThat(result.failed().get(0).reason()).isEqualTo(ErrorCode.NOT_ENOUGH_BALANCE.getMessage());
+
+		// verify
+		then(transferFacade).should(times(1)).transfer(any(TransferInfo.class));
+		then(accountRepository).should(times(1)).saveInstallmentSchedule(any(InstallmentSchedule.class));
+	}
+
+	@Test
+	@DisplayName("동일 계좌 이체 시도 - SAME_ACCOUNT_TRANSFER 에러 발생")
+	void handleInstallmentAccountSchedule_sameAccountTransfer() {
+		// given
+		LocalDate today = LocalDate.now();
+		// 출금계좌와 적금계좌가 동일한 경우
+		InstallmentSchedule schedule = createInstallmentSchedule(1L, 1L, 10000L, 1, 15);
+
+		given(accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(today))
+			.willReturn(List.of(schedule));
+
+		given(accountRepository.findAccountById(1L))
+			.willReturn(Optional.of(createAccount(1L, 10000L)));
+
+		doThrow(new BadRequestException(ErrorCode.SAME_ACCOUNT_TRANSFER))
+			.when(transferFacade).transfer(any(TransferInfo.class));
+
+		// when
+		InstallmentPaymentProcessingResult result = accountService.handleInstallmentAccountSchedule();
+
+		// then
+		assertThat(result.total()).isEqualTo(1);
+		assertThat(result.success()).isEqualTo(0);
+		assertThat(result.failed()).hasSize(1);
+		assertThat(result.failed().get(0).accountId()).isEqualTo(1L);
+		assertThat(result.failed().get(0).reason()).isEqualTo(ErrorCode.SAME_ACCOUNT_TRANSFER.getMessage());
+
+		// verify
+		then(transferFacade).should(times(1)).transfer(any(TransferInfo.class));
+		then(accountRepository).should(times(1)).saveInstallmentSchedule(any(InstallmentSchedule.class));
+	}
+
+	@Test
+	@DisplayName("회원 정보 없음 - MEMBER_NOT_FOUND 에러 발생")
+	void handleInstallmentAccountSchedule_memberNotFound() {
+		// given
+		LocalDate today = LocalDate.now();
+		InstallmentSchedule schedule = createInstallmentSchedule(1L, 2L, 10000L, 1, 15);
+
+		given(accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(today))
+			.willReturn(List.of(schedule));
+
+		given(accountRepository.findAccountById(1L))
+			.willReturn(Optional.of(createAccount(1L, 10000L)));
+		given(accountRepository.findAccountById(2L))
+			.willReturn(Optional.of(createAccount(2L, 0L)));
+
+		doThrow(new BadRequestException(ErrorCode.MEMBER_NOT_FOUND))
+			.when(transferFacade).transfer(any(TransferInfo.class));
+
+		// when
+		InstallmentPaymentProcessingResult result = accountService.handleInstallmentAccountSchedule();
+
+		// then
+		assertThat(result.total()).isEqualTo(1);
+		assertThat(result.success()).isEqualTo(0);
+		assertThat(result.failed()).hasSize(1);
+		assertThat(result.failed().get(0).accountId()).isEqualTo(2L);
+		assertThat(result.failed().get(0).reason()).isEqualTo(ErrorCode.MEMBER_NOT_FOUND.getMessage());
+
+		// verify
+		then(transferFacade).should(times(1)).transfer(any(TransferInfo.class));
+		then(accountRepository).should(times(1)).saveInstallmentSchedule(any(InstallmentSchedule.class));
+	}
+
+	@Test
+	@DisplayName("예상치 못한 런타임 예외 발생 시에도 실패 목록에 추가")
+	void handleInstallmentAccountSchedule_unexpectedException() {
+		// given
+		LocalDate today = LocalDate.now();
+		InstallmentSchedule schedule = createInstallmentSchedule(1L, 2L, 10000L, 1, 15);
+
+		given(accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(today))
+			.willReturn(List.of(schedule));
+
+		given(accountRepository.findAccountById(1L))
+			.willReturn(Optional.of(createAccount(1L, 10000L)));
+		given(accountRepository.findAccountById(2L))
+			.willReturn(Optional.of(createAccount(2L, 0L)));
+
+		// transfer 실패 시뮬레이션
+		doThrow(new RuntimeException("데이터베이스 연결 실패"))
+			.when(transferFacade).transfer(any(TransferInfo.class));
+
+		// 저장 동작 모킹 (void 메서드 처리)
+		doNothing().when(accountRepository).saveInstallmentSchedule(any(InstallmentSchedule.class));
+
+		// when
+		InstallmentPaymentProcessingResult result = accountService.handleInstallmentAccountSchedule();
+
+		// then
+		assertThat(result.total()).isEqualTo(1);
+		assertThat(result.success()).isEqualTo(0);
+		assertThat(result.failed()).hasSize(1);
+		assertThat(result.failed().get(0).accountId()).isEqualTo(2L);
+		assertThat(result.failed().get(0).reason()).contains("데이터베이스 연결 실패");
+
+		// verify
+		verify(accountRepository, times(1)).saveInstallmentSchedule(any(InstallmentSchedule.class));
+	}
+
+	private InstallmentSchedule createInstallmentSchedule(
+		Long withdrawalAccountId,
+		Long installmentAccountId,
+		Long amount,
+		int sequence,
+		int initialDay
+	) {
+		return InstallmentSchedule.builder()
+			.withdrawalAccountId(withdrawalAccountId)
+			.installmentAccountId(installmentAccountId)
+			.installmentAmount(amount)
+			.installmentSequence(sequence)
+			.initialInstallmentScheduleDay(initialDay)
+			.installmentScheduledDate(LocalDate.now().withDayOfMonth(initialDay))
+			.build();
+	}
+
+	private Account createAccount(Long accountId, Long balance) {
+		return Account.builder()
+			.accountId(accountId)
+			.accountBalance(balance)
+			.accountStatus(AccountStatus.ACTIVE)
+			.accountTypeCode("100")
+			.branchCode("001")
+			.accountNumber("12345678")
+			.password("1234")
+			.dailyTransferLimit(1000000L)
+			.singleTransferLimit(1000000L)
+			.interestRate(0.0)
+			.build();
 	}
 }
