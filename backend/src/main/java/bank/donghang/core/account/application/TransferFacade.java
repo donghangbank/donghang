@@ -28,6 +28,12 @@ public class TransferFacade {
 
 		String description = request.description();
 		long amount = request.amount();
-		transactionService.transfer(sendingAccount, receivingAccount, description, amount, LocalDateTime.now());
+		transactionService.transfer(
+				sendingAccount,
+				receivingAccount,
+				description,
+				amount,
+				LocalDateTime.now()
+		);
 	}
 }

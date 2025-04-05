@@ -5,4 +5,6 @@ import bank.donghang.core.card.dto.response.CardPasswordResponse;
 public interface CardJpaRepositoryCustom {
 
 	CardPasswordResponse checkCardPassword(String cardNumber);
+
+	Long findAccountIdByCardNumber(String cardNumber);
 }

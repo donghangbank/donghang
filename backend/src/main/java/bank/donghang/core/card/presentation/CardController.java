@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import bank.donghang.core.card.application.CardService;
 import bank.donghang.core.card.dto.request.CardPasswordRequest;
+import bank.donghang.core.card.dto.request.CardTransferRequest;
 import bank.donghang.core.card.dto.response.CardPasswordResponse;
+import bank.donghang.core.card.dto.response.CardTransferResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -20,6 +22,13 @@ public class CardController {
 	@PostMapping("/check")
 	public ResponseEntity<CardPasswordResponse> checkCardPassword(@RequestBody CardPasswordRequest request) {
 		CardPasswordResponse response = cardService.checkCardPassword(request);
+
+		return ResponseEntity.ok(response);
+	}
+
+	@PostMapping("/transfer")
+	public ResponseEntity<CardTransferResponse> proceedCardTransfer(@RequestBody CardTransferRequest request) {
+		CardTransferResponse response = cardService.proceedCardTransfer(request);
 
 		return ResponseEntity.ok(response);
 	}

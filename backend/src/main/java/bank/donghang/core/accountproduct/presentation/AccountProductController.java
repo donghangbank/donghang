@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import bank.donghang.core.accountproduct.application.AccountProductService;
 import bank.donghang.core.accountproduct.dto.request.AccountProductCreationRequest;
 import bank.donghang.core.accountproduct.dto.response.AccountProductDetail;
-import bank.donghang.core.accountproduct.dto.response.AccountProductListResponse;
 import bank.donghang.core.accountproduct.dto.response.AccountProductSummary;
 import lombok.RequiredArgsConstructor;
 

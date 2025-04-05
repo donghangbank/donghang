@@ -1,9 +1,11 @@
 package bank.donghang.core.card.presentation;
 
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,9 +16,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import bank.donghang.core.account.domain.enums.TransactionStatus;
 import bank.donghang.core.card.application.CardService;
 import bank.donghang.core.card.dto.request.CardPasswordRequest;
+import bank.donghang.core.card.dto.request.CardTransferRequest;
 import bank.donghang.core.card.dto.response.CardPasswordResponse;
+import bank.donghang.core.card.dto.response.CardTransferResponse;
 import bank.donghang.core.common.controller.ControllerTest;
 
 @WebMvcTest(CardController.class)
@@ -53,5 +58,42 @@ class CardControllerTest extends ControllerTest {
 				.content(objectMapper.writeValueAsString(request)))
 			.andDo(print())
 			.andExpect(status().isOk());
+	}
+
+	@Test
+	@DisplayName("카드로 이체를 할 수 있다.")
+	void can_transfer_by_card_number() throws Exception {
+		var request = new CardTransferRequest(
+				"1234123412341234",
+				"110257063096",
+				50000L,
+				"테스트 이체",
+				LocalDateTime.of(1990, 1, 1, 0, 0)
+		);
+
+		var expect = new CardTransferResponse(
+				"1234123412341234",
+				"110257063096",
+				950000L,
+				"김수한",
+				50000L,
+				TransactionStatus.COMPLETED,
+				LocalDateTime.now()
+		);
+
+		given(cardService.proceedCardTransfer(request))
+				.willReturn(expect);
+
+		mockMvc.perform(post("/api/v1/cards/transfer")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(request)))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.sendingCardNumber").value(expect.sendingCardNumber()))
+				.andExpect(jsonPath("$.receivingAccountNumber").value(expect.receivingAccountNumber()))
+				.andExpect(jsonPath("$.sendingAccountBalance").value(expect.sendingAccountBalance()))
+				.andExpect(jsonPath("$.recipientName").value(expect.recipientName()))
+				.andExpect(jsonPath("$.amount").value(expect.amount()))
+				.andExpect(jsonPath("$.status").value(expect.status().toString()));
 	}
 }
