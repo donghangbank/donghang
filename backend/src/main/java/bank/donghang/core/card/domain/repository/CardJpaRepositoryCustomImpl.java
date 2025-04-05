@@ -42,4 +42,14 @@ public class CardJpaRepositoryCustomImpl implements CardJpaRepositoryCustom {
 			.where(card.cardNumber.eq(cardNumber))
 			.fetchOne();
 	}
+
+	@Override
+	public Long findAccountIdByCardNumber(String cardNumber) {
+		return queryFactory.select(card.accountId)
+				.from(card)
+				.where(card.cardNumber.eq(cardNumber))
+				.fetchOne();
+	}
+
+
 }

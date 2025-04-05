@@ -9,7 +9,8 @@ import lombok.Builder;
 public record TransferInfo(
 	Account sendingAccount,
 	Account receivingAccount,
-	Long amount, String description,
+	Long amount,
+	String description,
 	LocalDateTime sessionStartTime) {
 	public String sendingAccountNumber() {
 
