@@ -45,6 +45,13 @@ import WithDrawalCashOutputPage from "./pages/general/withdrawal/WithDrawalCashO
 import WithDrawalInfoAmountPage from "./pages/general/withdrawal/WithDrawalInfoAmountPage";
 import WithDrawalSpecSheetPage from "./pages/general/withdrawal/WithDrawalSpecSheetPage";
 import WithDrawalCardInputPage from "./pages/general/withdrawal/WithDrawalCardInputPage";
+import InquiryMainPage from "./pages/general/inquiry/InquiryMainPage";
+import InquiryBalanceOptionPage from "./pages/general/inquiry/balance/InquiryBalanceOptionPage";
+import InquiryBalanceCardWarningPage from "./pages/general/inquiry/balance/InquiryBalanceCardWarningPage";
+import InquiryBalanceCardInputPage from "./pages/general/inquiry/balance/InquiryBalanceCardInputPage";
+import InquiryBalanceCardAuthPage from "./pages/general/inquiry/balance/InquiryBalanceCardAuthPage";
+import InquiryBalanceCardPasswordPage from "./pages/general/inquiry/balance/InquiryBalanceCardPasswordPage";
+import InquiryBalanceSpecSheetPage from "./pages/general/inquiry/balance/InquiryBalanceSpecSheetPage";
 
 const router = createHashRouter([
 	{
@@ -238,6 +245,54 @@ const router = createHashRouter([
 										element: <TransferInfoSpecSheetPage />
 									}
 								]
+							}
+						]
+					},
+					{
+						path: "inquiry",
+						children: [
+							{
+								path: "option",
+								element: <InquiryMainPage />
+							}
+						]
+					},
+					{
+						path: "balance",
+						children: [
+							{
+								path: "warning",
+								children: [
+									{
+										path: "card",
+										element: <InquiryBalanceCardWarningPage />
+									}
+								]
+							},
+							{
+								path: "option",
+								element: <InquiryBalanceOptionPage />
+							},
+							{
+								path: "card",
+								children: [
+									{
+										path: "input",
+										element: <InquiryBalanceCardInputPage />
+									},
+									{
+										path: "auth",
+										element: <InquiryBalanceCardAuthPage />
+									},
+									{
+										path: "password",
+										element: <InquiryBalanceCardPasswordPage />
+									}
+								]
+							},
+							{
+								path: "specsheet",
+								element: <InquiryBalanceSpecSheetPage />
 							}
 						]
 					},
