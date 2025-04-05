@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
@@ -25,6 +26,8 @@ import bank.donghang.core.accountproduct.dto.request.AccountProductCreationReque
 import bank.donghang.core.accountproduct.dto.response.AccountProductDetail;
 import bank.donghang.core.accountproduct.dto.response.AccountProductSummary;
 import bank.donghang.core.common.controller.ControllerTest;
+import bank.donghang.core.common.exception.BadRequestException;
+import bank.donghang.core.common.exception.ErrorCode;
 
 @WebMvcTest(AccountProductController.class)
 class AccountProductControllerTest extends ControllerTest {
@@ -50,7 +53,7 @@ class AccountProductControllerTest extends ControllerTest {
 				AccountProductType.DEMAND.name())
 		);
 
-		when(productService.getAllAccountProductsByQueryDsl()).thenReturn(summaries);
+		when(productService.getAllAccountProducts()).thenReturn(summaries);
 
 		MvcResult result = mockMvc.perform(get("/api/v1/accountproducts")
 				.contentType(MediaType.APPLICATION_JSON))
@@ -143,5 +146,134 @@ class AccountProductControllerTest extends ControllerTest {
 			AccountProductSummary.class);
 
 		Assertions.assertThat(response).usingRecursiveComparison().isEqualTo(expected);
+	}
+
+	@Test
+	@DisplayName("자유입출금 상품 목록을 조회한다.")
+	void getDemandProducts_shouldReturnDemandProducts() throws Exception {
+		// given
+		AccountProductSummary summary = new AccountProductSummary(
+				1L, "자유입출금 상품", 1L, 1.5, null, 0L, 0L, AccountProductType.DEMAND.name());
+		List<AccountProductSummary> expected = List.of(summary);
+
+		when(productService.getDemandProducts()).thenReturn(expected);
+
+		// when & then
+		mockMvc.perform(get("/api/v1/accountproducts/demands")
+						.contentType(MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$[0].accountProductType").value(AccountProductType.DEMAND.name()));
+	}
+
+	@Test
+	@DisplayName("예금 상품 목록을 조회한다.")
+	void getDepositProducts_shouldReturnDepositProducts() throws Exception {
+		// given
+		AccountProductSummary summary = new AccountProductSummary(
+				2L, "예금 상품", 1L, 2.5, 12L, 1000L, 100000L, AccountProductType.DEPOSIT.name());
+		List<AccountProductSummary> expected = List.of(summary);
+
+		when(productService.getDepositProducts()).thenReturn(expected);
+
+		// when & then
+		mockMvc.perform(get("/api/v1/accountproducts/deposits")
+						.contentType(MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$[0].accountProductType").value(AccountProductType.DEPOSIT.name()));
+	}
+
+	@Test
+	@DisplayName("적금 상품 목록을 조회한다.")
+	void getInstallmentProducts_shouldReturnInstallmentProducts() throws Exception {
+		// given
+		AccountProductSummary summary = new AccountProductSummary(
+				3L, "적금 상품", 1L, 3.5, 12L, 500L, 50000L, AccountProductType.INSTALLMENT.name());
+		List<AccountProductSummary> expected = List.of(summary);
+
+		when(productService.getInstallmentProducts()).thenReturn(expected);
+
+		// when & then
+		mockMvc.perform(get("/api/v1/accountproducts/installments")
+						.contentType(MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$[0].accountProductType").value(AccountProductType.INSTALLMENT.name()));
+	}
+
+	@Test
+	@DisplayName("상품 목록이 없을 때 빈 배열을 반환한다.")
+	void getProducts_whenNoProducts_shouldReturnEmptyList() throws Exception {
+		// given
+		when(productService.getAllAccountProducts()).thenReturn(Collections.emptyList());
+
+		// when & then
+		mockMvc.perform(get("/api/v1/accountproducts")
+						.contentType(MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$").isArray())
+				.andExpect(jsonPath("$").isEmpty());
+	}
+
+	@Test
+	@DisplayName("존재하지 않는 상품 ID로 조회 시 에러를 반환한다.")
+	void getProductDetail_withInvalidId_shouldReturnNotFound() throws Exception {
+		// given
+		Long invalidProductId = 999L;
+		when(productService.getAccountProductDetail(invalidProductId))
+				.thenThrow(new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND));
+
+		// when & then
+		mockMvc.perform(get("/api/v1/accountproducts/{productId}", invalidProductId)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andExpect(status().isNotFound());
+	}
+
+	@Test
+	@DisplayName("유효하지 않은 상품 생성 요청 시 에러를 반환한다.")
+	void createProduct_withInvalidRequest_shouldReturnBadRequest() throws Exception {
+		// given
+		String invalidRequestJson = """
+        {
+            "accountProductName": "",
+            "accountProductDescription": "",
+            "bankId": null,
+            "interestRate": -1.0,
+            "rateDescription": "",
+            "accountProductTypeCode": -1,
+            "subscriptionPeriod": null,
+            "minSubscriptionBalance": -1,
+            "maxSubscriptionBalance": -1
+        }
+        """;
+
+		// when & then
+		mockMvc.perform(post("/api/v1/accountproducts")
+						.content(invalidRequestJson)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	@DisplayName("상품 생성 시 서비스 계층에서 예외가 발생하면 해당 예외를 처리한다.")
+	void createProduct_whenServiceThrowsException_shouldHandleException() throws Exception {
+		// given
+		AccountProductCreationRequest request = new AccountProductCreationRequest(
+				"유효한 상품", "유효한 설명", 1L, 2.5, "기본 금리", 20, 12L, 1000L, 100000L
+		);
+
+		when(productService.registerAccountProduct(request))
+				.thenThrow(new BadRequestException(ErrorCode.BANK_NOT_FOUND));
+
+		// when & then
+		mockMvc.perform(post("/api/v1/accountproducts")
+						.content(objectMapper.writeValueAsString(request))
+						.contentType(MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andExpect(status().isNotFound());
 	}
 }

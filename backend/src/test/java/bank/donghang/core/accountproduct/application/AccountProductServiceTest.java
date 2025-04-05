@@ -67,9 +67,9 @@ class AccountProductServiceTest {
 			.map(AccountProductSummary::from)
 			.toList();
 
-		when(accountProductRepository.getAccountProductsByQueryDsl()).thenReturn(mockSummaries);
+		when(accountProductRepository.getAccountProductsByQueryDsl(null)).thenReturn(mockSummaries);
 
-		List<AccountProductSummary> response = accountProductService.getAllAccountProductsByQueryDsl();
+		List<AccountProductSummary> response = accountProductService.getAllAccountProducts();
 
 		assertThat(response).hasSize(2);
 		assertThat(response.get(0).accountProductName()).isEqualTo("Saving Account");
@@ -135,5 +135,50 @@ class AccountProductServiceTest {
 		AccountProductSummary result = accountProductService.registerAccountProduct(request);
 
 		assertThat(result.accountProductName()).isEqualTo("New Account");
+	}
+	
+	@Test
+	@DisplayName("자유입출금 상품 목록을 조회할 수 있다.")
+	void getDemandProducts_shouldReturnDemandList() {
+		List<AccountProductSummary> mockList = List.of(
+				new AccountProductSummary(1L, "자유입출금", 1L, 0.5, null, 0L, 0L, AccountProductType.DEMAND.name())
+		);
+
+		when(accountProductRepository.getAccountProductsByQueryDsl(AccountProductType.DEMAND)).thenReturn(mockList);
+
+		List<AccountProductSummary> result = accountProductService.getDemandProducts();
+
+		assertThat(result).hasSize(1);
+		assertThat(result.get(0).accountProductType()).isEqualTo(AccountProductType.DEMAND.name());
+	}
+
+	@Test
+	@DisplayName("예금 상품 목록을 조회할 수 있다.")
+	void getDepositProducts_shouldReturnDepositList() {
+		List<AccountProductSummary> mockList = List.of(
+				new AccountProductSummary(2L, "예금 상품", 1L, 2.0, 12L, 1000L, 100000L, AccountProductType.DEPOSIT.name())
+		);
+
+		when(accountProductRepository.getAccountProductsByQueryDsl(AccountProductType.DEPOSIT)).thenReturn(mockList);
+
+		List<AccountProductSummary> result = accountProductService.getDepositProducts();
+
+		assertThat(result).hasSize(1);
+		assertThat(result.get(0).accountProductType()).isEqualTo(AccountProductType.DEPOSIT.name());
+	}
+
+	@Test
+	@DisplayName("적금 상품 목록을 조회할 수 있다.")
+	void getInstallmentProducts_shouldReturnInstallmentList() {
+		List<AccountProductSummary> mockList = List.of(
+				new AccountProductSummary(3L, "적금 상품", 1L, 3.0, 12L, 500L, 50000L, AccountProductType.INSTALLMENT.name())
+		);
+
+		when(accountProductRepository.getAccountProductsByQueryDsl(AccountProductType.INSTALLMENT)).thenReturn(mockList);
+
+		List<AccountProductSummary> result = accountProductService.getInstallmentProducts();
+
+		assertThat(result).hasSize(1);
+		assertThat(result.get(0).accountProductType()).isEqualTo(AccountProductType.INSTALLMENT.name());
 	}
 }

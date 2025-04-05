@@ -10,6 +10,36 @@ include::{snippets}/account-product-controller-test/get_products/http-request.ad
 
 include::{snippets}/account-product-controller-test/get_products/http-response.adoc[]
 
+=== 자유입출금 상품 목록 조회(GET /api/v1/accountproducts/demands)
+
+==== 요청
+
+include::{snippets}/account-product-controller-test/get-demand-products_should-return-demand-products/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/account-product-controller-test/get-demand-products_should-return-demand-products/http-response.adoc[]
+
+=== 예금 상품 목록 조회(GET /api/v1/accountproducts/deposits)
+
+==== 요청
+
+include::{snippets}/account-product-controller-test/get-deposit-products_should-return-deposit-products/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/account-product-controller-test/get-deposit-products_should-return-deposit-products/http-response.adoc[]
+
+=== 적금 상품 목록 조회(GET /api/v1/accountproducts/installments)
+
+==== 요청
+
+include::{snippets}/account-product-controller-test/get-installment-products_should-return-installment-products/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/account-product-controller-test/get-installment-products_should-return-installment-products/http-response.adoc[]
+
 === 계좌 상품 상세 조회 (GET /api/v1/accountproducts/{productId})
 
 ==== 요청
