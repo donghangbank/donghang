@@ -1,6 +1,6 @@
 == CardController
 
-=== 카드 비밀번호 (POST /api/v1/cards/check)
+=== 카드 비밀번호 확인 (POST /api/v1/cards/check)
 
 ==== 요청
 
@@ -9,3 +9,13 @@ include::{snippets}/card-controller-test/can_check_card_password/http-request.ad
 ==== 응답
 
 include::{snippets}/card-controller-test/can_check_card_password/http-response.adoc[]
+
+=== 카드로 이체하기 (POST /api/v1/cards/transfer)
+
+==== 요청
+
+include::{snippets}/card-controller-test/can_transfer_by_card_number/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/card-controller-test/can_transfer_by_card_number/http-response.adoc[]
