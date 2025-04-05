@@ -4,12 +4,12 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
-import bank.donghang.core.accountproduct.domain.enums.AccountProductType;
 import bank.donghang.core.accountproduct.domain.QAccountProduct;
+import bank.donghang.core.accountproduct.domain.enums.AccountProductType;
 import bank.donghang.core.accountproduct.dto.response.AccountProductSummary;
 import lombok.RequiredArgsConstructor;
 
@@ -39,7 +39,10 @@ public class AccountProductJpaRepositoryCustomImpl implements AccountProductJpaR
 				.fetch();
 	}
 
-	private BooleanExpression eqAccountProductType(AccountProductType accountProductType, QAccountProduct accountProduct) {
+	private BooleanExpression eqAccountProductType(
+			AccountProductType accountProductType,
+			QAccountProduct accountProduct
+	) {
 		if (accountProductType == null) {
 			return null;
 		}
