@@ -2,6 +2,7 @@ import { InputContext } from "@renderer/contexts/InputContext";
 import { SpecSheetContext } from "@renderer/contexts/SpecSheetContext";
 import { useActionPlay } from "@renderer/hooks/ai/useActionPlay";
 import { useContextReset } from "@renderer/hooks/useContextReset";
+import { useQueryClient } from "@tanstack/react-query";
 import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -10,6 +11,7 @@ export const FinalPage = (): JSX.Element => {
 	const { resetAll } = useContext(InputContext);
 	const { resetSpecSheet } = useContext(SpecSheetContext);
 	const { resetContext } = useContextReset();
+	const queryClient = useQueryClient();
 
 	useEffect(() => {
 		// 1. 모든 Context 상태 초기화
@@ -23,11 +25,14 @@ export const FinalPage = (): JSX.Element => {
 		window.mainAPI.notifyMainNumberChange(""); // 입력 값 초기화
 		window.mainAPI.updateSubDisabled(false); // 버튼 활성화
 
-		// 3. 2초 후 홈으로 이동
+		// 3. 쿼리 클라이언트 초기화
+		queryClient.clear(); // 모든 쿼리 무효화
+
+		// 4. 2초 후 홈으로 이동
 		const timer = setTimeout(() => navigate("/"), 2000);
 
 		return (): void => clearTimeout(timer);
-	}, [navigate, resetAll, resetSpecSheet, resetContext]);
+	}, [navigate, resetAll, resetSpecSheet, resetContext, queryClient]);
 
 	useActionPlay({
 		audioFile: "thank_you.mp3",
