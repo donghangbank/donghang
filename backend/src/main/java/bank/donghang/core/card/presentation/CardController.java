@@ -1,7 +1,5 @@
 package bank.donghang.core.card.presentation;
 
-import bank.donghang.core.card.dto.request.CardTransferRequest;
-import bank.donghang.core.card.dto.response.CardTransferResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -9,7 +7,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import bank.donghang.core.card.application.CardService;
+import bank.donghang.core.card.dto.request.CardTransferRequest;
 import bank.donghang.core.card.dto.request.CardPasswordRequest;
+import bank.donghang.core.card.dto.response.CardTransferResponse;
 import bank.donghang.core.card.dto.response.CardPasswordResponse;
 import lombok.RequiredArgsConstructor;
 
