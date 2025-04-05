@@ -22,7 +22,7 @@ export const GeneralMain = (): JSX.Element => {
 						이체
 					</div>
 				</Link>
-				<Link to="/general/retrieve">
+				<Link to="/general/inquiry/option">
 					<div className="h-[200px] leading-[200px] bg-cloudyBlue shadow-custom rounded-3xl">
 						조회
 					</div>
