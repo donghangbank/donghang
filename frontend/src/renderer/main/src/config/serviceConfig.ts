@@ -44,6 +44,20 @@ const SERVICE_CONFIG: Record<string, ServiceConfig> = {
 			{ path: "specsheet", name: "명세표 확인" },
 			{ path: "final", name: "출금 완료" }
 		]
+	},
+	inquiry: {
+		title: "조회",
+		steps: [{ path: "option", name: "선택" }]
+	},
+	balance: {
+		title: "잔액 조회",
+		steps: [
+			{ path: "warning", name: "금융 사기" },
+			{ path: "option", name: "인증 수단 선택" },
+			{ path: "password", name: "비밀번호 입력" },
+			{ path: "specsheet", name: "잔액 확인" },
+			{ path: "final", name: "완료" }
+		]
 	}
 };
 
