@@ -5,6 +5,7 @@ export const inputLinkMapping: Record<string, string> = {
 	"/general/deposit/card/password": "/general/deposit/payment",
 	"/general/withdrawal/card/password": "/general/withdrawal/payment",
 	"/general/withdrawal/info/amount": "/general/drawal/cash/output",
+	"/general/balance/card/password": "/general/balance/specsheet",
 	"/senior/transfer/card/password": "/senior/transfer/info/account",
 	"/senior/transfer/info/account": "/senior/transfer/info/amount",
 	"/senior/transfer/info/amount": "/senior/transfer/info/specsheet"
