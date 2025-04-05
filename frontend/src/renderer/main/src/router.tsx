@@ -52,6 +52,12 @@ import InquiryBalanceCardInputPage from "./pages/general/inquiry/balance/Inquiry
 import InquiryBalanceCardAuthPage from "./pages/general/inquiry/balance/InquiryBalanceCardAuthPage";
 import InquiryBalanceCardPasswordPage from "./pages/general/inquiry/balance/InquiryBalanceCardPasswordPage";
 import InquiryBalanceSpecSheetPage from "./pages/general/inquiry/balance/InquiryBalanceSpecSheetPage";
+import InquiryHistoryCardWarningPage from "./pages/general/inquiry/history/InquiryHistoryCardWarningPage";
+import InquiryHistoryOptionPage from "./pages/general/inquiry/history/InquiryHistoryOptionPage";
+import InquiryHistoryCardInputPage from "./pages/general/inquiry/history/InquiryHistoryCardInputPage";
+import InquiryHistoryCardAuthPage from "./pages/general/inquiry/history/InquiryHistoryCardAuthPage";
+import InquiryHistoryCardPasswordPage from "./pages/general/inquiry/history/InquiryHistoryCardPasswordPage";
+import InquiryHistorySpecSheetPage from "./pages/general/inquiry/history/InquiryHistorySpecSheetPage";
 
 const router = createHashRouter([
 	{
@@ -293,6 +299,45 @@ const router = createHashRouter([
 							{
 								path: "specsheet",
 								element: <InquiryBalanceSpecSheetPage />
+							}
+						]
+					},
+					{
+						path: "history",
+						children: [
+							{
+								path: "warning",
+								children: [
+									{
+										path: "card",
+										element: <InquiryHistoryCardWarningPage />
+									}
+								]
+							},
+							{
+								path: "option",
+								element: <InquiryHistoryOptionPage />
+							},
+							{
+								path: "card",
+								children: [
+									{
+										path: "input",
+										element: <InquiryHistoryCardInputPage />
+									},
+									{
+										path: "auth",
+										element: <InquiryHistoryCardAuthPage />
+									},
+									{
+										path: "password",
+										element: <InquiryHistoryCardPasswordPage />
+									}
+								]
+							},
+							{
+								path: "specsheet",
+								element: <InquiryHistorySpecSheetPage />
 							}
 						]
 					},
