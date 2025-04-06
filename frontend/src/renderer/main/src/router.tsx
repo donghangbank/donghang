@@ -58,6 +58,13 @@ import InquiryHistoryCardInputPage from "./pages/general/inquiry/history/Inquiry
 import InquiryHistoryCardAuthPage from "./pages/general/inquiry/history/InquiryHistoryCardAuthPage";
 import InquiryHistoryCardPasswordPage from "./pages/general/inquiry/history/InquiryHistoryCardPasswordPage";
 import InquiryHistorySpecSheetPage from "./pages/general/inquiry/history/InquiryHistorySpecSheetPage";
+import SeniorDepositScamWarningPage from "./pages/senior/deposit/SeniorDepositScamWarningPage";
+import SeniorDepositCardWarningPage from "./pages/senior/deposit/SeniorDepositCardWarningPage";
+import SeniorDepositOptionPage from "./pages/senior/deposit/SeniorDepositOptionPage";
+import { SeniorDepositCardInputPage } from "./pages/senior/deposit/SeniorDepositCardInputPage";
+import SeniorDepositCardAuthPage from "./pages/senior/deposit/SeniorDepositCardAuthPage";
+import SeniorDepositCardPasswordPage from "./pages/senior/deposit/SeniorDepositCardPasswordPage";
+import SeniorDepositPaymentPage from "./pages/senior/deposit/SeniorDepositPaymentPage";
 
 const router = createHashRouter([
 	{
@@ -408,6 +415,49 @@ const router = createHashRouter([
 										element: <SeniorTransferInfoSpecSheetPage />
 									}
 								]
+							}
+						]
+					},
+					{
+						path: "deposit",
+						children: [
+							{
+								path: "warning",
+								children: [
+									{
+										path: "scam",
+										element: <SeniorDepositScamWarningPage />
+									},
+									{
+										path: "card",
+										element: <SeniorDepositCardWarningPage />
+									}
+								]
+							},
+							{
+								path: "option",
+								element: <SeniorDepositOptionPage />
+							},
+							{
+								path: "card",
+								children: [
+									{
+										path: "input",
+										element: <SeniorDepositCardInputPage />
+									},
+									{
+										path: "auth",
+										element: <SeniorDepositCardAuthPage />
+									},
+									{
+										path: "password",
+										element: <SeniorDepositCardPasswordPage />
+									}
+								]
+							},
+							{
+								path: "payment",
+								element: <SeniorDepositPaymentPage />
 							}
 						]
 					},
