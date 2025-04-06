@@ -6,20 +6,16 @@ type PredictionResponse = {
 };
 
 export async function requestPrediction(
-	text: string
+	audio: Blob
 ): Promise<{ construction: Construction; response: PredictionResponse }> {
 	try {
-		console.log("예측 요청:", text);
-		const response = await fetch(
-			`http://localhost:8000/prediction?text=${encodeURIComponent(text)}`,
-			{
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json"
-				},
-				body: JSON.stringify({ text })
-			}
-		);
+		const formData = new FormData();
+		formData.append("file", audio, "audio.webm");
+
+		const response = await fetch("https://stirred-solely-hippo.ngrok-free.app/prediction", {
+			method: "POST",
+			body: formData
+		});
 
 		if (!response.ok) {
 			const errorData = await response.json();
