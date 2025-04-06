@@ -14,6 +14,7 @@ import bank.donghang.core.accountproduct.application.AccountProductService;
 import bank.donghang.core.accountproduct.dto.request.AccountProductCreationRequest;
 import bank.donghang.core.accountproduct.dto.response.AccountProductDetail;
 import bank.donghang.core.accountproduct.dto.response.AccountProductSummary;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -24,18 +25,33 @@ public class AccountProductController {
 
 	@GetMapping()
 	public ResponseEntity<List<AccountProductSummary>> getAccountProducts() {
-		return ResponseEntity.ok(productService.getAllAccountProductsByQueryDsl());
+		return ResponseEntity.ok(productService.getAllAccountProducts());
 	}
 
 	@GetMapping("/{productId}")
 	public ResponseEntity<AccountProductDetail> getAccountProductDetail(
-		@PathVariable(name = "productId", required = true) Long productId) {
+			@PathVariable(name = "productId", required = true) Long productId) {
 		return ResponseEntity.ok(productService.getAccountProductDetail(productId));
 	}
 
 	@PostMapping()
 	public ResponseEntity<AccountProductSummary> createAccountProduct(
-		@RequestBody AccountProductCreationRequest accountProductCreationRequest) {
+			@RequestBody @Valid AccountProductCreationRequest accountProductCreationRequest) {
 		return ResponseEntity.ok(productService.registerAccountProduct(accountProductCreationRequest));
+	}
+
+	@GetMapping("/demands")
+	public ResponseEntity<List<AccountProductSummary>> getDemandProducts() {
+		return ResponseEntity.ok(productService.getDemandProducts());
+	}
+
+	@GetMapping("/deposits")
+	public ResponseEntity<List<AccountProductSummary>> getDepositProducts() {
+		return ResponseEntity.ok(productService.getDepositProducts());
+	}
+
+	@GetMapping("/installments")
+	public ResponseEntity<List<AccountProductSummary>> getInstallmentProducts() {
+		return ResponseEntity.ok(productService.getInstallmentProducts());
 	}
 }

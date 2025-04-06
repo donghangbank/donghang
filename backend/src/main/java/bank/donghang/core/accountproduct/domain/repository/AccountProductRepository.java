@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 import bank.donghang.core.accountproduct.domain.AccountProduct;
+import bank.donghang.core.accountproduct.domain.enums.AccountProductType;
 import bank.donghang.core.accountproduct.dto.response.AccountProductSummary;
 import lombok.RequiredArgsConstructor;
 
@@ -34,7 +35,7 @@ public class AccountProductRepository {
 		accountProductJpaRepository.deleteAll();
 	}
 
-	public List<AccountProductSummary> getAccountProductsByQueryDsl() {
-		return accountProductJpaRepositoryCustomImpl.getAccountProductsByQueryDsl();
+	public List<AccountProductSummary> getAccountProductsByQueryDsl(AccountProductType accountProductType) {
+		return accountProductJpaRepositoryCustomImpl.getAccountProductsByQueryDsl(accountProductType);
 	}
 }
