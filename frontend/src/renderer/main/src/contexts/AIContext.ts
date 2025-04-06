@@ -1,6 +1,7 @@
 import { createContext } from "react";
+import { AnimationType } from "@renderer/components/banker/AvatarController";
 
-export type AvatarState = "idle" | "walk" | "bow";
+export type AvatarState = AnimationType;
 export type Construction = (typeof CONSTRUCTION_VALUES)[number];
 export const CONSTRUCTION_VALUES = [
 	"etc",

@@ -6,9 +6,10 @@ import { Avatar } from "./Avatar";
 import idleAnimation from "@renderer/assets/models/avatar_idle.fbx?url";
 import walkAnimation from "@renderer/assets/models/avatar_walk.fbx?url";
 import bowAnimation from "@renderer/assets/models/avatar_bow.fbx?url";
+import focusBottomAnimation from "@renderer/assets/models/avatar_focus_bottom.fbx?url";
 import { AIContext } from "@renderer/contexts/AIContext";
 
-type AnimationType = "idle" | "walk" | "bow";
+export type AnimationType = "idle" | "walk" | "bow" | "focusBottom";
 
 export const AvatarController = (): JSX.Element => {
 	const avatarRef = useRef<THREE.Group>(null);
@@ -24,11 +25,13 @@ export const AvatarController = (): JSX.Element => {
 	const idleAnim = useFBX(idleAnimation);
 	const walkAnim = useFBX(walkAnimation);
 	const bowAnim = useFBX(bowAnimation);
+	const focusBottomAnim = useFBX(focusBottomAnimation);
 
 	const actionsRef = useRef<Record<AnimationType, THREE.AnimationAction | null>>({
 		idle: null,
 		walk: null,
-		bow: null
+		bow: null,
+		focusBottom: null
 	});
 
 	const fadeToAction = useCallback(
@@ -92,14 +95,16 @@ export const AvatarController = (): JSX.Element => {
 			const idleAction = mixer.clipAction(idleAnim.animations[0]);
 			const walkAction = mixer.clipAction(walkAnim.animations[0]);
 			const bowAction = mixer.clipAction(bowAnim.animations[0]);
+			const focusBottomAction = mixer.clipAction(focusBottomAnim.animations[0]);
 
 			idleAction.play();
 
 			actionsRef.current.idle = idleAction;
 			actionsRef.current.walk = walkAction;
 			actionsRef.current.bow = bowAction;
+			actionsRef.current.focusBottom = focusBottomAction;
 		}
-	}, [idleAnim, walkAnim, bowAnim]);
+	}, [idleAnim, walkAnim, bowAnim, focusBottomAnim]);
 
 	useFrame((_, delta) => {
 		if (mixerRef.current) {
