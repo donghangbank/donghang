@@ -81,6 +81,15 @@ import SeniorDepositCashCountingPage from "./pages/senior/deposit/SeniorDepositC
 import SeniorDepositCashInputPage from "./pages/senior/deposit/SeniorDepositCashInputPage";
 import SeniorDepositCheckPage from "./pages/senior/deposit/SeniorDepositCheckPage";
 import GeneralProductsPage from "./pages/general/products/GeneralProductsPage";
+import SeniorDepositProductCheckPage from "./pages/senior/products/deposit/SeniorDepositProductCheckPage";
+import SeniorDepositProductRecommendationPage from "./pages/senior/products/deposit/SeniorDepositProductRecommendationPage";
+import SeniorDepositProductDicisionPage from "./pages/senior/products/deposit/SeniorDepositProductDicisionPage";
+import SeniorDepositProductOption from "./pages/senior/products/deposit/SeniorDepositProductOptionPage";
+import SeniorDepositProductCardInputPage from "./pages/senior/products/deposit/SeniorDepositProductCardInputPage";
+import SeniorDepositProductCardAuthPage from "./pages/senior/products/deposit/SeniorDepositProductCardAuthPage";
+import SeniorDepositProductCardPasswordPage from "./pages/senior/products/deposit/SeniorDepositProductCardPasswordPage";
+import SeniorDepositProductInfoAmountPage from "./pages/senior/products/deposit/SeniorDepositProductInfoAmountPage";
+import SeniorDepositProductInfoSpecSheetPage from "./pages/senior/products/deposit/SeniorDepositProductInfoSpecSheetPage";
 
 const router = createHashRouter([
 	{
@@ -568,6 +577,57 @@ const router = createHashRouter([
 							{
 								path: "specsheet",
 								element: <SeniorDepositSpecSheetPage />
+							}
+						]
+					},
+					{
+						path: "depositproducts",
+						children: [
+							{
+								path: "check",
+								element: <SeniorDepositProductCheckPage />
+							},
+							{
+								path: "recommendation",
+								element: <SeniorDepositProductRecommendationPage />
+							},
+							{
+								path: "dicision",
+								element: <SeniorDepositProductDicisionPage />
+							},
+							{
+								path: "option",
+								element: <SeniorDepositProductOption />
+							},
+							{
+								path: "card",
+								children: [
+									{
+										path: "input",
+										element: <SeniorDepositProductCardInputPage />
+									},
+									{
+										path: "auth",
+										element: <SeniorDepositProductCardAuthPage />
+									},
+									{
+										path: "password",
+										element: <SeniorDepositProductCardPasswordPage />
+									}
+								]
+							},
+							{
+								path: "info",
+								children: [
+									{
+										path: "amount",
+										element: <SeniorDepositProductInfoAmountPage />
+									},
+									{
+										path: "specsheet",
+										element: <SeniorDepositProductInfoSpecSheetPage />
+									}
+								]
 							}
 						]
 					},
