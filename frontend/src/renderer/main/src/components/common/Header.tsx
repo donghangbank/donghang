@@ -10,7 +10,9 @@ export const Header = (): JSX.Element => {
 
 	return (
 		<div className="h-[10%] p-5 flex items-center">
-			{pathname === "/general" && <img className="h-full mr-8" src={Logo} alt="logo" />}
+			{(pathname === "/general" || pathname === "/general/others") && (
+				<img className="h-full mr-8" src={Logo} alt="logo" />
+			)}
 
 			{currentService && (
 				<ServiceProgress

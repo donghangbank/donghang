@@ -65,6 +65,7 @@ import { SeniorDepositCardInputPage } from "./pages/senior/deposit/SeniorDeposit
 import SeniorDepositCardAuthPage from "./pages/senior/deposit/SeniorDepositCardAuthPage";
 import SeniorDepositCardPasswordPage from "./pages/senior/deposit/SeniorDepositCardPasswordPage";
 import SeniorDepositPaymentPage from "./pages/senior/deposit/SeniorDepositPaymentPage";
+import GeneralOtherPage from "./pages/general/GeneralOtherPage";
 
 const router = createHashRouter([
 	{
@@ -79,6 +80,10 @@ const router = createHashRouter([
 					{
 						path: "",
 						element: <GeneralMain />
+					},
+					{
+						path: "others",
+						element: <GeneralOtherPage />
 					},
 					{
 						path: "deposit",
