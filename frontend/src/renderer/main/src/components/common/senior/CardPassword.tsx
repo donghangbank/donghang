@@ -8,21 +8,25 @@ import { InputContext } from "@renderer/contexts/InputContext";
 import { useSubMonitorListeners } from "@renderer/hooks/useSubMonitorListeners";
 import NumberPanel from "@renderer/components/common/senior/NumberPanel";
 import { formatPassword } from "@renderer/utils/formatters";
+import { SpecSheetContext } from "@renderer/contexts/SpecSheetContext";
 
 interface CardPasswordProps {
 	cardNumber?: string;
+	isSender?: boolean;
 	prev: string;
 	link: string;
 }
 
 export default function CardPassword({
 	cardNumber = "9999999999999999",
+	isSender = true,
 	prev,
 	link
 }: CardPasswordProps): JSX.Element {
 	const navigate = useNavigate();
 	const [passwordNotMatch, setPasswordNotMatch] = useState(false);
 	const { setSendingAccountNumber, password, setPassword, setDisabled } = useContext(InputContext);
+	const { setRecipientName, setReceivingAccountNumber } = useContext(SpecSheetContext);
 
 	useActionPlay({
 		dialogue: "비밀번호 4자리를 입력해주세요!",
@@ -43,7 +47,11 @@ export default function CardPassword({
 	const { mutate: cardCheck } = useMutation({
 		mutationFn: () => cardCheckAPI({ cardNumber, password }),
 		onSuccess: (data) => {
-			setSendingAccountNumber(data?.fullAccountNumber ?? "");
+			if (isSender) setSendingAccountNumber(data?.fullAccountNumber ?? "");
+			else {
+				setReceivingAccountNumber(data?.fullAccountNumber ?? "");
+				setRecipientName(data?.ownerName ?? "");
+			}
 			navigate(link);
 		},
 		onError: () => {
