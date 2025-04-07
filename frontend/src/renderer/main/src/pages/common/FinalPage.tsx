@@ -1,4 +1,5 @@
 import { InputContext } from "@renderer/contexts/InputContext";
+import { ProductContext } from "@renderer/contexts/ProductContext";
 import { SpecSheetContext } from "@renderer/contexts/SpecSheetContext";
 import { useActionPlay } from "@renderer/hooks/ai/useActionPlay";
 import { useContextReset } from "@renderer/hooks/useContextReset";
@@ -9,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 export const FinalPage = (): JSX.Element => {
 	const navigate = useNavigate();
 	const { resetAll } = useContext(InputContext);
+	const { resetAll: productResetAll } = useContext(ProductContext);
 	const { resetSpecSheet } = useContext(SpecSheetContext);
 	const { resetContext } = useContextReset();
 	const queryClient = useQueryClient();
@@ -16,6 +18,7 @@ export const FinalPage = (): JSX.Element => {
 	useEffect(() => {
 		// 1. 모든 Context 상태 초기화
 		resetAll();
+		productResetAll();
 		resetSpecSheet();
 		resetContext();
 
@@ -32,7 +35,7 @@ export const FinalPage = (): JSX.Element => {
 		const timer = setTimeout(() => navigate("/"), 2000);
 
 		return (): void => clearTimeout(timer);
-	}, [navigate, resetAll, resetSpecSheet, resetContext, queryClient]);
+	}, [navigate, resetAll, resetSpecSheet, resetContext, queryClient, productResetAll]);
 
 	useActionPlay({
 		audioFile: "thank_you.mp3",
