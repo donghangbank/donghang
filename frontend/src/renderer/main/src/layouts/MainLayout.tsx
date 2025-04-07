@@ -7,6 +7,7 @@ import { useVADSTT } from "@renderer/hooks/ai/useVADSTT";
 import { PageContext } from "@renderer/contexts/PageContext";
 import { motion } from "framer-motion";
 import TestButton from "@renderer/components/common/senior/TestButton";
+import { AIContext } from "@renderer/contexts/AIContext";
 
 declare global {
 	interface Window {
@@ -30,6 +31,7 @@ export const MainLayout = (): JSX.Element => {
 	const isSenior = location.pathname === "/" || location.pathname.includes("/senior");
 	const isSeniorTest = location.pathname.includes("/senior");
 	const { currentJob } = useContext(PageContext);
+	const { setConstruction } = useContext(AIContext);
 
 	useEffect(() => {
 		if (window.mainAPI) {
@@ -63,6 +65,10 @@ export const MainLayout = (): JSX.Element => {
 			}
 		}
 	}, [location.pathname]);
+
+	useEffect(() => {
+		setConstruction("etc");
+	}, [location.pathname, setConstruction]);
 
 	const { start, stop } = useVADSTT();
 
