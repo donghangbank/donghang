@@ -11,7 +11,7 @@ public record AccountProductDetail(
 	String rateDescription,
 	String productTypeName,
 	Integer productTypeCode,
-	Long subscriptionPeriod,
+	Integer subscriptionPeriod,
 	Long minSubscriptionBalance,
 	Long maxSubscriptionBalance
 ) {

@@ -50,17 +50,21 @@ public class InstallmentSchedule {
 	@Column(nullable = false, name = "installment_sequence")
 	private int installmentSequence;
 
+	@Column(nullable = false, name = "subscription_period")
+	private int subscriptionPeriod;
+
 	public InstallmentSchedule reassignInstallmentSchedule() {
 		LocalDate nextInstallmentScheduleDate = createNextInstallmentScheduleDate();
 		setInstallmentStatus(InstallmentStatus.FAILED);
 		InstallmentSchedule newInstallmentSchedule = InstallmentSchedule.builder()
-			.installmentAccountId(installmentAccountId)
-			.withdrawalAccountId(withdrawalAccountId)
-			.initialInstallmentScheduleDay(initialInstallmentScheduleDay)
-			.installmentScheduledDate(nextInstallmentScheduleDate)
-			.installmentAmount(installmentAmount)
-			.installmentSequence(this.getInstallmentSequence())
-			.build();
+				.installmentAccountId(installmentAccountId)
+				.withdrawalAccountId(withdrawalAccountId)
+				.initialInstallmentScheduleDay(initialInstallmentScheduleDay)
+				.installmentScheduledDate(nextInstallmentScheduleDate)
+				.installmentAmount(installmentAmount)
+				.installmentSequence(this.getInstallmentSequence())
+				.subscriptionPeriod(this.getSubscriptionPeriod())
+				.build();
 		return newInstallmentSchedule;
 	}
 
@@ -68,28 +72,29 @@ public class InstallmentSchedule {
 		LocalDate nextInstallmentScheduleDate = createNextInstallmentScheduleDate();
 
 		return InstallmentSchedule.builder()
-			.installmentAccountId(installmentAccountId)
-			.withdrawalAccountId(withdrawalAccountId)
-			.installmentStatus(InstallmentStatus.SCHEDULED)
-			.initialInstallmentScheduleDay(initialInstallmentScheduleDay)
-			.installmentScheduledDate(nextInstallmentScheduleDate)
-			.installmentAmount(installmentAmount)
-			.installmentSequence(installmentSequence + 1)
-			.build();
+				.installmentAccountId(installmentAccountId)
+				.withdrawalAccountId(withdrawalAccountId)
+				.installmentStatus(InstallmentStatus.SCHEDULED)
+				.initialInstallmentScheduleDay(initialInstallmentScheduleDay)
+				.installmentScheduledDate(nextInstallmentScheduleDate)
+				.installmentAmount(installmentAmount)
+				.installmentSequence(installmentSequence + 1)
+				.subscriptionPeriod(this.getSubscriptionPeriod())
+				.build();
 	}
 
 	public LocalDate createNextInstallmentScheduleDate() {
 
 		return LocalDate.now()
-			.plusMonths(1)
-			.withDayOfMonth(
-				Math.min(
-					initialInstallmentScheduleDay,
-					YearMonth
-						.from(LocalDate
-							.now()
-							.plusMonths(1))
-						.lengthOfMonth()));
+				.plusMonths(1)
+				.withDayOfMonth(
+						Math.min(
+								initialInstallmentScheduleDay,
+								YearMonth
+										.from(LocalDate
+												.now()
+												.plusMonths(1))
+										.lengthOfMonth()));
 	}
 
 	private void setInstallmentStatus(InstallmentStatus status) {

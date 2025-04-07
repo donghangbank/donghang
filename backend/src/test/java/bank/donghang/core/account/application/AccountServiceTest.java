@@ -160,7 +160,7 @@ class AccountServiceTest {
 		AccountProduct accountProduct = mock(AccountProduct.class);
 		when(accountProduct.isDepositProduct()).thenReturn(true);
 		when(accountProduct.getInterestRate()).thenReturn(0.5);
-		when(accountProduct.getSubscriptionPeriod()).thenReturn(12L);
+		when(accountProduct.getSubscriptionPeriod()).thenReturn(12);
 
 		when(accountProductRepository.existsAccountProductById(productId)).thenReturn(true);
 		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
@@ -428,7 +428,7 @@ class AccountServiceTest {
 
 		AccountProduct accountProduct = mock(AccountProduct.class);
 		when(accountProduct.getInterestRate()).thenReturn(5.0);
-		when(accountProduct.getSubscriptionPeriod()).thenReturn(24L);
+		when(accountProduct.getSubscriptionPeriod()).thenReturn(24);
 
 		when(accountProductRepository.existsAccountProductById(productId)).thenReturn(true);
 		when(accountProductRepository.getAccountProductById(productId)).thenReturn(accountProduct);
@@ -461,7 +461,7 @@ class AccountServiceTest {
 			eq(expectedExpiryDate)))
 			.thenReturn(installmentAccount);
 
-		when(accountRepository.saveInstallmentAccount(installmentAccount)).thenReturn(installmentAccount);
+		when(accountRepository.saveInstallmentAccount(installmentAccount, accountProduct)).thenReturn(installmentAccount);
 
 		AccountRegisterResponse response = accountService.createInstallmentAccount(request);
 		assertNotNull(response);
@@ -472,7 +472,7 @@ class AccountServiceTest {
 		verify(withdrawalAccount).verifyWithdrawalAccount(memberId, monthlyInstallmentAmount);
 		verify(payoutAccount).verifyPayoutAccount(memberId);
 		verify(accountRepository).getNextAccountNumber("300", "001");
-		verify(accountRepository).saveInstallmentAccount(installmentAccount);
+		verify(accountRepository).saveInstallmentAccount(installmentAccount, accountProduct);
 	}
 
 	@Test

@@ -30,7 +30,7 @@ public record AccountProductCreationRequest(
 		Integer accountProductTypeCode,
 
 		@Positive(message = "가입 기간은 양수여야 합니다.")
-		Long subscriptionPeriod,
+		Integer subscriptionPeriod,
 
 		@Min(value = 0, message = "최소 가입 금액은 0 이상이어야 합니다.")
 		Long minSubscriptionBalance,

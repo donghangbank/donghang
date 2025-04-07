@@ -42,7 +42,7 @@ public class AccountProduct {
 	private AccountProductType accountProductType;
 
 	@Column(name = "subscription_period")
-	private Long subscriptionPeriod;
+	private Integer subscriptionPeriod;
 
 	@Column(name = "rate_description")
 	private String rateDescription;

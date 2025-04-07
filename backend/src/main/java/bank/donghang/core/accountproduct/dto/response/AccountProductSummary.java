@@ -9,7 +9,7 @@ public record AccountProductSummary(
 	String bankName,
 	String bankLogoUrl,
 	Double interestRate,
-	Long subscriptionPeriod,
+	Integer subscriptionPeriod,
 	Long minSubscriptionBalance,
 	Long maxSubscriptionBalance,
 	String accountProductType

@@ -5,6 +5,7 @@ import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
 
+import bank.donghang.core.accountproduct.domain.AccountProduct;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,30 +35,31 @@ public class AccountRepository {
 		return accountJpaRepository.save(account);
 	}
 
-	// 적금 게좌 저장 + 적금 납입 스케줄 저장
+	// 적금 계좌 저장 + 적금 납입 스케줄 저장
 	@Transactional
-	public Account saveInstallmentAccount(Account account) {
+	public Account saveInstallmentAccount(Account account, AccountProduct accountProduct) {
 		Account savedAccount = saveAccount(account);
 		LocalDate nextInstallmentDate = LocalDate.now()
-			.plusMonths(1)
-			.withDayOfMonth(
-				Math.min(account.getMonthlyInstallmentDay(),
-					YearMonth
-						.from(
-							LocalDate
-								.now()
-								.plusMonths(1))
-						.lengthOfMonth()));
+				.plusMonths(1)
+				.withDayOfMonth(
+						Math.min(account.getMonthlyInstallmentDay(),
+								YearMonth
+										.from(
+												LocalDate
+														.now()
+														.plusMonths(1))
+										.lengthOfMonth()));
 
 		InstallmentSchedule installmentSchedule =
-			InstallmentSchedule
-				.builder().installmentAccountId(savedAccount.getAccountId())
-				.withdrawalAccountId(savedAccount.getWithdrawalAccountId())
-				.installmentAmount(savedAccount.getMonthlyInstallmentAmount())
-				.installmentSequence(1)
-				.installmentStatus(InstallmentStatus.SCHEDULED)
-				.installmentScheduledDate(nextInstallmentDate)
-				.build();
+				InstallmentSchedule
+						.builder().installmentAccountId(savedAccount.getAccountId())
+						.withdrawalAccountId(savedAccount.getWithdrawalAccountId())
+						.installmentAmount(savedAccount.getMonthlyInstallmentAmount())
+						.installmentSequence(1)
+						.installmentStatus(InstallmentStatus.SCHEDULED)
+						.installmentScheduledDate(nextInstallmentDate)
+						.subscriptionPeriod(accountProduct.getSubscriptionPeriod())
+						.build();
 
 		installmentScheduleJpaRepository.save(installmentSchedule);
 		return savedAccount;
@@ -69,7 +71,7 @@ public class AccountRepository {
 
 	public List<InstallmentSchedule> findInstallmentScheduleByInstallmentDateAndScheduled(LocalDate today) {
 		return installmentScheduleJpaRepository.findInstallmentScheduleByInstallmentScheduledDateAndInstallmentStatus(
-			today, InstallmentStatus.SCHEDULED);
+				today, InstallmentStatus.SCHEDULED);
 	}
 
 	public void deleteAll() {
@@ -83,7 +85,7 @@ public class AccountRepository {
 	public String getNextAccountNumber(String accountTypeCode, String branchCode) {
 		// 1. 가장 큰 accountNumber를 가진 Account 조회
 		Optional<Account> optAccount = accountJpaRepository
-			.findTopByAccountTypeCodeAndBranchCodeOrderByAccountNumberDesc(accountTypeCode, branchCode);
+				.findTopByAccountTypeCodeAndBranchCodeOrderByAccountNumberDesc(accountTypeCode, branchCode);
 
 		// 2. 값이 있으면 +1, 없으면 1부터 시작
 		String nextNumber;
@@ -109,7 +111,7 @@ public class AccountRepository {
 		String accountNumber = fullAccountNumber.substring(6);
 
 		return accountJpaRepository.findByAccountTypeCodeAndBranchCodeAndAccountNumber(accountTypeCode, branchCode,
-			accountNumber);
+				accountNumber);
 	}
 
 	public void deleteAllAccounts() {
@@ -126,9 +128,9 @@ public class AccountRepository {
 		String accountNumber = fullAccountNumber.substring(6);
 
 		return accountJpaRepositoryCustomImpl.getAccountBalance(
-			accountTypeCode,
-			branchCode,
-			accountNumber
+				accountTypeCode,
+				branchCode,
+				accountNumber
 		);
 	}
 
