@@ -24,6 +24,7 @@ import bank.donghang.core.accountproduct.dto.response.AccountProductDetail;
 import bank.donghang.core.accountproduct.dto.response.AccountProductSummary;
 import bank.donghang.core.bank.domain.Bank;
 import bank.donghang.core.bank.domain.repository.BankRepository;
+import bank.donghang.core.common.dto.PageInfo;
 import bank.donghang.core.common.exception.BadRequestException;
 import bank.donghang.core.common.exception.ErrorCode;
 
@@ -42,48 +43,30 @@ class AccountProductServiceTest {
 	@Test
 	@DisplayName("계좌 상품 목록을 조회할 수 있다.")
 	void getAllAccountProducts_shouldReturnProductList() {
-		List<AccountProduct> mockProducts = List.of(
-			AccountProduct.builder()
-				.accountProductId(1L)
-				.accountProductName("Saving Account")
-				.accountProductDescription("High Interest Savings")
-				.bankId(1L)
-				.interestRate(0.3)
-				.accountProductType(AccountProductType.DEMAND)
-				.subscriptionPeriod(null)
-				.rateDescription("기본 이율")
-				.minSubscriptionBalance(0L)
-				.maxSubscriptionBalance(0L)
-				.build(),
-			AccountProduct.builder()
-				.accountProductId(2L)
-				.accountProductName("Checking Account")
-				.accountProductDescription("Daily Transactions")
-				.bankId(1L)
-				.interestRate(0.2)
-				.accountProductType(AccountProductType.DEMAND)
-				.subscriptionPeriod(null)
-				.rateDescription("기본 이율")
-				.minSubscriptionBalance(0L)
-				.maxSubscriptionBalance(0L)
-				.build()
+		// given
+		List<AccountProductSummary> mockSummaries = List.of(
+			new AccountProductSummary(
+				1L, "Saving Account", 1L, "Mock Bank",
+				"https://logo.mockbank.com/logo.png", 0.3, null, 0L, 0L,
+				AccountProductType.DEMAND.name()),
+			new AccountProductSummary(
+				2L, "Checking Account", 1L, "Mock Bank",
+				"https://logo.mockbank.com/logo.png", 0.2, null, 0L, 0L,
+				AccountProductType.DEMAND.name())
 		);
 
-		List<AccountProductSummary> mockSummaries = mockProducts.stream()
-			.map(product -> AccountProductSummary.from(
-				product,
-				"Mock Bank",
-				"https://logo.mockbank.com/logo.png")
-			)
-			.toList();
+		PageInfo<AccountProductSummary> expectedPage = PageInfo.of(null, mockSummaries, false);
 
-		when(accountProductRepository.getAccountProductsByQueryDsl(null)).thenReturn(mockSummaries);
+		when(accountProductRepository.getPaginatedAccountProductsByAccountProductType(null, null))
+			.thenReturn(expectedPage);
 
-		List<AccountProductSummary> response = accountProductService.getAllAccountProducts();
+		// when
+		PageInfo<AccountProductSummary> response = accountProductService.getAllAccountProducts(null);
 
-		assertThat(response).hasSize(2);
-		assertThat(response.get(0).accountProductName()).isEqualTo("Saving Account");
-		assertThat(response.get(1).accountProductName()).isEqualTo("Checking Account");
+		// then
+		assertThat(response.data()).hasSize(2);
+		assertThat(response.data().get(0).accountProductName()).isEqualTo("Saving Account");
+		assertThat(response.data().get(1).accountProductName()).isEqualTo("Checking Account");
 	}
 
 	@Test
@@ -127,6 +110,7 @@ class AccountProductServiceTest {
 	@Test
 	@DisplayName("계좌 상품을 생성할 수 있다.")
 	void registerAccountProduct_shouldCreateProduct() {
+		// given
 		AccountProductCreationRequest request = new AccountProductCreationRequest(
 			"New Account",
 			"Special benefits",
@@ -142,17 +126,20 @@ class AccountProductServiceTest {
 
 		Bank mockBank = Bank.createBank("Mock Bank", "https://logo.mockbank.com");
 		given(bankRepository.findById(request.bankId())).willReturn(Optional.of(mockBank));
+		when(accountProductRepository.saveAccountProduct(any(AccountProduct.class)))
+			.thenReturn(savedProduct);
 
-		when(accountProductRepository.saveAccountProduct(any(AccountProduct.class))).thenReturn(savedProduct);
-
+		// when
 		AccountProductSummary result = accountProductService.registerAccountProduct(request);
 
+		// then
 		assertThat(result.accountProductName()).isEqualTo("New Account");
 	}
 
 	@Test
 	@DisplayName("자유입출금 상품 목록을 조회할 수 있다.")
 	void getDemandProducts_shouldReturnDemandList() {
+		// given
 		List<AccountProductSummary> mockList = List.of(
 			new AccountProductSummary(
 				1L,
@@ -167,62 +154,70 @@ class AccountProductServiceTest {
 				AccountProductType.DEMAND.name())
 		);
 
-		when(accountProductRepository.getAccountProductsByQueryDsl(AccountProductType.DEMAND)).thenReturn(mockList);
+		PageInfo<AccountProductSummary> expectedPage = PageInfo.of(null, mockList, false);
 
-		List<AccountProductSummary> result = accountProductService.getDemandProducts();
+		when(accountProductRepository.getPaginatedAccountProductsByAccountProductType(
+			AccountProductType.DEMAND, null))
+			.thenReturn(expectedPage);
 
-		assertThat(result).hasSize(1);
-		assertThat(result.get(0).accountProductType()).isEqualTo(AccountProductType.DEMAND.name());
+		// when
+		PageInfo<AccountProductSummary> result = accountProductService.getDemandProducts(null);
+
+		// then
+		assertThat(result.data()).hasSize(1);
+		assertThat(result.data().get(0).accountProductType())
+			.isEqualTo(AccountProductType.DEMAND.name());
 	}
 
 	@Test
 	@DisplayName("예금 상품 목록을 조회할 수 있다.")
 	void getDepositProducts_shouldReturnDepositList() {
+		// given
 		List<AccountProductSummary> mockList = List.of(
 			new AccountProductSummary(
-				2L,
-				"예금 상품",
-				1L,
-				"샘플 은행",
-				"https://logo.mockbank.com/logo.png",
-				2.0,
-				12L,
-				1000L,
-				100000L,
+				2L, "예금 상품", 1L, "샘플 은행",
+				"https://logo.mockbank.com/logo.png", 2.0, 12L, 1000L, 100000L,
 				AccountProductType.DEPOSIT.name())
 		);
 
-		when(accountProductRepository.getAccountProductsByQueryDsl(AccountProductType.DEPOSIT)).thenReturn(mockList);
+		PageInfo<AccountProductSummary> expectedPage = PageInfo.of(null, mockList, false);
 
-		List<AccountProductSummary> result = accountProductService.getDepositProducts();
+		when(accountProductRepository.getPaginatedAccountProductsByAccountProductType(
+			AccountProductType.DEPOSIT, null))
+			.thenReturn(expectedPage);
 
-		assertThat(result).hasSize(1);
-		assertThat(result.get(0).accountProductType()).isEqualTo(AccountProductType.DEPOSIT.name());
+		// when
+		PageInfo<AccountProductSummary> result = accountProductService.getDepositProducts(null);
+
+		// then
+		assertThat(result.data()).hasSize(1);
+		assertThat(result.data().get(0).accountProductType())
+			.isEqualTo(AccountProductType.DEPOSIT.name());
 	}
 
 	@Test
 	@DisplayName("적금 상품 목록을 조회할 수 있다.")
 	void getInstallmentProducts_shouldReturnInstallmentList() {
+		// given
 		List<AccountProductSummary> mockList = List.of(
 			new AccountProductSummary(
-				3L,
-				"적금 상품",
-				1L,
-				"샘플 은행",
-				"https://logo.mockbank.com/logo.png",
-				3.0,
-				12L,
-				500L,
-				50000L, AccountProductType.INSTALLMENT.name()
-			)
+				3L, "적금 상품", 1L, "샘플 은행",
+				"https://logo.mockbank.com/logo.png", 3.0, 12L, 500L, 50000L,
+				AccountProductType.INSTALLMENT.name())
 		);
 
-		when(accountProductRepository.getAccountProductsByQueryDsl(AccountProductType.INSTALLMENT))
-			.thenReturn(mockList);
+		PageInfo<AccountProductSummary> expectedPage = PageInfo.of(null, mockList, false);
 
-		List<AccountProductSummary> result = accountProductService.getInstallmentProducts();
+		when(accountProductRepository.getPaginatedAccountProductsByAccountProductType(
+			AccountProductType.INSTALLMENT, null))
+			.thenReturn(expectedPage);
 
-		assertThat(result).hasSize(1);
-		assertThat(result.get(0).accountProductType()).isEqualTo(AccountProductType.INSTALLMENT.name());
+		// when
+		PageInfo<AccountProductSummary> result = accountProductService.getInstallmentProducts(null);
+
+		// then
+		assertThat(result.data()).hasSize(1);
+		assertThat(result.data().get(0).accountProductType())
+			.isEqualTo(AccountProductType.INSTALLMENT.name());
 	}
 }
