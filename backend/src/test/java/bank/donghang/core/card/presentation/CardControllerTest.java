@@ -47,7 +47,8 @@ class CardControllerTest extends ControllerTest {
 			"1234123412341234",
 			"1234",
 			"110110123456",
-			"박종하"
+			"박종하",
+			1L
 		);
 
 		given(cardService.checkCardPassword(request))
@@ -64,36 +65,36 @@ class CardControllerTest extends ControllerTest {
 	@DisplayName("카드로 이체를 할 수 있다.")
 	void can_transfer_by_card_number() throws Exception {
 		var request = new CardTransferRequest(
-				"1234123412341234",
-				"110257063096",
-				50000L,
-				"테스트 이체",
-				LocalDateTime.of(1990, 1, 1, 0, 0)
+			"1234123412341234",
+			"110257063096",
+			50000L,
+			"테스트 이체",
+			LocalDateTime.of(1990, 1, 1, 0, 0)
 		);
 
 		var expect = new CardTransferResponse(
-				"1234123412341234",
-				"110257063096",
-				950000L,
-				"김수한",
-				50000L,
-				TransactionStatus.COMPLETED,
-				LocalDateTime.now()
+			"1234123412341234",
+			"110257063096",
+			950000L,
+			"김수한",
+			50000L,
+			TransactionStatus.COMPLETED,
+			LocalDateTime.now()
 		);
 
 		given(cardService.proceedCardTransfer(request))
-				.willReturn(expect);
+			.willReturn(expect);
 
 		mockMvc.perform(post("/api/v1/cards/transfer")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(request)))
-				.andDo(print())
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.sendingCardNumber").value(expect.sendingCardNumber()))
-				.andExpect(jsonPath("$.receivingAccountNumber").value(expect.receivingAccountNumber()))
-				.andExpect(jsonPath("$.sendingAccountBalance").value(expect.sendingAccountBalance()))
-				.andExpect(jsonPath("$.recipientName").value(expect.recipientName()))
-				.andExpect(jsonPath("$.amount").value(expect.amount()))
-				.andExpect(jsonPath("$.status").value(expect.status().toString()));
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.sendingCardNumber").value(expect.sendingCardNumber()))
+			.andExpect(jsonPath("$.receivingAccountNumber").value(expect.receivingAccountNumber()))
+			.andExpect(jsonPath("$.sendingAccountBalance").value(expect.sendingAccountBalance()))
+			.andExpect(jsonPath("$.recipientName").value(expect.recipientName()))
+			.andExpect(jsonPath("$.amount").value(expect.amount()))
+			.andExpect(jsonPath("$.status").value(expect.status().toString()));
 	}
 }

@@ -44,7 +44,8 @@ class CardServiceTest {
 			cardNumber,
 			password,
 			fullAccountNumber,
-			name
+			name,
+			1L
 		);
 
 		given(cardRepository.existsByCardNumber(cardNumber))
@@ -74,7 +75,8 @@ class CardServiceTest {
 			cardNumber,
 			correctPassword,
 			fullAccountNumber,
-			name
+			name,
+			1L
 		);
 
 		given(cardRepository.existsByCardNumber(cardNumber))
