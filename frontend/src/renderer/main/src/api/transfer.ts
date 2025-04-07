@@ -5,6 +5,7 @@ interface CardCheckAPIResponse {
 	password: string;
 	fullAccountNumber: string;
 	ownerName: string;
+	ownerId: number;
 }
 
 interface accountOwnerCheckAPIResponse {
