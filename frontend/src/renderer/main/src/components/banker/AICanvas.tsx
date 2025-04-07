@@ -33,7 +33,7 @@ export default function AICanvas(): JSX.Element {
 				shadows
 				gl={{ antialias: true }}
 				camera={{ position: [0, 0.4, 7.5], rotation: [-0.15, 0, 0], fov: 50 }}
-				onCreated={(state) => state.gl.setClearColor("#fBfCfE")}
+				onCreated={(state) => state.gl.setClearColor("#F1F2F5")}
 			>
 				{/* 전체적인 조명 */}
 				<ambientLight intensity={1.3} color={"#ffffff"} />
