@@ -34,7 +34,7 @@ export default function SeniorMain(): JSX.Element {
 	}, [construction, navigate]);
 	return (
 		<>
-			<TestButton prevRoute="/" nextRoute="/senior/transfer/check" />
+			<TestButton prevRoute="/" nextRoute="/senior/deposit/warning/scam" />
 		</>
 	);
 }

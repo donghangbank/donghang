@@ -47,5 +47,7 @@ contextBridge.exposeInMainWorld("mainAPI", {
 
 	updateSubDisabled: (disabled: boolean) => {
 		ipcRenderer.send("update-sub-disabled", disabled);
-	}
+	},
+
+	send: (channel, ...args) => ipcRenderer.send(channel, ...args)
 });

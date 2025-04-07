@@ -1,3 +1,4 @@
+// main/MainLayout.tsx
 import AICanvas from "@renderer/components/banker/AICanvas";
 import Header from "@renderer/components/common/Header";
 import Simulator from "@renderer/components/common/simulator/Simulator";
@@ -5,7 +6,6 @@ import inputLinkMapping from "@renderer/config/inputLinkMapping";
 import { useContext, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { useVADSTT } from "@renderer/hooks/ai/useVADSTT";
-import { useHandleSTTResult } from "@renderer/hooks/ai/useHandleSTTResult";
 import { PageContext } from "@renderer/contexts/PageContext";
 import { motion } from "framer-motion";
 import TestButton from "@renderer/components/common/senior/TestButton";
@@ -22,6 +22,8 @@ declare global {
 			removeCallCancel: (callback: () => void) => void;
 			updateSubType: (type: string) => void;
 			updateSubDisabled: (value: boolean) => void;
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			send: (channel: string, ...args: any[]) => void;
 		};
 	}
 }
@@ -35,15 +37,41 @@ export const MainLayout = (): JSX.Element => {
 	const inputLink = inputLinkMapping[location.pathname] || "";
 
 	useEffect(() => {
-		// inputLink가 바뀔 때마다 “서브 윈도우 상태 변경” IPC 전송
-		// 예: inputLink가 존재(true)면 서브 윈도우에서 <MainButton /> 보여주도록
-		if (window.mainAPI && typeof window.mainAPI.updateSubState === "function") {
+		if (window.mainAPI) {
 			window.mainAPI.updateSubState(!!inputLink);
-		}
-	}, [inputLink]);
 
-	const { transcript, start, stop } = useVADSTT();
-	const { handleSTT } = useHandleSTTResult();
+			const path = location.pathname;
+			if (
+				path.includes("password") ||
+				path.includes("account") ||
+				path.includes("amount") ||
+				path.includes("resident")
+			) {
+				window.mainAPI.updateSubType(
+					path.includes("password")
+						? "password"
+						: path.includes("account")
+							? "account"
+							: path.includes("amount")
+								? "amount"
+								: "resident"
+				);
+				window.mainAPI.send("set-sub-mode", "numpad");
+			} else if (path.includes("warning")) {
+				if (path.includes("scam")) {
+					window.mainAPI.send("set-sub-mode", "scam-warning");
+				} else if (path.includes("card")) {
+					window.mainAPI.send("set-sub-mode", "card-warning");
+				} else {
+					window.mainAPI.send("set-sub-mode", "default");
+				}
+			} else {
+				window.mainAPI.send("set-sub-mode", "default");
+			}
+		}
+	}, [location.pathname, inputLink]);
+
+	const { start, stop } = useVADSTT();
 
 	useEffect(() => {
 		start();
@@ -51,21 +79,10 @@ export const MainLayout = (): JSX.Element => {
 	}, [start, stop]);
 
 	useEffect(() => {
-		if (transcript.trim()) {
-			handleSTT(transcript);
+		if (window.mainAPI && typeof window.mainAPI.updateSubState === "function") {
+			window.mainAPI.updateSubState(!!inputLink);
 		}
-	}, [transcript, handleSTT]);
-
-	useEffect(() => {
-		const path = location.pathname;
-		let type = "";
-		if (path.includes("password")) type = "password";
-		else if (path.includes("account")) type = "account";
-		else if (path.includes("amount")) type = "amount";
-		else if (path.includes("resident")) type = "resident";
-
-		if (type) window.mainAPI.updateSubType(type);
-	}, [location.pathname]);
+	}, [inputLink]);
 
 	return (
 		<div className="w-screen h-screen flex flex-col overflow-hidden">

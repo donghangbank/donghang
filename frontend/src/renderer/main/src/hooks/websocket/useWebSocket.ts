@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { requestMsg, responseMsg } from "./socketMsg";
 
 interface UseWebSocketOptions {
@@ -13,12 +13,17 @@ export function useWebSocket(
 	options: UseWebSocketOptions
 ): { send: (payload: requestMsg | ArrayBuffer) => void; readyState: number } {
 	const wsRef = useRef<WebSocket | null>(null);
+	const reconnectAttempts = useRef(0);
+	const maxReconnectAttempts = 5;
 
-	useEffect(() => {
+	const connect = useCallback((): void => {
 		const ws = new WebSocket(url);
 		wsRef.current = ws;
 
-		ws.onopen = (): void => options.onOpen?.();
+		ws.onopen = (): void => {
+			reconnectAttempts.current = 0; // Reset on successful connection
+			options.onOpen?.();
+		};
 		ws.onmessage = (e): void => {
 			try {
 				const data = JSON.parse(e.data);
@@ -35,10 +40,22 @@ export function useWebSocket(
 		ws.onclose = (e): void => {
 			console.log(`WebSocket closed: ${e.code} ${e.reason}`);
 			options.onClose?.();
+			if (reconnectAttempts.current < maxReconnectAttempts) {
+				setTimeout(() => {
+					reconnectAttempts.current += 1;
+					console.log(`Reconnecting... Attempt ${reconnectAttempts.current}`);
+					connect();
+				}, 1000 * reconnectAttempts.current);
+			}
 		};
+	}, [url, options, maxReconnectAttempts]);
 
-		return (): void => ws.close();
-	}, [url, options]);
+	useEffect(() => {
+		connect();
+		return (): void => {
+			wsRef.current?.close();
+		};
+	}, [url, connect]);
 
 	const send = (payload: requestMsg | ArrayBuffer): void => {
 		if (wsRef.current?.readyState === WebSocket.OPEN) {

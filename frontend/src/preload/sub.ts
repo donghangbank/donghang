@@ -32,5 +32,7 @@ contextBridge.exposeInMainWorld("subAPI", {
 		ipcRenderer.on("sub-disabled-updated", (event, disabled: boolean) => {
 			callback(disabled);
 		});
-	}
+	},
+
+	onSubModeUpdate: (callback) => ipcRenderer.on("set-sub-mode", (event, data) => callback(data))
 });

@@ -6,17 +6,15 @@ import icon from "../../resources/icon.png?asset";
 let mainWindow: BrowserWindow | null = null;
 let subWindow: BrowserWindow | null = null;
 
+const USE_SINGLE_MONITOR = true;
+
 function createWindows(): void {
 	const displays = screen.getAllDisplays();
 	const primaryDisplay = displays[0];
 	const secondaryDisplay = displays[1];
 
-	// 메인 윈도우 (1번 모니터)
-	mainWindow = new BrowserWindow({
-		x: primaryDisplay.bounds.x,
-		y: primaryDisplay.bounds.y,
-		width: primaryDisplay.bounds.width,
-		height: primaryDisplay.bounds.height,
+	// Common window options
+	const commonOptions = {
 		kiosk: true,
 		frame: false,
 		autoHideMenuBar: true,
@@ -26,13 +24,54 @@ function createWindows(): void {
 			contextIsolation: true,
 			nodeIntegration: false
 		}
-	});
+	};
 
+	if (USE_SINGLE_MONITOR || displays.length === 1) {
+		// Single-monitor mode: Split the primary display into two windows
+		const halfWidth = primaryDisplay.bounds.width / 2;
+
+		// Main Window (left half)
+		mainWindow = new BrowserWindow({
+			x: primaryDisplay.bounds.x,
+			y: primaryDisplay.bounds.y,
+			width: halfWidth,
+			height: primaryDisplay.bounds.height,
+			...commonOptions
+		});
+
+		// Sub Window (right half)
+		subWindow = new BrowserWindow({
+			x: primaryDisplay.bounds.x + halfWidth,
+			y: primaryDisplay.bounds.y,
+			width: halfWidth,
+			height: primaryDisplay.bounds.height,
+			...commonOptions
+		});
+	} else {
+		// Dual-monitor mode: Use separate displays
+		// Main Window (primary monitor)
+		mainWindow = new BrowserWindow({
+			x: primaryDisplay.bounds.x,
+			y: primaryDisplay.bounds.y,
+			width: primaryDisplay.bounds.width,
+			height: primaryDisplay.bounds.height,
+			...commonOptions
+		});
+
+		// Sub Window (secondary monitor)
+		subWindow = new BrowserWindow({
+			x: secondaryDisplay.bounds.x,
+			y: secondaryDisplay.bounds.y,
+			width: secondaryDisplay.bounds.width,
+			height: secondaryDisplay.bounds.height,
+			...commonOptions
+		});
+	}
+
+	// Load content for Main Window
 	if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
-		// dev 모드 → "메인" 창은 /main.html
 		mainWindow.loadURL(`${process.env["ELECTRON_RENDERER_URL"]}/main/index.html`);
 	} else {
-		// 프로덕션 빌드 → dist/renderer/main/index.html
 		mainWindow.loadFile(join(__dirname, "../renderer/main/index.html"));
 	}
 
@@ -41,28 +80,10 @@ function createWindows(): void {
 		mainWindow?.show();
 	});
 
-	// 서브 윈도우 (2번 모니터)
-	subWindow = new BrowserWindow({
-		x: secondaryDisplay.bounds.x,
-		y: secondaryDisplay.bounds.y,
-		width: secondaryDisplay.bounds.width,
-		height: secondaryDisplay.bounds.height,
-		kiosk: true,
-		frame: false,
-		autoHideMenuBar: true,
-		icon: process.platform === "linux" ? icon : undefined,
-		webPreferences: {
-			preload: join(__dirname, "../preload/index.js"),
-			contextIsolation: true,
-			nodeIntegration: false
-		}
-	});
-
+	// Load content for Sub Window
 	if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
-		// dev 모드 → "서브" 창은 /sub.html
 		subWindow.loadURL(`${process.env["ELECTRON_RENDERER_URL"]}/sub/index.html`);
 	} else {
-		// 프로덕션 빌드 → dist/renderer/sub/index.html
 		subWindow.loadFile(join(__dirname, "../renderer/sub/index.html"));
 	}
 
@@ -72,6 +93,7 @@ function createWindows(): void {
 	});
 }
 
+// Rest of your code remains unchanged
 app.whenReady().then(() => {
 	electronApp.setAppUserModelId("com.electron");
 
@@ -86,9 +108,7 @@ app.whenReady().then(() => {
 	});
 
 	ipcMain.on("update-sub-state", (event, hasInputLink: boolean) => {
-		// 서브 윈도우가 열려 있고 파괴되지 않았다면
 		if (subWindow && !subWindow.isDestroyed()) {
-			// 서브 윈도우에 "sub-inputlink-updated" 이벤트를 보냄
 			subWindow.webContents.send("sub-inputlink-updated", hasInputLink);
 		}
 	});
@@ -100,13 +120,10 @@ app.whenReady().then(() => {
 	});
 
 	ipcMain.on("main-number-updated", (event, value: string) => {
-		// 메인 → 서브
-		// 서브 윈도우에 'update-sub-input' 이벤트로 알려줌
 		subWindow?.webContents.send("update-sub-input", value);
 	});
 
 	ipcMain.on("sub-button-pressed", (event, action: "confirm" | "cancel") => {
-		// 여기서 "confirm" or "cancel"에 따라 메인 윈도우에 알림
 		if (mainWindow && !mainWindow.isDestroyed()) {
 			if (action === "confirm") {
 				mainWindow.webContents.send("call-confirm");
@@ -117,7 +134,6 @@ app.whenReady().then(() => {
 	});
 
 	ipcMain.on("update-sub-type", (event, type: string) => {
-		// 서브 윈도우에 전달
 		if (subWindow && !subWindow.isDestroyed()) {
 			subWindow.webContents.send("set-sub-type", type);
 		}
@@ -128,6 +144,16 @@ app.whenReady().then(() => {
 			subWindow.webContents.send("sub-disabled-updated", disabled);
 		}
 	});
+
+	ipcMain.on(
+		"set-sub-mode",
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		(event, mode: "numpad" | "scam-warning" | "card-warning", data?: any) => {
+			if (subWindow && !subWindow.isDestroyed()) {
+				subWindow.webContents.send("set-sub-mode", { mode, data });
+			}
+		}
+	);
 });
 
 app.on("window-all-closed", () => {
