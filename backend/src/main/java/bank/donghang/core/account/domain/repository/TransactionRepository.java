@@ -1,11 +1,13 @@
 package bank.donghang.core.account.domain.repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
 import bank.donghang.core.account.domain.Transaction;
 import bank.donghang.core.account.domain.enums.TransactionType;
+import bank.donghang.core.account.dto.query.AccountTransactionInfo;
 import bank.donghang.core.account.dto.response.TransactionHistoryResponse;
 import bank.donghang.core.common.dto.PageInfo;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 @Repository
 @RequiredArgsConstructor
 public class TransactionRepository {
-	private static final int TRANSACTION_PAGE_SIZE = 30;
+	private static final int TRANSACTION_PAGE_SIZE = 3;
 
 	private final TransactionJpaRepository transactionJpaRepository;
 	private final TransactionJpaRepositoryCustomImpl transactionJpaRepositoryCustomImpl;
@@ -61,5 +63,15 @@ public class TransactionRepository {
 		String nextPageToken = String.valueOf(lastData.transactionId());
 
 		return PageInfo.of(nextPageToken, data, true);
+	}
+
+	public List<AccountTransactionInfo> findTransactionsBetweenDates(
+		LocalDateTime start,
+		LocalDateTime end
+	) {
+		return transactionJpaRepositoryCustomImpl.getTransactionsBetweenDates(
+			start,
+			end
+		);
 	}
 }

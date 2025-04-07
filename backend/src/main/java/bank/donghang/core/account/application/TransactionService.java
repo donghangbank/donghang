@@ -2,6 +2,7 @@ package bank.donghang.core.account.application;
 
 import java.time.LocalDateTime;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import bank.donghang.core.account.domain.Account;
@@ -24,6 +25,9 @@ import bank.donghang.core.common.annotation.TransferDistributedLock;
 import bank.donghang.core.common.dto.PageInfo;
 import bank.donghang.core.common.exception.BadRequestException;
 import bank.donghang.core.common.exception.ErrorCode;
+import bank.donghang.core.ledger.dto.event.DepositEvent;
+import bank.donghang.core.ledger.dto.event.TransferEvent;
+import bank.donghang.core.ledger.dto.event.WithdrawalEvent;
 import bank.donghang.core.member.domain.Member;
 import bank.donghang.core.member.domain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +41,7 @@ public class TransactionService {
 	private final TransactionRepository transactionRepository;
 	private final AccountRepository accountRepository;
 	private final MemberRepository memberRepository;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@TransferDistributedLock(
 		key1 = "#request.sendingAccountNumber",
@@ -122,6 +127,15 @@ public class TransactionService {
 
 		transactionRepository.saveTransaction(transaction);
 
+		eventPublisher.publishEvent(
+			new DepositEvent(
+				transaction.getId(),
+				account.getAccountId(),
+				request.amount(),
+				request.sessionStartTime()
+			)
+		);
+
 		DepositResponse response = DepositResponse.of(
 			account,
 			transaction
@@ -164,6 +178,15 @@ public class TransactionService {
 		);
 
 		transactionRepository.saveTransaction(transaction);
+
+		eventPublisher.publishEvent(
+			new WithdrawalEvent(
+				transaction.getId(),
+				account.getAccountId(),
+				request.amount(),
+				request.sessionStartTime()
+			)
+		);
 
 		WithdrawalResponse response = WithdrawalResponse.of(
 			account,
@@ -259,6 +282,17 @@ public class TransactionService {
 
 		transactionRepository.saveTransaction(senderTransaction);
 		transactionRepository.saveTransaction(recipientTransaction);
+
+		eventPublisher.publishEvent(
+			new TransferEvent(
+				senderTransaction.getId(),
+				recipientTransaction.getId(),
+				amount,
+				sendingAccount.getAccountId(),
+				receivingAccount.getAccountId(),
+				sessionStartTime
+			)
+		);
 
 		return senderTransaction;
 	}
