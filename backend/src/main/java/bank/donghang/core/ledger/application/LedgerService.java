@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class LedgerService {
 
-	//TODO: 계좌 검증 로직 추가, 은행 계좌(자산, 현금)들 보고서 작성
+	//TODO: 계좌 검증 로직 추가, 은행 계좌(자산, 현금)들 보고서 작성, 보고서 발급해주기
 
 	private final LedgerRepository ledgerRepository;
 
@@ -91,8 +91,9 @@ public class LedgerService {
 	}
 
 	private boolean validateJournalEntry(List<DailyReconciliationQuery> entryLines, List<ErrorDetail> errors) {
-		if (entryLines.isEmpty())
+		if (entryLines.isEmpty()) {
 			return false;
+		}
 
 		DailyReconciliationQuery firstLine = entryLines.get(0);
 		boolean isValid = true;
@@ -106,8 +107,8 @@ public class LedgerService {
 			isValid = false;
 		}
 
-		if (firstLine.transactionType() == TransactionType.DEPOSIT ||
-			firstLine.transactionType() == TransactionType.WITHDRAWAL) {
+		if (firstLine.transactionType() == TransactionType.DEPOSIT
+			|| firstLine.transactionType() == TransactionType.WITHDRAWAL) {
 
 			if (entryLines.size() != 2) {
 				errors.add(new ErrorDetail(

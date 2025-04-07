@@ -3,12 +3,11 @@ package bank.donghang.core.account.domain.repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import bank.donghang.core.account.dto.query.AccountTransactionInfo;
-
 import org.springframework.stereotype.Repository;
 
 import bank.donghang.core.account.domain.Transaction;
 import bank.donghang.core.account.domain.enums.TransactionType;
+import bank.donghang.core.account.dto.query.AccountTransactionInfo;
 import bank.donghang.core.account.dto.response.TransactionHistoryResponse;
 import bank.donghang.core.common.dto.PageInfo;
 import lombok.RequiredArgsConstructor;

@@ -2,10 +2,11 @@ package bank.donghang.core.ledger.domain;
 
 import org.hibernate.annotations.Type;
 
+import com.vladmihalcea.hibernate.type.json.JsonType;
+
 import bank.donghang.core.account.domain.enums.TransactionType;
 import bank.donghang.core.common.entity.BaseEntity;
 import bank.donghang.core.ledger.domain.enums.ReconciliationStatus;
-import com.vladmihalcea.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

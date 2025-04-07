@@ -6,13 +6,13 @@ import static bank.donghang.core.account.domain.QTransaction.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import bank.donghang.core.account.dto.query.AccountTransactionInfo;
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import bank.donghang.core.account.dto.query.AccountTransactionInfo;
 import bank.donghang.core.account.dto.response.TransactionHistoryResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -57,22 +57,21 @@ public class TransactionJpaRepositoryCustomImpl implements TransactionJpaReposit
 
 	@Override
 	public List<AccountTransactionInfo> getTransactionsBetweenDates(
-			LocalDateTime start,
-			LocalDateTime end
+		LocalDateTime start,
+		LocalDateTime end
 	) {
 		return queryFactory.select(
-						Projections.constructor(
-								AccountTransactionInfo.class,
-								account.accountId,
-								transaction.amount,
-								transaction.status,
-								transaction.type
-						))
-				.from(transaction)
-				.where(transaction.createdAt.between(start, end))
-				.fetch();
+				Projections.constructor(
+					AccountTransactionInfo.class,
+					account.accountId,
+					transaction.amount,
+					transaction.status,
+					transaction.type
+				))
+			.from(transaction)
+			.where(transaction.createdAt.between(start, end))
+			.fetch();
 	}
-
 
 	private BooleanExpression isInRange(String pageToken) {
 		if (pageToken == null) {

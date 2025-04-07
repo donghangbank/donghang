@@ -1,13 +1,13 @@
 package bank.donghang.core.ledger.dto.response;
 
-import bank.donghang.core.ledger.dto.ErrorDetail;
-import bank.donghang.core.ledger.dto.ValidationResult;
-import bank.donghang.core.ledger.dto.query.DailyReconciliationQuery;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import bank.donghang.core.ledger.dto.ErrorDetail;
+import bank.donghang.core.ledger.dto.ValidationResult;
+import bank.donghang.core.ledger.dto.query.DailyReconciliationQuery;
 
 public record DailyReconciliationReport(
 	LocalDateTime reportTime,
