@@ -444,7 +444,10 @@ class AccountServiceTest {
 		doNothing().when(payoutAccount).verifyPayoutAccount(memberId);
 
 		String newAccountNumber = "300001000010";
-		when(accountRepository.getNextAccountNumber("300", "001")).thenReturn(newAccountNumber);
+		when(accountRepository.getNextAccountNumber(
+				"300",
+				"001")
+		).thenReturn(newAccountNumber);
 
 		when(withdrawalAccount.getAccountId()).thenReturn(111L);
 		when(payoutAccount.getAccountId()).thenReturn(222L);
@@ -461,7 +464,10 @@ class AccountServiceTest {
 			eq(expectedExpiryDate)))
 			.thenReturn(installmentAccount);
 
-		when(accountRepository.saveInstallmentAccount(installmentAccount, accountProduct)).thenReturn(installmentAccount);
+		when(accountRepository.saveInstallmentAccount(
+				installmentAccount,
+				accountProduct)
+		).thenReturn(installmentAccount);
 
 		AccountRegisterResponse response = accountService.createInstallmentAccount(request);
 		assertNotNull(response);
@@ -719,8 +725,20 @@ class AccountServiceTest {
 	void handleInstallmentAccountSchedule_success() {
 		// given
 		LocalDate today = LocalDate.now();
-		InstallmentSchedule schedule1 = createInstallmentSchedule(1L, 2L, 10000L, 1, 15);
-		InstallmentSchedule schedule2 = createInstallmentSchedule(3L, 4L, 20000L, 2, 15);
+		InstallmentSchedule schedule1 = createInstallmentSchedule(
+				1L,
+				2L,
+				10000L,
+				1,
+				15
+		);
+		InstallmentSchedule schedule2 = createInstallmentSchedule(
+				3L,
+				4L,
+				20000L,
+				2,
+				15
+		);
 
 		given(accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(today))
 			.willReturn(List.of(schedule1, schedule2));
@@ -744,8 +762,10 @@ class AccountServiceTest {
 		assertThat(result.failed()).isEmpty();
 
 		// verify
-		then(transferFacade).should(times(2)).transfer(any(TransferInfo.class));
-		then(accountRepository).should(times(2)).saveInstallmentSchedule(any(InstallmentSchedule.class));
+		then(transferFacade).should(times(2))
+				.transfer(any(TransferInfo.class));
+		then(accountRepository).should(times(2))
+				.saveInstallmentSchedule(any(InstallmentSchedule.class));
 	}
 
 	@Test
@@ -753,7 +773,13 @@ class AccountServiceTest {
 	void handleInstallmentAccountSchedule_withdrawalAccountNotFound() {
 		// given
 		LocalDate today = LocalDate.now();
-		InstallmentSchedule schedule = createInstallmentSchedule(1L, 2L, 10000L, 1, 15);
+		InstallmentSchedule schedule = createInstallmentSchedule(
+				1L,
+				2L,
+				10000L,
+				1,
+				15
+		);
 
 		given(accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(today))
 			.willReturn(List.of(schedule));
@@ -773,7 +799,8 @@ class AccountServiceTest {
 
 		// verify
 		then(transferFacade).should(never()).transfer(any());
-		then(accountRepository).should(times(1)).saveInstallmentSchedule(any(InstallmentSchedule.class));
+		then(accountRepository).should(times(1))
+				.saveInstallmentSchedule(any(InstallmentSchedule.class));
 	}
 
 	@Test
@@ -781,7 +808,13 @@ class AccountServiceTest {
 	void handleInstallmentAccountSchedule_installmentAccountNotFound() {
 		// given
 		LocalDate today = LocalDate.now();
-		InstallmentSchedule schedule = createInstallmentSchedule(1L, 2L, 10000L, 1, 15);
+		InstallmentSchedule schedule = createInstallmentSchedule(
+				1L,
+				2L,
+				10000L,
+				1,
+				15
+		);
 
 		given(accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(today))
 			.willReturn(List.of(schedule));
@@ -803,7 +836,8 @@ class AccountServiceTest {
 
 		// verify
 		then(transferFacade).should(never()).transfer(any());
-		then(accountRepository).should(times(1)).saveInstallmentSchedule(any(InstallmentSchedule.class));
+		then(accountRepository).should(times(1))
+				.saveInstallmentSchedule(any(InstallmentSchedule.class));
 	}
 
 	@Test
@@ -811,7 +845,13 @@ class AccountServiceTest {
 	void handleInstallmentAccountSchedule_insufficientBalance() {
 		// given
 		LocalDate today = LocalDate.now();
-		InstallmentSchedule schedule = createInstallmentSchedule(1L, 2L, 10000L, 1, 15);
+		InstallmentSchedule schedule = createInstallmentSchedule(
+				1L,
+				2L,
+				10000L,
+				1,
+				15
+		);
 
 		given(accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(today))
 			.willReturn(List.of(schedule));
@@ -835,8 +875,10 @@ class AccountServiceTest {
 		assertThat(result.failed().get(0).reason()).isEqualTo(ErrorCode.NOT_ENOUGH_BALANCE.getMessage());
 
 		// verify
-		then(transferFacade).should(times(1)).transfer(any(TransferInfo.class));
-		then(accountRepository).should(times(1)).saveInstallmentSchedule(any(InstallmentSchedule.class));
+		then(transferFacade).should(times(1))
+				.transfer(any(TransferInfo.class));
+		then(accountRepository).should(times(1))
+				.saveInstallmentSchedule(any(InstallmentSchedule.class));
 	}
 
 	@Test
@@ -845,13 +887,22 @@ class AccountServiceTest {
 		// given
 		LocalDate today = LocalDate.now();
 		// 출금계좌와 적금계좌가 동일한 경우
-		InstallmentSchedule schedule = createInstallmentSchedule(1L, 1L, 10000L, 1, 15);
+		InstallmentSchedule schedule = createInstallmentSchedule(
+				1L,
+				1L,
+				10000L,
+				1,
+				15
+		);
 
 		given(accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(today))
 			.willReturn(List.of(schedule));
 
 		given(accountRepository.findAccountById(1L))
-			.willReturn(Optional.of(createAccount(1L, 10000L)));
+			.willReturn(Optional.of(createAccount(
+					1L,
+					10000L))
+			);
 
 		doThrow(new BadRequestException(ErrorCode.SAME_ACCOUNT_TRANSFER))
 			.when(transferFacade).transfer(any(TransferInfo.class));
@@ -867,8 +918,10 @@ class AccountServiceTest {
 		assertThat(result.failed().get(0).reason()).isEqualTo(ErrorCode.SAME_ACCOUNT_TRANSFER.getMessage());
 
 		// verify
-		then(transferFacade).should(times(1)).transfer(any(TransferInfo.class));
-		then(accountRepository).should(times(1)).saveInstallmentSchedule(any(InstallmentSchedule.class));
+		then(transferFacade).should(times(1))
+				.transfer(any(TransferInfo.class));
+		then(accountRepository).should(times(1))
+				.saveInstallmentSchedule(any(InstallmentSchedule.class));
 	}
 
 	@Test
@@ -876,7 +929,13 @@ class AccountServiceTest {
 	void handleInstallmentAccountSchedule_memberNotFound() {
 		// given
 		LocalDate today = LocalDate.now();
-		InstallmentSchedule schedule = createInstallmentSchedule(1L, 2L, 10000L, 1, 15);
+		InstallmentSchedule schedule = createInstallmentSchedule(
+				1L,
+				2L,
+				10000L,
+				1,
+				15
+		);
 
 		given(accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(today))
 			.willReturn(List.of(schedule));
@@ -900,8 +959,10 @@ class AccountServiceTest {
 		assertThat(result.failed().get(0).reason()).isEqualTo(ErrorCode.MEMBER_NOT_FOUND.getMessage());
 
 		// verify
-		then(transferFacade).should(times(1)).transfer(any(TransferInfo.class));
-		then(accountRepository).should(times(1)).saveInstallmentSchedule(any(InstallmentSchedule.class));
+		then(transferFacade).should(times(1))
+				.transfer(any(TransferInfo.class));
+		then(accountRepository).should(times(1))
+				.saveInstallmentSchedule(any(InstallmentSchedule.class));
 	}
 
 	@Test
@@ -909,7 +970,13 @@ class AccountServiceTest {
 	void handleInstallmentAccountSchedule_unexpectedException() {
 		// given
 		LocalDate today = LocalDate.now();
-		InstallmentSchedule schedule = createInstallmentSchedule(1L, 2L, 10000L, 1, 15);
+		InstallmentSchedule schedule = createInstallmentSchedule(
+				1L,
+				2L,
+				10000L,
+				1,
+				15
+		);
 
 		given(accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(today))
 			.willReturn(List.of(schedule));
@@ -937,7 +1004,8 @@ class AccountServiceTest {
 		assertThat(result.failed().get(0).reason()).contains("데이터베이스 연결 실패");
 
 		// verify
-		verify(accountRepository, times(1)).saveInstallmentSchedule(any(InstallmentSchedule.class));
+		verify(accountRepository, times(1))
+				.saveInstallmentSchedule(any(InstallmentSchedule.class));
 	}
 
 	private InstallmentSchedule createInstallmentSchedule(

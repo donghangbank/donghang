@@ -210,7 +210,10 @@ public class AccountService {
 			expiryDate
 		);
 
-		Account savedInstallmentAccount = accountRepository.saveInstallmentAccount(newInstallmentAccount, data.accountProduct);
+		Account savedInstallmentAccount = accountRepository.saveInstallmentAccount(
+				newInstallmentAccount,
+				data.accountProduct
+		);
 
 		return AccountRegisterResponse.from(
 			savedInstallmentAccount,
