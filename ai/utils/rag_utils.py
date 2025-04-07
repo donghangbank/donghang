@@ -14,6 +14,10 @@ vectorstore = FAISS.load_local(
     "faiss", embeddings_model, allow_dangerous_deserialization=True
 )
 
+recommend_vectordb = FAISS.load_local(
+    "faiss_account", embeddings_model, allow_dangerous_deserialization=True
+)
+
 
 def predict_action(text: str):
     """텍스트 기반 FAISS을 통한 행동 예측"""
@@ -22,3 +26,9 @@ def predict_action(text: str):
     if similarity_score < 0.12:
         return {"user_text": text, "predicted_action": result[0][0].metadata["answer"]}
     return {"user_text": text, "predicted_action": "etc"}
+
+
+def list_account(text: str):
+    """텍스트 기반 FAISS를 통한 계좌 리스트업"""
+    docs = recommend_vectordb.similarity_search(text, k=3)
+    return docs
