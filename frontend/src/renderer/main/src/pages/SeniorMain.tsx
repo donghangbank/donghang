@@ -30,11 +30,14 @@ export default function SeniorMain(): JSX.Element {
 			case "이체":
 				navigate("/senior/transfer/check");
 				break;
+			case "입금":
+				navigate("/senior/deposit/check");
+				break;
 		}
 	}, [construction, navigate]);
 	return (
 		<>
-			<TestButton prevRoute="/" nextRoute="/senior/deposit/warning/scam" />
+			<TestButton prevRoute="/" nextRoute="/senior/deposit/check" />
 		</>
 	);
 }

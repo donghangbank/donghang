@@ -61,7 +61,7 @@ import InquiryHistorySpecSheetPage from "./pages/general/inquiry/history/Inquiry
 import SeniorDepositScamWarningPage from "./pages/senior/deposit/SeniorDepositScamWarningPage";
 import SeniorDepositCardWarningPage from "./pages/senior/deposit/SeniorDepositCardWarningPage";
 import SeniorDepositOptionPage from "./pages/senior/deposit/SeniorDepositOptionPage";
-import { SeniorDepositCardInputPage } from "./pages/senior/deposit/SeniorDepositCardInputPage";
+import SeniorDepositCardInputPage from "./pages/senior/deposit/SeniorDepositCardInputPage";
 import SeniorDepositCardAuthPage from "./pages/senior/deposit/SeniorDepositCardAuthPage";
 import SeniorDepositCardPasswordPage from "./pages/senior/deposit/SeniorDepositCardPasswordPage";
 import SeniorDepositPaymentPage from "./pages/senior/deposit/SeniorDepositPaymentPage";
@@ -75,6 +75,11 @@ import DepositProductCardAuthPage from "./pages/general/products/deposit/Deposit
 import DepositProductCardPasswordPage from "./pages/general/products/deposit/DepositProductCardPasswordPage";
 import DepositProductInfoAmountPage from "./pages/general/products/deposit/DepositProductInfoAmountPage";
 import DepositProductInfoSpecSheetPage from "./pages/general/products/deposit/DepositProductInfoSpecSheetPage";
+import SeniorDepositSpecSheetPage from "./pages/senior/deposit/SeniorDepositSpecSheetPage";
+import SeniorDepositConfirmPage from "./pages/senior/deposit/SeniorDepositConfirmPage";
+import SeniorDepositCashCountingPage from "./pages/senior/deposit/SeniorDepositCashCountingPage";
+import SeniorDepositCashInputPage from "./pages/senior/deposit/SeniorDepositCashInputPage";
+import SeniorDepositCheckPage from "./pages/senior/deposit/SeniorDepositCheckPage";
 
 const router = createHashRouter([
 	{
@@ -497,6 +502,10 @@ const router = createHashRouter([
 						path: "deposit",
 						children: [
 							{
+								path: "check",
+								element: <SeniorDepositCheckPage />
+							},
+							{
 								path: "warning",
 								children: [
 									{
@@ -533,6 +542,27 @@ const router = createHashRouter([
 							{
 								path: "payment",
 								element: <SeniorDepositPaymentPage />
+							},
+							{
+								path: "cash",
+								children: [
+									{
+										path: "input",
+										element: <SeniorDepositCashInputPage />
+									},
+									{
+										path: "count",
+										element: <SeniorDepositCashCountingPage />
+									}
+								]
+							},
+							{
+								path: "confirm",
+								element: <SeniorDepositConfirmPage />
+							},
+							{
+								path: "specsheet",
+								element: <SeniorDepositSpecSheetPage />
 							}
 						]
 					},

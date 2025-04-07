@@ -1,14 +1,22 @@
 import { useActionPlay } from "@renderer/hooks/ai/useActionPlay";
 import TestButton from "@renderer/components/common/senior/TestButton";
 import { Link } from "react-router-dom";
-import { formatAmount } from "@renderer/utils/formatters";
+import {
+	formatAmount,
+	formatAccountNumber,
+	formatResidentNumber,
+	formatPassword,
+	formatTransactionTime,
+	formatDefault
+} from "@renderer/utils/formatters";
 import { motion } from "framer-motion";
 import billCheck from "@renderer/assets/audios/bill_check.mp3?url";
+import { useEffect, useState } from "react";
 
 interface Section {
 	label: string;
 	value: string | number | null;
-	formatValue?: boolean;
+	formatType?: "amount" | "account" | "resident" | "password" | "datetime" | "default";
 }
 
 interface SpecSheetProps {
@@ -21,6 +29,15 @@ interface SpecSheetProps {
 	className?: string;
 	buttonText?: string;
 }
+
+const formatters: Record<NonNullable<Section["formatType"]>, (value: string) => string> = {
+	amount: formatAmount,
+	account: formatAccountNumber,
+	resident: formatResidentNumber,
+	password: formatPassword,
+	datetime: formatTransactionTime,
+	default: formatDefault
+};
 
 export default function SpecSheet({
 	sections,
@@ -38,7 +55,12 @@ export default function SpecSheet({
 		avatarState: "idle"
 	});
 
-	const isReady = sections.every((section) => !!section.value);
+	const [isVisible, setIsVisible] = useState(false);
+
+	useEffect(() => {
+		const timer = setTimeout(() => setIsVisible(true), 1000);
+		return (): void => clearTimeout(timer);
+	}, []);
 
 	return (
 		<div className={`flex w-full h-full justify-end items-center ${className}`}>
@@ -46,20 +68,24 @@ export default function SpecSheet({
 
 			<motion.div
 				initial={{ opacity: 0, y: 20 }}
-				animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0 }}
+				animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0 }}
 				transition={{ duration: 0.5 }}
 				className="bg-white p-5 flex flex-col gap-6 mr-24 rounded-3xl"
 			>
-				{sections.map((section, index) => (
-					<div key={index} className="flex flex-col gap-6 justify-center items-start">
-						<span className="text-blue text-3xl font-bold">{section.label}</span>
-						<div className="bg-cloudyBlue text-3xl p-5 text-right rounded-3xl font-bold w-[400px]">
-							<span>
-								{section.formatValue ? formatAmount(String(section.value)) : section.value}
-							</span>
+				{sections.map((section, index) => {
+					const raw = section.value?.toString() ?? "";
+					const formatter = formatters[section.formatType ?? "default"];
+					const formattedValue = formatter(raw);
+
+					return (
+						<div key={index} className="flex flex-col gap-6 justify-center items-start">
+							<span className="text-blue text-3xl font-bold">{section.label}</span>
+							<div className="bg-cloudyBlue text-3xl p-5 text-right rounded-3xl font-bold w-[400px]">
+								<span>{formattedValue}</span>
+							</div>
 						</div>
-					</div>
-				))}
+					);
+				})}
 
 				<div className="flex justify-center items-center">
 					<button type="button" className="p-6 bg-blue rounded-xl w-full">

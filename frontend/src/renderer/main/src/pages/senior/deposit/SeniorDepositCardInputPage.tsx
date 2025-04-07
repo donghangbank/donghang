@@ -1,5 +1,5 @@
 import CardInput from "@renderer/components/common/senior/CardInput";
 
-export function SeniorDepositCardInputPage(): JSX.Element {
-	return <CardInput prev="/senior/deposit/check" link="/senior/deposit/card/check" />;
+export default function SeniorDepositCardInputPage(): JSX.Element {
+	return <CardInput prev="/senior/deposit/option" link="/senior/deposit/card/auth" />;
 }
