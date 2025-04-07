@@ -75,7 +75,7 @@ public class AccountService {
 		return response;
 	}
 
-	public void checkAccountPassword(AccountPasswordRequest request) {
+	public AccountPasswordResponse checkAccountPassword(AccountPasswordRequest request) {
 		String fullAccountNumber = request.accountNumber();
 		String accountTypeCode = fullAccountNumber.substring(0, 3);
 		String branchCode = fullAccountNumber.substring(3, 6);
@@ -98,6 +98,8 @@ public class AccountService {
 		if (!request.password().equals(response.password())) {
 			throw new BadRequestException(ErrorCode.PASSWORD_MISMATCH);
 		}
+
+		return response;
 	}
 
 	public AccountRegisterResponse createDemandAccount(DemandAccountRegisterRequest demandAccountRegisterRequest) {
