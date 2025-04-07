@@ -11,6 +11,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import bank.donghang.core.accountproduct.domain.QAccountProduct;
 import bank.donghang.core.accountproduct.domain.enums.AccountProductType;
 import bank.donghang.core.accountproduct.dto.response.AccountProductSummary;
+import bank.donghang.core.bank.domain.QBank;
 import lombok.RequiredArgsConstructor;
 
 @Repository
@@ -22,26 +23,31 @@ public class AccountProductJpaRepositoryCustomImpl implements AccountProductJpaR
 	@Override
 	public List<AccountProductSummary> getAccountProductsByQueryDsl(AccountProductType accountProductType) {
 		QAccountProduct accountProduct = QAccountProduct.accountProduct;
+		QBank bank = QBank.bank;
 
 		return queryFactory
-				.select(Projections.constructor(AccountProductSummary.class,
-						accountProduct.accountProductId,
-						accountProduct.accountProductName,
-						accountProduct.bankId,
-						accountProduct.interestRate,
-						accountProduct.subscriptionPeriod,
-						accountProduct.minSubscriptionBalance,
-						accountProduct.maxSubscriptionBalance,
-						accountProduct.accountProductType.stringValue()
-				))
-				.from(accountProduct)
-				.where(eqAccountProductType(accountProductType, accountProduct))
-				.fetch();
+			.select(Projections.constructor(AccountProductSummary.class,
+				accountProduct.accountProductId,
+				accountProduct.accountProductName,
+				accountProduct.bankId,
+				bank.name,
+				bank.logoUrl,
+				accountProduct.interestRate,
+				accountProduct.subscriptionPeriod,
+				accountProduct.minSubscriptionBalance,
+				accountProduct.maxSubscriptionBalance,
+				accountProduct.accountProductType.stringValue()
+			))
+			.from(accountProduct)
+			.join(bank)
+			.on(accountProduct.bankId.eq(bank.id))
+			.where(eqAccountProductType(accountProductType, accountProduct))
+			.fetch();
 	}
 
 	private BooleanExpression eqAccountProductType(
-			AccountProductType accountProductType,
-			QAccountProduct accountProduct
+		AccountProductType accountProductType,
+		QAccountProduct accountProduct
 	) {
 		if (accountProductType == null) {
 			return null;

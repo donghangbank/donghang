@@ -3,9 +3,11 @@ package bank.donghang.core.accountproduct.application;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,8 +21,9 @@ import bank.donghang.core.accountproduct.domain.enums.AccountProductType;
 import bank.donghang.core.accountproduct.domain.repository.AccountProductRepository;
 import bank.donghang.core.accountproduct.dto.request.AccountProductCreationRequest;
 import bank.donghang.core.accountproduct.dto.response.AccountProductDetail;
-import bank.donghang.core.accountproduct.dto.response.AccountProductListResponse;
 import bank.donghang.core.accountproduct.dto.response.AccountProductSummary;
+import bank.donghang.core.bank.domain.Bank;
+import bank.donghang.core.bank.domain.repository.BankRepository;
 import bank.donghang.core.common.exception.BadRequestException;
 import bank.donghang.core.common.exception.ErrorCode;
 
@@ -33,39 +36,46 @@ class AccountProductServiceTest {
 	@Mock
 	private AccountProductRepository accountProductRepository;
 
+	@Mock
+	private BankRepository bankRepository;
+
 	@Test
 	@DisplayName("계좌 상품 목록을 조회할 수 있다.")
 	void getAllAccountProducts_shouldReturnProductList() {
 		List<AccountProduct> mockProducts = List.of(
-				AccountProduct.builder()
-						.accountProductId(1L)
-						.accountProductName("Saving Account")
-						.accountProductDescription("High Interest Savings")
-						.bankId(1L)
-						.interestRate(0.3)
-						.accountProductType(AccountProductType.DEMAND)
-						.subscriptionPeriod(null)
-						.rateDescription("기본 이율")
-						.minSubscriptionBalance(0L)
-						.maxSubscriptionBalance(0L)
-						.build(),
-				AccountProduct.builder()
-						.accountProductId(2L)
-						.accountProductName("Checking Account")
-						.accountProductDescription("Daily Transactions")
-						.bankId(1L)
-						.interestRate(0.2)
-						.accountProductType(AccountProductType.DEMAND)
-						.subscriptionPeriod(null)
-						.rateDescription("기본 이율")
-						.minSubscriptionBalance(0L)
-						.maxSubscriptionBalance(0L)
-						.build()
+			AccountProduct.builder()
+				.accountProductId(1L)
+				.accountProductName("Saving Account")
+				.accountProductDescription("High Interest Savings")
+				.bankId(1L)
+				.interestRate(0.3)
+				.accountProductType(AccountProductType.DEMAND)
+				.subscriptionPeriod(null)
+				.rateDescription("기본 이율")
+				.minSubscriptionBalance(0L)
+				.maxSubscriptionBalance(0L)
+				.build(),
+			AccountProduct.builder()
+				.accountProductId(2L)
+				.accountProductName("Checking Account")
+				.accountProductDescription("Daily Transactions")
+				.bankId(1L)
+				.interestRate(0.2)
+				.accountProductType(AccountProductType.DEMAND)
+				.subscriptionPeriod(null)
+				.rateDescription("기본 이율")
+				.minSubscriptionBalance(0L)
+				.maxSubscriptionBalance(0L)
+				.build()
 		);
 
 		List<AccountProductSummary> mockSummaries = mockProducts.stream()
-				.map(AccountProductSummary::from)
-				.toList();
+			.map(product -> AccountProductSummary.from(
+				product,
+				"Mock Bank",
+				"https://logo.mockbank.com/logo.png")
+			)
+			.toList();
 
 		when(accountProductRepository.getAccountProductsByQueryDsl(null)).thenReturn(mockSummaries);
 
@@ -80,17 +90,17 @@ class AccountProductServiceTest {
 	@DisplayName("특정 계좌 상품의 상세 정보를 가져올 수 있다.")
 	void getAccountProductDetail_shouldReturnDetail() {
 		AccountProduct mockProduct = AccountProduct.builder()
-				.accountProductId(1L)
-				.accountProductName("Saving Account")
-				.accountProductDescription("High Interest Savings")
-				.bankId(1L)
-				.interestRate(0.3)
-				.accountProductType(AccountProductType.DEMAND)
-				.subscriptionPeriod(null)
-				.rateDescription("기본 이율")
-				.minSubscriptionBalance(0L)
-				.maxSubscriptionBalance(0L)
-				.build();
+			.accountProductId(1L)
+			.accountProductName("Saving Account")
+			.accountProductDescription("High Interest Savings")
+			.bankId(1L)
+			.interestRate(0.3)
+			.accountProductType(AccountProductType.DEMAND)
+			.subscriptionPeriod(null)
+			.rateDescription("기본 이율")
+			.minSubscriptionBalance(0L)
+			.maxSubscriptionBalance(0L)
+			.build();
 
 		when(accountProductRepository.existsAccountProductById(1L)).thenReturn(true);
 		when(accountProductRepository.getAccountProductById(1L)).thenReturn(mockProduct);
@@ -107,8 +117,8 @@ class AccountProductServiceTest {
 		when(accountProductRepository.existsAccountProductById(99L)).thenReturn(false);
 
 		BadRequestException exception = assertThrows(
-				BadRequestException.class,
-				() -> accountProductService.getAccountProductDetail(99L)
+			BadRequestException.class,
+			() -> accountProductService.getAccountProductDetail(99L)
 		);
 		System.out.println(exception.getCode() + " : " + exception.getMessage());
 		assertThat(exception.getCode()).isEqualTo(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND.getCode());
@@ -118,17 +128,20 @@ class AccountProductServiceTest {
 	@DisplayName("계좌 상품을 생성할 수 있다.")
 	void registerAccountProduct_shouldCreateProduct() {
 		AccountProductCreationRequest request = new AccountProductCreationRequest(
-				"New Account",
-				"Special benefits",
-				1L,
-				0.1,
-				"Standard Rate",
-				1,
-				12L,
-				1000L,
-				100000L
+			"New Account",
+			"Special benefits",
+			1L,
+			0.1,
+			"Standard Rate",
+			1,
+			12L,
+			1000L,
+			100000L
 		);
 		AccountProduct savedProduct = request.toEntity();
+
+		Bank mockBank = Bank.createBank("Mock Bank", "https://logo.mockbank.com");
+		given(bankRepository.findById(request.bankId())).willReturn(Optional.of(mockBank));
 
 		when(accountProductRepository.saveAccountProduct(any(AccountProduct.class))).thenReturn(savedProduct);
 
@@ -141,7 +154,17 @@ class AccountProductServiceTest {
 	@DisplayName("자유입출금 상품 목록을 조회할 수 있다.")
 	void getDemandProducts_shouldReturnDemandList() {
 		List<AccountProductSummary> mockList = List.of(
-				new AccountProductSummary(1L, "자유입출금", 1L, 0.5, null, 0L, 0L, AccountProductType.DEMAND.name())
+			new AccountProductSummary(
+				1L,
+				"자유입출금",
+				1L,
+				"샘플 은행",
+				"https://logo.mockbank.com/logo.png",
+				0.5,
+				null,
+				0L,
+				0L,
+				AccountProductType.DEMAND.name())
 		);
 
 		when(accountProductRepository.getAccountProductsByQueryDsl(AccountProductType.DEMAND)).thenReturn(mockList);
@@ -156,7 +179,17 @@ class AccountProductServiceTest {
 	@DisplayName("예금 상품 목록을 조회할 수 있다.")
 	void getDepositProducts_shouldReturnDepositList() {
 		List<AccountProductSummary> mockList = List.of(
-				new AccountProductSummary(2L, "예금 상품", 1L, 2.0, 12L, 1000L, 100000L, AccountProductType.DEPOSIT.name())
+			new AccountProductSummary(
+				2L,
+				"예금 상품",
+				1L,
+				"샘플 은행",
+				"https://logo.mockbank.com/logo.png",
+				2.0,
+				12L,
+				1000L,
+				100000L,
+				AccountProductType.DEPOSIT.name())
 		);
 
 		when(accountProductRepository.getAccountProductsByQueryDsl(AccountProductType.DEPOSIT)).thenReturn(mockList);
@@ -171,19 +204,21 @@ class AccountProductServiceTest {
 	@DisplayName("적금 상품 목록을 조회할 수 있다.")
 	void getInstallmentProducts_shouldReturnInstallmentList() {
 		List<AccountProductSummary> mockList = List.of(
-				new AccountProductSummary(
-						3L,
-						"적금 상품",
-						1L,
-						3.0,
-						12L,
-						500L,
-						50000L, AccountProductType.INSTALLMENT.name()
-				)
+			new AccountProductSummary(
+				3L,
+				"적금 상품",
+				1L,
+				"샘플 은행",
+				"https://logo.mockbank.com/logo.png",
+				3.0,
+				12L,
+				500L,
+				50000L, AccountProductType.INSTALLMENT.name()
+			)
 		);
 
 		when(accountProductRepository.getAccountProductsByQueryDsl(AccountProductType.INSTALLMENT))
-				.thenReturn(mockList);
+			.thenReturn(mockList);
 
 		List<AccountProductSummary> result = accountProductService.getInstallmentProducts();
 
