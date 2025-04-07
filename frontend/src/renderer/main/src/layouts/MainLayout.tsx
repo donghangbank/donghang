@@ -1,8 +1,6 @@
-// main/MainLayout.tsx
 import AICanvas from "@renderer/components/banker/AICanvas";
 import Header from "@renderer/components/common/Header";
 import Simulator from "@renderer/components/common/simulator/Simulator";
-import inputLinkMapping from "@renderer/config/inputLinkMapping";
 import { useContext, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { useVADSTT } from "@renderer/hooks/ai/useVADSTT";
@@ -22,8 +20,7 @@ declare global {
 			removeCallCancel: (callback: () => void) => void;
 			updateSubType: (type: string) => void;
 			updateSubDisabled: (value: boolean) => void;
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			send: (channel: string, ...args: any[]) => void;
+			send: (channel: string, ...args: unknown[]) => void;
 		};
 	}
 }
@@ -34,12 +31,8 @@ export const MainLayout = (): JSX.Element => {
 	const isSeniorTest = location.pathname.includes("/senior");
 	const { currentJob } = useContext(PageContext);
 
-	const inputLink = inputLinkMapping[location.pathname] || "";
-
 	useEffect(() => {
 		if (window.mainAPI) {
-			window.mainAPI.updateSubState(!!inputLink);
-
 			const path = location.pathname;
 			if (
 				path.includes("password") ||
@@ -69,7 +62,7 @@ export const MainLayout = (): JSX.Element => {
 				window.mainAPI.send("set-sub-mode", "default");
 			}
 		}
-	}, [location.pathname, inputLink]);
+	}, [location.pathname]);
 
 	const { start, stop } = useVADSTT();
 
@@ -77,12 +70,6 @@ export const MainLayout = (): JSX.Element => {
 		start();
 		return (): void => stop();
 	}, [start, stop]);
-
-	useEffect(() => {
-		if (window.mainAPI && typeof window.mainAPI.updateSubState === "function") {
-			window.mainAPI.updateSubState(!!inputLink);
-		}
-	}, [inputLink]);
 
 	return (
 		<div className="w-screen h-screen flex flex-col overflow-hidden">
