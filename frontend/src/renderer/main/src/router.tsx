@@ -80,6 +80,7 @@ import SeniorDepositConfirmPage from "./pages/senior/deposit/SeniorDepositConfir
 import SeniorDepositCashCountingPage from "./pages/senior/deposit/SeniorDepositCashCountingPage";
 import SeniorDepositCashInputPage from "./pages/senior/deposit/SeniorDepositCashInputPage";
 import SeniorDepositCheckPage from "./pages/senior/deposit/SeniorDepositCheckPage";
+import GeneralProductsPage from "./pages/general/products/GeneralProductsPage";
 
 const router = createHashRouter([
 	{
