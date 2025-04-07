@@ -18,7 +18,9 @@ import bank.donghang.core.ledger.dto.ValidationResult;
 import bank.donghang.core.ledger.dto.query.DailyReconciliationQuery;
 import bank.donghang.core.ledger.dto.response.DailyReconciliationReport;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LedgerService {
@@ -48,26 +50,28 @@ public class LedgerService {
 		List<ErrorDetail> errors = new ArrayList<>();
 		long totalDebit = 0;
 		long totalCredit = 0;
-		int successfulEntries = 0; // JournalEntry 기준 카운트
-		int failedEntries = 0;     // JournalEntry 기준 카운트
+		int successfulEntries = 0;
+		int failedEntries = 0;
 
 		Map<Long, List<DailyReconciliationQuery>> entriesByJournal = queries.stream()
 			.collect(Collectors.groupingBy(DailyReconciliationQuery::journalEntryId));
 
 		for (List<DailyReconciliationQuery> entryLines : entriesByJournal.values()) {
-			if (!validateJournalEntry(entryLines, errors)) {
-				failedEntries++; // 실패한 JournalEntry 1건 증가
-				continue;
-			}
-			successfulEntries++; // 성공한 JournalEntry 1건 증가
+			boolean isValid = validateJournalEntry(entryLines, errors);
 
-			// 금액 집계 (기존과 동일)
+			// 무조건 총합에는 포함
 			for (DailyReconciliationQuery line : entryLines) {
 				if (line.entryType() == EntryType.DEBIT) {
 					totalDebit += line.amount();
 				} else {
 					totalCredit += line.amount();
 				}
+			}
+
+			if (isValid) {
+				successfulEntries++;
+			} else {
+				failedEntries++;
 			}
 		}
 
@@ -91,7 +95,6 @@ public class LedgerService {
 		DailyReconciliationQuery firstLine = entryLines.get(0);
 		boolean isValid = true;
 
-		// 트랜잭션 상태 검증
 		if (firstLine.transactionStatus() != TransactionStatus.COMPLETED) {
 			errors.add(new ErrorDetail(
 				firstLine.transactionId(),
@@ -101,7 +104,6 @@ public class LedgerService {
 			isValid = false;
 		}
 
-		// 입출금 거래인 경우 쌍으로 검증 (2개의 라인 필요)
 		if (firstLine.transactionType() == TransactionType.DEPOSIT ||
 			firstLine.transactionType() == TransactionType.WITHDRAWAL) {
 
@@ -127,24 +129,21 @@ public class LedgerService {
 			if (debitSum != creditSum) {
 				errors.add(new ErrorDetail(
 					firstLine.transactionId(),
-					null,
+					firstLine.accountId(),
 					ReconciliationCode.AMOUNT_MISMATCH
 				));
 				isValid = false;
 			}
-		}
-		// 이체 거래는 2개의 라인 필요 (DEBIT 1개 + CREDIT 1개)
-		else if (firstLine.transactionType() == TransactionType.TRANSFER) {
+		} else if (firstLine.transactionType() == TransactionType.TRANSFER) {
 			if (entryLines.size() != 2) {
 				errors.add(new ErrorDetail(
 					firstLine.transactionId(),
-					null,
+					firstLine.accountId(),
 					ReconciliationCode.INVALID_ENTRY_COUNT
 				));
 				return false;
 			}
 
-			// DEBIT과 CREDIT이 각각 1개씩 있는지 확인
 			long debitCount = entryLines.stream()
 				.filter(line -> line.entryType() == EntryType.DEBIT)
 				.count();
@@ -155,13 +154,12 @@ public class LedgerService {
 			if (debitCount != 1 || creditCount != 1) {
 				errors.add(new ErrorDetail(
 					firstLine.transactionId(),
-					null,
+					firstLine.accountId(),
 					ReconciliationCode.ENTRY_TYPE_MISMATCH
 				));
 				isValid = false;
 			}
 
-			// 금액 일치 검증
 			long debitSum = entryLines.stream()
 				.filter(line -> line.entryType() == EntryType.DEBIT)
 				.mapToLong(DailyReconciliationQuery::amount)
@@ -171,10 +169,11 @@ public class LedgerService {
 				.mapToLong(DailyReconciliationQuery::amount)
 				.sum();
 
+			log.info("accountId {}", firstLine.accountId());
 			if (debitSum != creditSum) {
 				errors.add(new ErrorDetail(
 					firstLine.transactionId(),
-					null,
+					firstLine.accountId(),
 					ReconciliationCode.AMOUNT_MISMATCH
 				));
 				isValid = false;
@@ -182,13 +181,5 @@ public class LedgerService {
 		}
 
 		return isValid;
-	}
-
-	private boolean isEntryTypeConsistent(TransactionType transactionType, EntryType entryType) {
-		return switch (transactionType) {
-			case DEPOSIT, WITHDRAWAL -> true;
-			case TRANSFER -> entryType == EntryType.DEBIT || entryType == EntryType.CREDIT;
-			default -> false;
-		};
 	}
 }

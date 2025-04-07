@@ -38,9 +38,9 @@ public class LedgerEventHandler {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handleTransfer(TransferEvent transferEvent) {
-		// 이체 거래는 1개의 JournalEntry에 2개의 JournalLine을 생성 (DEBIT + CREDIT)
+
 		JournalEntry transferEntry = createJournalEntry(
-			transferEvent.senderTransactionId(), // 메인 트랜잭션 ID 사용
+			transferEvent.senderTransactionId(),
 			"계좌 이체",
 			transferEvent.transactionTime(),
 			TransactionType.TRANSFER,
@@ -52,7 +52,6 @@ public class LedgerEventHandler {
 
 		ledgerRepository.saveJournalEntry(transferEntry);
 
-		// 송금 측 (DEBIT)
 		JournalLine debitLine = JournalLine.create(
 			transferEntry.getId(),
 			transferEvent.senderAccountId(),
@@ -60,7 +59,6 @@ public class LedgerEventHandler {
 			transferEvent.amount()
 		);
 
-		// 입금 측 (CREDIT)
 		JournalLine creditLine = JournalLine.create(
 			transferEntry.getId(),
 			transferEvent.receiverAccountId(),
@@ -153,7 +151,6 @@ public class LedgerEventHandler {
 		JournalEntryInfo info = new JournalEntryInfo(
 			summary,
 			eventTime,
-			transactionType,
 			amount,
 			senderAccount,
 			recipientAccount,
@@ -162,7 +159,8 @@ public class LedgerEventHandler {
 		return JournalEntry.create(
 			transactionId,
 			ReconciliationStatus.PENDING,
-			info
+			info,
+			transactionType
 		);
 	}
 }

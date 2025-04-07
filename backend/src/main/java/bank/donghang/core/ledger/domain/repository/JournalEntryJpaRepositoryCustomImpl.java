@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
-import bank.donghang.core.account.domain.enums.TransactionStatus;
 import bank.donghang.core.ledger.domain.enums.ReconciliationStatus;
 import bank.donghang.core.ledger.dto.query.DailyReconciliationQuery;
 import com.querydsl.core.types.Projections;
@@ -31,7 +30,7 @@ public class JournalEntryJpaRepositoryCustomImpl implements JournalEntryJpaRepos
 				Projections.constructor(
 					DailyReconciliationQuery.class,
 					journalEntry.transactionId,
-					transaction.type,
+					journalEntry.journalType,
 					transaction.status,
 					journalEntry.id,
 					journalLine.id,

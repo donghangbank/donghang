@@ -7,7 +7,6 @@ import bank.donghang.core.account.domain.enums.TransactionType;
 public record JournalEntryInfo(
 	String summary,
 	LocalDateTime eventTime,
-	TransactionType transactionType,
 	Long amount,
 
 	String senderAccount,
