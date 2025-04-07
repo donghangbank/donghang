@@ -55,7 +55,7 @@ export const DepositProductInfoAmountPage = (): JSX.Element => {
 			setAccountExpiryDate(data.accountExpiryDate);
 			setDisabled(true);
 			setIsPopupVisible(true);
-			navigate("/general/products/deposit/info/specsheet");
+			navigate("/general/depositproducts/info/specsheet");
 		},
 		onError: (error: AxiosError) => {
 			console.log(error);

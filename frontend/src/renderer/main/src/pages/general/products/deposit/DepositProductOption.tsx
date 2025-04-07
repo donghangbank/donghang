@@ -5,9 +5,9 @@ import Option from "@renderer/components/common/general/Option";
 
 export const DepositProductOption = (): JSX.Element => {
 	const prompts = [
-		{ prompt: "카드", link: "/general/products/deposit/card/input", imageUrl: card },
-		{ prompt: "통장", link: "/general/products/deposit/card/input", imageUrl: bankbook },
-		{ prompt: "계좌번호", link: "/general/products/deposit/card/input", imageUrl: numberpad }
+		{ prompt: "카드", link: "/general/depositproducts/card/input", imageUrl: card },
+		{ prompt: "통장", link: "/general/depositproducts/card/input", imageUrl: bankbook },
+		{ prompt: "계좌번호", link: "/general/depositproducts/card/input", imageUrl: numberpad }
 	];
 	return <Option prompts={prompts} title="무엇을 가져오셨나요?" />;
 };

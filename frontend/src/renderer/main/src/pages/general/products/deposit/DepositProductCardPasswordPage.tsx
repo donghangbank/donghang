@@ -21,7 +21,7 @@ export const DepositProductCardPasswordPage = (): JSX.Element => {
 			setWithdrawalAccountNumber(data.fullAccountNumber);
 			setPayoutAccountNumber(data.fullAccountNumber);
 			setMemberId(data.ownerId);
-			navigate("/general/products/deposit/info/amount");
+			navigate("/general/depositproducts/info/amount");
 		},
 		onError: () => {
 			setIsPopupVisible(true);

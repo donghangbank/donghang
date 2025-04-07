@@ -24,7 +24,7 @@ export const DepositProduct = (): JSX.Element => {
 		setAccountProductId(Number(id));
 		setMinAmount(data.minSubscriptionBalance);
 		setMaxAmount(data.maxSubscriptionBalance);
-		navigate("/general/products/deposit/warning/card");
+		navigate("/general/depositproducts/warning/card");
 	};
 
 	return (
@@ -63,7 +63,7 @@ export const DepositProduct = (): JSX.Element => {
 				</div>
 			</div>
 			<div className="flex justify-center items-center gap-6">
-				<Link to={"/general/products/deposit"} className="w-full">
+				<Link to={"/general/depositproducts/products"} className="w-full">
 					<button type="button" className="p-6 bg-red rounded-xl w-full">
 						<span className="text-3xl text-white">뒤로가기</span>
 					</button>

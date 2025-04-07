@@ -29,12 +29,6 @@ export default function SeniorDepositConfirmPage(): JSX.Element {
 	const sessionStartTime = useKoreaTime();
 	const disableMasking = true;
 
-	useEffect(() => {
-		console.log("amount", amount);
-		console.log("receivingAccountNumber", receivingAccountNumber);
-		console.log("sessionStartTime", sessionStartTime);
-	}, []);
-
 	const { mutate: deposit } = useMutation({
 		mutationFn: () =>
 			depositAPI({
