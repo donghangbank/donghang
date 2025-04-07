@@ -15,6 +15,8 @@ resource "aws_db_instance" "db" {
   username               = var.mysql_username
   password               = var.mysql_password
   identifier             = "donghang-db"
+  storage_encrypted      = true
+  kms_key_id             = var.kms_rds_key_arn
   skip_final_snapshot    = true
   multi_az               = false
   db_subnet_group_name   = aws_db_subnet_group.dbsg.name
