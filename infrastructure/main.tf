@@ -54,6 +54,10 @@ module "iam" {
   source = "./Modules/IAM"
 }
 
+module "kms" {
+  source = "./Modules/KMS"
+}
+
 module "networing" {
   source                     = "./Modules/Networking"
   availability_zones         = var.availability_zones
@@ -69,6 +73,7 @@ module "networing" {
 module "rds" {
   source           = "./Modules/RDS"
   database_subnets = module.networing.database_subnets
+  kms_rds_key_arn  = module.kms.kms_rds_key_arn
   mysql_password   = var.mysql_password
   mysql_username   = var.mysql_username
   sg_mysql_id      = module.security_group.sg_mysql_id
