@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 public record DailyReconciliationReport(
 	LocalDateTime reportTime,
 	LocalDateTime requestTime,
-	Integer totalEntries,          // JournalEntry 기준 카운트
+	Integer totalEntries,
 	Integer successfulEntries,
 	Integer failedEntries,
 	Integer errorCount,

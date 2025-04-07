@@ -1,0 +1,11 @@
+== LedgerController
+
+=== 하루 동안의 원장 검사 (GET /api/v1/ledgers/daily-reconciliation)
+
+==== 요청
+
+include::{snippets}/ledger-controller-test/get_daily_conciliation_report/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/ledger-controller-test/get_daily_conciliation_report/http-response.adoc[]

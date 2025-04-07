@@ -25,6 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class LedgerService {
 
+	//TODO: 계좌 검증 로직 추가, 은행 계좌(자산, 현금)들 보고서 작성
+
 	private final LedgerRepository ledgerRepository;
 
 	public DailyReconciliationReport getDailyReconciliationReport() {

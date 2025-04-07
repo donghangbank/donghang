@@ -27,6 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LedgerEventHandler {
 
+	//TODO: 벌크 인서트 고민
+
 	@Value("${DONGHANG_CASH_ACCOUNT_ID}")
 	private Long bankCashAccountId;
 
