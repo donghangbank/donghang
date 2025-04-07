@@ -8,12 +8,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import bank.donghang.core.accountproduct.application.AccountProductService;
 import bank.donghang.core.accountproduct.dto.request.AccountProductCreationRequest;
 import bank.donghang.core.accountproduct.dto.response.AccountProductDetail;
 import bank.donghang.core.accountproduct.dto.response.AccountProductSummary;
+import bank.donghang.core.common.dto.PageInfo;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -24,8 +26,10 @@ public class AccountProductController {
 	private final AccountProductService productService;
 
 	@GetMapping()
-	public ResponseEntity<List<AccountProductSummary>> getAccountProducts() {
-		return ResponseEntity.ok(productService.getAllAccountProducts());
+	public ResponseEntity<PageInfo<AccountProductSummary>> getAccountProducts(
+		@RequestParam(required = false) String pageToken
+	) {
+		return ResponseEntity.ok(productService.getAllAccountProducts(pageToken));
 	}
 
 	@GetMapping("/{productId}")
@@ -41,17 +45,23 @@ public class AccountProductController {
 	}
 
 	@GetMapping("/demands")
-	public ResponseEntity<List<AccountProductSummary>> getDemandProducts() {
-		return ResponseEntity.ok(productService.getDemandProducts());
+	public ResponseEntity<PageInfo<AccountProductSummary>> getDemandProducts(
+		@RequestParam(required = false) String pageToken
+	) {
+		return ResponseEntity.ok(productService.getDemandProducts(pageToken));
 	}
 
 	@GetMapping("/deposits")
-	public ResponseEntity<List<AccountProductSummary>> getDepositProducts() {
-		return ResponseEntity.ok(productService.getDepositProducts());
+	public ResponseEntity<PageInfo<AccountProductSummary>> getDepositProducts(
+		@RequestParam(required = false) String pageToken
+	) {
+		return ResponseEntity.ok(productService.getDepositProducts(pageToken));
 	}
 
 	@GetMapping("/installments")
-	public ResponseEntity<List<AccountProductSummary>> getInstallmentProducts() {
-		return ResponseEntity.ok(productService.getInstallmentProducts());
+	public ResponseEntity<PageInfo<AccountProductSummary>> getInstallmentProducts(
+		@RequestParam(required = false) String pageToken
+	) {
+		return ResponseEntity.ok(productService.getInstallmentProducts(pageToken));
 	}
 }

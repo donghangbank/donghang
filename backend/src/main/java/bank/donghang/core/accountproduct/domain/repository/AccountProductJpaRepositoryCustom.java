@@ -6,5 +6,9 @@ import bank.donghang.core.accountproduct.domain.enums.AccountProductType;
 import bank.donghang.core.accountproduct.dto.response.AccountProductSummary;
 
 public interface AccountProductJpaRepositoryCustom {
-	List<AccountProductSummary> getAccountProductsByQueryDsl(AccountProductType accountProductType);
+	List<AccountProductSummary> getAccountProductsByAccountProductType(
+		AccountProductType accountProductType,
+		String pageToken,
+		int pageSize
+	);
 }

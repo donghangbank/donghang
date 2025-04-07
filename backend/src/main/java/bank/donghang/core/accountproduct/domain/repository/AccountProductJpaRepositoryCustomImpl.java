@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import bank.donghang.core.accountproduct.domain.QAccountProduct;
@@ -21,7 +22,11 @@ public class AccountProductJpaRepositoryCustomImpl implements AccountProductJpaR
 	private final JPAQueryFactory queryFactory;
 
 	@Override
-	public List<AccountProductSummary> getAccountProductsByQueryDsl(AccountProductType accountProductType) {
+	public List<AccountProductSummary> getAccountProductsByAccountProductType(
+		AccountProductType accountProductType,
+		String pageToken,
+		int pageSize
+	) {
 		QAccountProduct accountProduct = QAccountProduct.accountProduct;
 		QBank bank = QBank.bank;
 
@@ -41,7 +46,12 @@ public class AccountProductJpaRepositoryCustomImpl implements AccountProductJpaR
 			.from(accountProduct)
 			.join(bank)
 			.on(accountProduct.bankId.eq(bank.id))
-			.where(eqAccountProductType(accountProductType, accountProduct))
+			.where(
+				eqAccountProductType(accountProductType, accountProduct),
+				isInRange(pageToken, accountProduct.accountProductId)
+			)
+			.orderBy(accountProduct.accountProductId.desc())
+			.limit(pageSize + 1)
 			.fetch();
 	}
 
@@ -49,9 +59,20 @@ public class AccountProductJpaRepositoryCustomImpl implements AccountProductJpaR
 		AccountProductType accountProductType,
 		QAccountProduct accountProduct
 	) {
-		if (accountProductType == null) {
+		return accountProductType != null
+			? accountProduct.accountProductType.eq(accountProductType)
+			: null;
+	}
+
+	private BooleanExpression isInRange(String pageToken, NumberPath<Long> idPath) {
+		if (pageToken == null || pageToken.isEmpty()) {
 			return null;
 		}
-		return accountProduct.accountProductType.eq(accountProductType);
+		try {
+			Long lastId = Long.parseLong(pageToken);
+			return idPath.lt(lastId);
+		} catch (NumberFormatException e) {
+			return null;
+		}
 	}
 }

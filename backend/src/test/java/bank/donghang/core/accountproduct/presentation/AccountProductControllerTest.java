@@ -26,6 +26,7 @@ import bank.donghang.core.accountproduct.dto.request.AccountProductCreationReque
 import bank.donghang.core.accountproduct.dto.response.AccountProductDetail;
 import bank.donghang.core.accountproduct.dto.response.AccountProductSummary;
 import bank.donghang.core.common.controller.ControllerTest;
+import bank.donghang.core.common.dto.PageInfo;
 import bank.donghang.core.common.exception.BadRequestException;
 import bank.donghang.core.common.exception.ErrorCode;
 
@@ -55,7 +56,9 @@ class AccountProductControllerTest extends ControllerTest {
 				AccountProductType.DEMAND.name())
 		);
 
-		when(productService.getAllAccountProducts()).thenReturn(summaries);
+		PageInfo<AccountProductSummary> expectedPage = PageInfo.of(null, summaries, false);
+
+		when(productService.getAllAccountProducts(any())).thenReturn(expectedPage);
 
 		MvcResult result = mockMvc.perform(get("/api/v1/accountproducts")
 				.contentType(MediaType.APPLICATION_JSON))
@@ -63,13 +66,13 @@ class AccountProductControllerTest extends ControllerTest {
 			.andExpect(status().isOk())
 			.andReturn();
 
-		List<AccountProductSummary> response = objectMapper.readValue(
+		PageInfo<AccountProductSummary> response = objectMapper.readValue(
 			result.getResponse().getContentAsString(),
 			new TypeReference<>() {
 			}
 		);
 
-		Assertions.assertThat(response).usingRecursiveComparison().isEqualTo(summaries);
+		Assertions.assertThat(response).usingRecursiveComparison().isEqualTo(expectedPage);
 	}
 
 	@Test
@@ -168,16 +171,26 @@ class AccountProductControllerTest extends ControllerTest {
 			0L,
 			AccountProductType.DEMAND.name()
 		);
-		List<AccountProductSummary> expected = List.of(summary);
+		List<AccountProductSummary> summaries = List.of(summary);
+		PageInfo<AccountProductSummary> expectedPage = PageInfo.of(null, summaries, false);
 
-		when(productService.getDemandProducts()).thenReturn(expected);
+		when(productService.getDemandProducts(any())).thenReturn(expectedPage);
 
 		// when & then
-		mockMvc.perform(get("/api/v1/accountproducts/demands")
+		MvcResult result = mockMvc.perform(get("/api/v1/accountproducts/demands")
 				.contentType(MediaType.APPLICATION_JSON))
 			.andDo(print())
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$[0].accountProductType").value(AccountProductType.DEMAND.name()));
+			.andReturn();
+
+		PageInfo<AccountProductSummary> response = objectMapper.readValue(
+			result.getResponse().getContentAsString(),
+			new TypeReference<>() {
+			}
+		);
+
+		Assertions.assertThat(response.getData().get(0).accountProductType())
+			.isEqualTo(AccountProductType.DEMAND.name());
 	}
 
 	@Test
@@ -196,16 +209,26 @@ class AccountProductControllerTest extends ControllerTest {
 			100000L,
 			AccountProductType.DEPOSIT.name()
 		);
-		List<AccountProductSummary> expected = List.of(summary);
+		List<AccountProductSummary> summaries = List.of(summary);
+		PageInfo<AccountProductSummary> expectedPage = PageInfo.of(null, summaries, false);
 
-		when(productService.getDepositProducts()).thenReturn(expected);
+		when(productService.getDepositProducts(any())).thenReturn(expectedPage);
 
 		// when & then
-		mockMvc.perform(get("/api/v1/accountproducts/deposits")
+		MvcResult result = mockMvc.perform(get("/api/v1/accountproducts/deposits")
 				.contentType(MediaType.APPLICATION_JSON))
 			.andDo(print())
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$[0].accountProductType").value(AccountProductType.DEPOSIT.name()));
+			.andReturn();
+
+		PageInfo<AccountProductSummary> response = objectMapper.readValue(
+			result.getResponse().getContentAsString(),
+			new TypeReference<>() {
+			}
+		);
+
+		Assertions.assertThat(response.getData().get(0).accountProductType())
+			.isEqualTo(AccountProductType.DEPOSIT.name());
 	}
 
 	@Test
@@ -224,31 +247,49 @@ class AccountProductControllerTest extends ControllerTest {
 			50000L,
 			AccountProductType.INSTALLMENT.name()
 		);
-		List<AccountProductSummary> expected = List.of(summary);
+		List<AccountProductSummary> summaries = List.of(summary);
+		PageInfo<AccountProductSummary> expectedPage = PageInfo.of(null, summaries, false);
 
-		when(productService.getInstallmentProducts()).thenReturn(expected);
+		when(productService.getInstallmentProducts(any())).thenReturn(expectedPage);
 
 		// when & then
-		mockMvc.perform(get("/api/v1/accountproducts/installments")
+		MvcResult result = mockMvc.perform(get("/api/v1/accountproducts/installments")
 				.contentType(MediaType.APPLICATION_JSON))
 			.andDo(print())
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$[0].accountProductType").value(AccountProductType.INSTALLMENT.name()));
+			.andReturn();
+
+		PageInfo<AccountProductSummary> response = objectMapper.readValue(
+			result.getResponse().getContentAsString(),
+			new TypeReference<>() {
+			}
+		);
+
+		Assertions.assertThat(response.getData().get(0).accountProductType())
+			.isEqualTo(AccountProductType.INSTALLMENT.name());
 	}
 
 	@Test
 	@DisplayName("상품 목록이 없을 때 빈 배열을 반환한다.")
 	void getProducts_whenNoProducts_shouldReturnEmptyList() throws Exception {
 		// given
-		when(productService.getAllAccountProducts()).thenReturn(Collections.emptyList());
+		PageInfo<AccountProductSummary> expectedPage = PageInfo.of(null, Collections.emptyList(), false);
+		when(productService.getAllAccountProducts(any())).thenReturn(expectedPage);
 
 		// when & then
-		mockMvc.perform(get("/api/v1/accountproducts")
+		MvcResult result = mockMvc.perform(get("/api/v1/accountproducts")
 				.contentType(MediaType.APPLICATION_JSON))
 			.andDo(print())
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$").isArray())
-			.andExpect(jsonPath("$").isEmpty());
+			.andReturn();
+
+		PageInfo<AccountProductSummary> response = objectMapper.readValue(
+			result.getResponse().getContentAsString(),
+			new TypeReference<>() {
+			}
+		);
+
+		Assertions.assertThat(response.getData()).isEmpty();
 	}
 
 	@Test
