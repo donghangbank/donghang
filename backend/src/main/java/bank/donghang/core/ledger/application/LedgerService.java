@@ -7,20 +7,21 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import bank.donghang.core.account.domain.enums.TransactionStatus;
 import bank.donghang.core.account.domain.enums.TransactionType;
+import bank.donghang.core.ledger.domain.JournalEntry;
 import bank.donghang.core.ledger.domain.enums.EntryType;
 import bank.donghang.core.ledger.domain.enums.ReconciliationCode;
+import bank.donghang.core.ledger.domain.enums.ReconciliationStatus;
 import bank.donghang.core.ledger.domain.repository.LedgerRepository;
 import bank.donghang.core.ledger.dto.ErrorDetail;
 import bank.donghang.core.ledger.dto.ValidationResult;
 import bank.donghang.core.ledger.dto.query.DailyReconciliationQuery;
 import bank.donghang.core.ledger.dto.response.DailyReconciliationReport;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LedgerService {
@@ -29,6 +30,7 @@ public class LedgerService {
 
 	private final LedgerRepository ledgerRepository;
 
+	@Transactional
 	public DailyReconciliationReport getDailyReconciliationReport() {
 		LocalDateTime requestTime = LocalDateTime.now();
 		LocalDateTime reportTime = requestTime.minusDays(1);
@@ -40,6 +42,13 @@ public class LedgerService {
 
 		ValidationResult validationResult = validateTransactions(queries);
 
+		List<JournalEntry> journalEntries = ledgerRepository.getAllJournalEntriesIn(
+			validationResult.completedEntries());
+
+		for (JournalEntry journalEntry : journalEntries) {
+			journalEntry.updateReconciliationStatus(ReconciliationStatus.CONFIRMED);
+		}
+
 		return DailyReconciliationReport.from(
 			reportTime,
 			requestTime,
@@ -50,6 +59,7 @@ public class LedgerService {
 
 	private ValidationResult validateTransactions(List<DailyReconciliationQuery> queries) {
 		List<ErrorDetail> errors = new ArrayList<>();
+		List<Long> completedEntries = new ArrayList<>();
 		long totalDebit = 0;
 		long totalCredit = 0;
 		int successfulEntries = 0;
@@ -61,7 +71,6 @@ public class LedgerService {
 		for (List<DailyReconciliationQuery> entryLines : entriesByJournal.values()) {
 			boolean isValid = validateJournalEntry(entryLines, errors);
 
-			// 무조건 총합에는 포함
 			for (DailyReconciliationQuery line : entryLines) {
 				if (line.entryType() == EntryType.DEBIT) {
 					totalDebit += line.amount();
@@ -72,6 +81,8 @@ public class LedgerService {
 
 			if (isValid) {
 				successfulEntries++;
+				completedEntries.add(entryLines.get(0).journalEntryId());
+
 			} else {
 				failedEntries++;
 			}
@@ -86,7 +97,8 @@ public class LedgerService {
 			totalCredit,
 			successfulEntries,
 			failedEntries,
-			errors
+			errors,
+			completedEntries
 		);
 	}
 
@@ -172,7 +184,6 @@ public class LedgerService {
 				.mapToLong(DailyReconciliationQuery::amount)
 				.sum();
 
-			log.info("accountId {}", firstLine.accountId());
 			if (debitSum != creditSum) {
 				errors.add(new ErrorDetail(
 					firstLine.transactionId(),

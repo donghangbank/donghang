@@ -7,6 +7,7 @@ public record ValidationResult(
 	long totalCredit,
 	int successfulEntries,
 	int failedEntries,
-	List<ErrorDetail> errors
+	List<ErrorDetail> errors,
+	List<Long> completedEntries
 ) {
 }

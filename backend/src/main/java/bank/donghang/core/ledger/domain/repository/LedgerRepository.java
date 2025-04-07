@@ -35,4 +35,8 @@ public class LedgerRepository {
 			end
 		);
 	}
+
+	public List<JournalEntry> getAllJournalEntriesIn(List<Long> journalEntryIds) {
+		return journalEntryJpaRepository.findAllById(journalEntryIds);
+	}
 }
