@@ -3,6 +3,7 @@ package bank.donghang.core.ledger.domain.repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import bank.donghang.core.ledger.domain.enums.ReconciliationStatus;
 import org.springframework.stereotype.Repository;
 
 import bank.donghang.core.ledger.domain.JournalEntry;
@@ -38,5 +39,12 @@ public class LedgerRepository {
 
 	public List<JournalEntry> getAllJournalEntriesIn(List<Long> journalEntryIds) {
 		return journalEntryJpaRepository.findAllById(journalEntryIds);
+	}
+
+	public int updateJournalEntriesStatus(ReconciliationStatus status, List<Long> journalEntryIds) {
+		return journalEntryJpaRepository.updateJournalEntriesStatus(
+				status,
+				journalEntryIds
+		);
 	}
 }

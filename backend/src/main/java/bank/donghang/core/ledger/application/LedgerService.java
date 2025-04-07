@@ -42,12 +42,10 @@ public class LedgerService {
 
 		ValidationResult validationResult = validateTransactions(queries);
 
-		List<JournalEntry> journalEntries = ledgerRepository.getAllJournalEntriesIn(
-			validationResult.completedEntries());
-
-		for (JournalEntry journalEntry : journalEntries) {
-			journalEntry.updateReconciliationStatus(ReconciliationStatus.CONFIRMED);
-		}
+		int confirmedJournalEntriesCount = ledgerRepository.updateJournalEntriesStatus(
+				ReconciliationStatus.CONFIRMED,
+				validationResult.completedEntries()
+		);
 
 		return DailyReconciliationReport.from(
 			reportTime,
