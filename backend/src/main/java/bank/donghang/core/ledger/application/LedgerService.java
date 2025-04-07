@@ -3,6 +3,8 @@ package bank.donghang.core.ledger.application;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -27,18 +29,18 @@ public class LedgerService {
 		LocalDateTime requestTime = LocalDateTime.now();
 		LocalDateTime reportTime = requestTime.minusDays(1);
 
-		List<DailyReconciliationQuery> queries = ledgerRepository.getDailyReconciliationQuery(
-				reportTime,
-				requestTime
+		List<DailyReconciliationQuery> queries = ledgerRepository.getDailyReconciliationInfo(
+			reportTime,
+			requestTime
 		);
 
 		ValidationResult validationResult = validateTransactions(queries);
 
 		return DailyReconciliationReport.from(
-				reportTime,
-				requestTime,
-				queries,
-				validationResult
+			reportTime,
+			requestTime,
+			queries,
+			validationResult
 		);
 	}
 
@@ -49,17 +51,22 @@ public class LedgerService {
 		int successfulEntries = 0;
 		int failedEntries = 0;
 
-		for (DailyReconciliationQuery query : queries) {
-			if (!validateTransaction(query, errors)) {
-				failedEntries++;
+		Map<Long, List<DailyReconciliationQuery>> entriesByJournal = queries.stream()
+			.collect(Collectors.groupingBy(DailyReconciliationQuery::journalEntryId));
+
+		for (List<DailyReconciliationQuery> entryLines : entriesByJournal.values()) {
+			if (!validateJournalEntry(entryLines, errors)) {
+				failedEntries += entryLines.size();
 				continue;
 			}
-			successfulEntries++;
+			successfulEntries += entryLines.size();
 
-			if (query.entryType() == EntryType.DEBIT) {
-				totalDebit += query.amount();
-			} else {
-				totalCredit += query.amount();
+			for (DailyReconciliationQuery line : entryLines) {
+				if (line.entryType() == EntryType.DEBIT) {
+					totalDebit += line.amount();
+				} else {
+					totalCredit += line.amount();
+				}
 			}
 		}
 
@@ -68,33 +75,84 @@ public class LedgerService {
 		}
 
 		return new ValidationResult(
-				totalDebit,
-				totalCredit,
-				successfulEntries,
-				failedEntries,
-				errors
+			totalDebit,
+			totalCredit,
+			successfulEntries,
+			failedEntries,
+			errors
 		);
 	}
 
-	private boolean validateTransaction(DailyReconciliationQuery query, List<ErrorDetail> errors) {
+	private boolean validateJournalEntry(List<DailyReconciliationQuery> entryLines, List<ErrorDetail> errors) {
+		if (entryLines.isEmpty())
+			return false;
+
+		DailyReconciliationQuery firstLine = entryLines.get(0);
 		boolean isValid = true;
 
-		if (query.transactionStatus() != TransactionStatus.COMPLETED) {
+		// 트랜잭션 상태 검증
+		if (firstLine.transactionStatus() != TransactionStatus.COMPLETED) {
 			errors.add(new ErrorDetail(
-					query.transactionId(),
-					query.accountId(),
-					ReconciliationCode.TRANSACTION_NOT_COMPLETED
+				firstLine.transactionId(),
+				null,
+				ReconciliationCode.TRANSACTION_NOT_COMPLETED
 			));
 			isValid = false;
 		}
 
-		if (!isEntryTypeConsistent(query.transactionType(), query.entryType())) {
-			errors.add(new ErrorDetail(
-					query.transactionId(),
-					query.accountId(),
-					ReconciliationCode.ENTRY_TYPE_MISMATCH
-			));
-			isValid = false;
+		// 입출금 거래인 경우 쌍으로 검증 (2개의 라인 필요)
+		if (firstLine.transactionType() == TransactionType.DEPOSIT ||
+			firstLine.transactionType() == TransactionType.WITHDRAWAL) {
+
+			if (entryLines.size() != 2) {
+				errors.add(new ErrorDetail(
+					firstLine.transactionId(),
+					null,
+					ReconciliationCode.INVALID_ENTRY_COUNT
+				));
+				return false;
+			}
+
+			long debitSum = entryLines.stream()
+				.filter(line -> line.entryType() == EntryType.DEBIT)
+				.mapToLong(DailyReconciliationQuery::amount)
+				.sum();
+
+			long creditSum = entryLines.stream()
+				.filter(line -> line.entryType() == EntryType.CREDIT)
+				.mapToLong(DailyReconciliationQuery::amount)
+				.sum();
+
+			if (debitSum != creditSum) {
+				errors.add(new ErrorDetail(
+					firstLine.transactionId(),
+					null,
+					ReconciliationCode.AMOUNT_MISMATCH
+				));
+				isValid = false;
+			}
+		}
+		// 이체 거래는 1개의 라인만 있어도 유효 (DEBIT 또는 CREDIT)
+		else if (firstLine.transactionType() == TransactionType.TRANSFER) {
+			if (entryLines.size() != 1) {
+				errors.add(new ErrorDetail(
+					firstLine.transactionId(),
+					null,
+					ReconciliationCode.INVALID_ENTRY_COUNT
+				));
+				return false;
+			}
+
+			for (DailyReconciliationQuery line : entryLines) {
+				if (!isEntryTypeConsistent(line.transactionType(), line.entryType())) {
+					errors.add(new ErrorDetail(
+						line.transactionId(),
+						line.accountId(),
+						ReconciliationCode.ENTRY_TYPE_MISMATCH
+					));
+					isValid = false;
+				}
+			}
 		}
 
 		return isValid;
@@ -102,9 +160,8 @@ public class LedgerService {
 
 	private boolean isEntryTypeConsistent(TransactionType transactionType, EntryType entryType) {
 		return switch (transactionType) {
-			case DEPOSIT -> entryType == EntryType.CREDIT;
-			case WITHDRAWAL -> entryType == EntryType.DEBIT;
-			case TRANSFER -> true;
+			case DEPOSIT, WITHDRAWAL -> true;
+			case TRANSFER -> entryType == EntryType.DEBIT || entryType == EntryType.CREDIT;
 			default -> false;
 		};
 	}

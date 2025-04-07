@@ -30,8 +30,8 @@ public class LedgerEventHandler {
 	@Value("${DONGHANG_CASH_ACCOUNT_ID}")
 	private Long bankCashAccountId;
 
-//	@Value("${DONGHANG_ASSET_ACCOUNT_ID}")
-//	private Long bankAssetAccountId;
+	//	@Value("${DONGHANG_ASSET_ACCOUNT_ID}")
+	//	private Long bankAssetAccountId;
 
 	private final LedgerRepository ledgerRepository;
 
@@ -39,43 +39,45 @@ public class LedgerEventHandler {
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handleTransfer(TransferEvent transferEvent) {
 		JournalEntry withdrawalEntry = createJournalEntry(
-				transferEvent.senderTransactionId(),
-				"계좌 이체 출금",
-				transferEvent.transactionTime(),
-				TransactionType.TRANSFER,
-				transferEvent.amount(),
-				transferEvent.senderAccountId().toString(),
-				transferEvent.receiverAccountId().toString(),
-				"송금 처리"
-		);
-
-		JournalLine withdrawalLine = JournalLine.create(
-				withdrawalEntry.getId(),
-				transferEvent.senderAccountId(),
-				EntryType.DEBIT,
-				transferEvent.amount()
-		);
-
-		JournalEntry depositEntry = createJournalEntry(
-				transferEvent.receiverTransactionId(),
-				"계좌 이체 입금",
-				transferEvent.transactionTime(),
-				TransactionType.TRANSFER,
-				transferEvent.amount(),
-				transferEvent.senderAccountId().toString(),
-				transferEvent.receiverAccountId().toString(),
-				"입금 처리"
-		);
-
-		JournalLine depositLine = JournalLine.create(
-				depositEntry.getId(),
-				transferEvent.receiverAccountId(),
-				EntryType.CREDIT,
-				transferEvent.amount()
+			transferEvent.senderTransactionId(),
+			"계좌 이체 출금",
+			transferEvent.transactionTime(),
+			TransactionType.TRANSFER,
+			transferEvent.amount(),
+			transferEvent.senderAccountId().toString(),
+			transferEvent.receiverAccountId().toString(),
+			"송금 처리"
 		);
 
 		ledgerRepository.saveJournalEntry(withdrawalEntry);
+
+		JournalLine withdrawalLine = JournalLine.create(
+			withdrawalEntry.getId(),
+			transferEvent.senderAccountId(),
+			EntryType.DEBIT,
+			transferEvent.amount()
+		);
+
+		JournalEntry depositEntry = createJournalEntry(
+			transferEvent.receiverTransactionId(),
+			"계좌 이체 입금",
+			transferEvent.transactionTime(),
+			TransactionType.TRANSFER,
+			transferEvent.amount(),
+			transferEvent.senderAccountId().toString(),
+			transferEvent.receiverAccountId().toString(),
+			"입금 처리"
+		);
+
 		ledgerRepository.saveJournalEntry(depositEntry);
+
+		JournalLine depositLine = JournalLine.create(
+			depositEntry.getId(),
+			transferEvent.receiverAccountId(),
+			EntryType.CREDIT,
+			transferEvent.amount()
+		);
+
 		ledgerRepository.saveJournalLine(withdrawalLine);
 		ledgerRepository.saveJournalLine(depositLine);
 	}
@@ -84,31 +86,32 @@ public class LedgerEventHandler {
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handleDeposit(DepositEvent event) {
 		JournalEntry depositEntry = createJournalEntry(
-				event.transactionId(),
-				"계좌 입금",
-				event.transactionTime(),
-				TransactionType.DEPOSIT,
-				event.amount(),
-				bankCashAccountId.toString(),
-				event.accountId().toString(),
-				"현금 입금 처리"
-		);
-
-		JournalLine customerLine = JournalLine.create(
-				depositEntry.getId(),
-				event.accountId(),
-				EntryType.CREDIT,
-				event.amount()
-		);
-
-		JournalLine bankLine = JournalLine.create(
-				depositEntry.getId(),
-				bankCashAccountId,
-				EntryType.DEBIT,
-				event.amount()
+			event.transactionId(),
+			"계좌 입금",
+			event.transactionTime(),
+			TransactionType.DEPOSIT,
+			event.amount(),
+			bankCashAccountId.toString(),
+			event.accountId().toString(),
+			"현금 입금 처리"
 		);
 
 		ledgerRepository.saveJournalEntry(depositEntry);
+
+		JournalLine customerLine = JournalLine.create(
+			depositEntry.getId(),
+			event.accountId(),
+			EntryType.CREDIT,
+			event.amount()
+		);
+
+		JournalLine bankLine = JournalLine.create(
+			depositEntry.getId(),
+			bankCashAccountId,
+			EntryType.DEBIT,
+			event.amount()
+		);
+
 		ledgerRepository.saveJournalLine(customerLine);
 		ledgerRepository.saveJournalLine(bankLine);
 	}
@@ -117,54 +120,59 @@ public class LedgerEventHandler {
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handleWithdrawal(WithdrawalEvent event) {
 		JournalEntry withdrawalEntry = createJournalEntry(
-				event.transactionId(),
-				"계좌 출금",
-				event.transactionTime(),
-				TransactionType.WITHDRAWAL,
-				event.amount(),
-				event.accountId().toString(),
-				bankCashAccountId.toString(),
-				"현금 출금 처리"
-		);
-
-		JournalLine customerLine = JournalLine.create(
-				withdrawalEntry.getId(),
-				event.accountId(),
-				EntryType.DEBIT,
-				event.amount()
-		);
-
-		JournalLine bankLine = JournalLine.create(
-				withdrawalEntry.getId(),
-				bankCashAccountId,
-				EntryType.CREDIT,
-				event.amount()
+			event.transactionId(),
+			"계좌 출금",
+			event.transactionTime(),
+			TransactionType.WITHDRAWAL,
+			event.amount(),
+			event.accountId().toString(),
+			bankCashAccountId.toString(),
+			"현금 출금 처리"
 		);
 
 		ledgerRepository.saveJournalEntry(withdrawalEntry);
+
+		JournalLine customerLine = JournalLine.create(
+			withdrawalEntry.getId(),
+			event.accountId(),
+			EntryType.DEBIT,
+			event.amount()
+		);
+
+		JournalLine bankLine = JournalLine.create(
+			withdrawalEntry.getId(),
+			bankCashAccountId,
+			EntryType.CREDIT,
+			event.amount()
+		);
+
 		ledgerRepository.saveJournalLine(customerLine);
 		ledgerRepository.saveJournalLine(bankLine);
 	}
 
 	private JournalEntry createJournalEntry(
-			Long transactionId,
-			String summary,
-			LocalDateTime eventTime,
-			TransactionType transactionType,
-			Long amount,
-			String senderAccount,
-			String recipientAccount,
-			String additionalNotes
+		Long transactionId,
+		String summary,
+		LocalDateTime eventTime,
+		TransactionType transactionType,
+		Long amount,
+		String senderAccount,
+		String recipientAccount,
+		String additionalNotes
 	) {
 		JournalEntryInfo info = new JournalEntryInfo(
-				summary,
-				eventTime,
-				transactionType,
-				amount,
-				senderAccount,
-				recipientAccount,
-				additionalNotes
+			summary,
+			eventTime,
+			transactionType,
+			amount,
+			senderAccount,
+			recipientAccount,
+			additionalNotes
 		);
-		return JournalEntry.create(transactionId, ReconciliationStatus.PENDING, info);
+		return JournalEntry.create(
+			transactionId,
+			ReconciliationStatus.PENDING,
+			info
+		);
 	}
 }

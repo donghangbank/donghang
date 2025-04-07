@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 public class LedgerRepository {
 
 	private final JournalEntryJpaRepository journalEntryJpaRepository;
+	private final JournalEntryJpaRepositoryCustomImpl journalEntryJpaRepositoryCustom;
 	private final JournalLineJpaRepository journalLineJpaRepository;
 
 	public void saveJournalEntry(JournalEntry journalEntry) {
@@ -25,10 +26,13 @@ public class LedgerRepository {
 		journalLineJpaRepository.save(journalLine);
 	}
 
-	public List<DailyReconciliationQuery> getDailyReconciliationQuery(
+	public List<DailyReconciliationQuery> getDailyReconciliationInfo(
 		LocalDateTime start,
 		LocalDateTime end
 	) {
-		return null;
+		return journalEntryJpaRepositoryCustom.getDailyReconciliationInfo(
+			start,
+			end
+		);
 	}
 }

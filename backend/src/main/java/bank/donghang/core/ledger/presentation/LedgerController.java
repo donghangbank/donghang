@@ -18,6 +18,8 @@ public class LedgerController {
 
 	@GetMapping("/daily-reconciliation")
 	public ResponseEntity<DailyReconciliationReport> proceedDailyReconciliation() {
-		return null;
+		DailyReconciliationReport dailyReconciliationReport = ledgerService.getDailyReconciliationReport();
+
+		return ResponseEntity.ok(dailyReconciliationReport);
 	}
 }

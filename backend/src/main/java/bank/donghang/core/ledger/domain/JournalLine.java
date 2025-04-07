@@ -4,6 +4,8 @@ import bank.donghang.core.common.entity.BaseEntity;
 import bank.donghang.core.ledger.domain.enums.EntryType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,6 +28,7 @@ public class JournalLine extends BaseEntity {
 	@Column(name = "account_id", nullable = false)
 	private Long accountId;
 
+	@Enumerated(EnumType.STRING)
 	@Column(name = "entry_type", nullable = false)
 	private EntryType entryType;
 
