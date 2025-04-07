@@ -8,6 +8,10 @@ interface depositAPIResponse {
 	transactionTime: string;
 }
 
+interface accountOwnerCheckAPIResponse {
+	ownerName: string;
+}
+
 export const depositAPI = async ({
 	receivingAccountNumber,
 	amount,
@@ -24,6 +28,17 @@ export const depositAPI = async ({
 		amount: Number(amount),
 		sessionStartTime,
 		disableMasking
+	});
+	return response.data;
+};
+
+export const accountOwnerCheckAPI = async ({
+	receivingAccountNumber
+}: {
+	receivingAccountNumber: string;
+}): Promise<accountOwnerCheckAPIResponse> => {
+	const response = await localAxios.post<accountOwnerCheckAPIResponse>("/accounts/owner", {
+		accountNumber: receivingAccountNumber
 	});
 	return response.data;
 };
