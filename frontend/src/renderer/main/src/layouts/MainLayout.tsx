@@ -88,7 +88,7 @@ export const MainLayout = (): JSX.Element => {
 						className="w-full h-[90%] shadow-md"
 					>
 						{currentJob && (
-							<div className="fixed top-4 left-4 py-4 px-8 rounded-xl w-44 h-12 bg-blue text-white font-semibold flex justify-center items-center text-2xl z-10">
+							<div className="fixed top-4 left-4 py-4 px-8 rounded-xl w-fit h-12 bg-blue text-white font-semibold flex justify-center items-center text-2xl z-10">
 								{currentJob}
 							</div>
 						)}
