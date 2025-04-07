@@ -55,7 +55,7 @@ export const DepositProducts = (): JSX.Element => {
 				<div className="flex flex-col gap-4 min-h-[528px]">
 					{visibleDepositProducts.map((product) => (
 						<Link
-							to={`/general/products/deposit/${product.accountProductId}`}
+							to={`/general/depositproducts/${product.accountProductId}`}
 							key={product.accountProductId}
 						>
 							<div

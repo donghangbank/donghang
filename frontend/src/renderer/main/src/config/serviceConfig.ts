@@ -71,8 +71,12 @@ const SERVICE_CONFIG: Record<string, ServiceConfig> = {
 	},
 	products: {
 		title: "상품 가입",
+		steps: [{ path: "option", name: "상품 선택" }]
+	},
+	depositproducts: {
+		title: "예금 상품 가입",
 		steps: [
-			{ path: "deposit", name: "예금 상품 목록" },
+			{ path: "products", name: "예금 상품 목록" },
 			{ path: "warning", name: "금융 사기" },
 			{ path: "option", name: "인증 수단 선택" },
 			{ path: "password", name: "비밀번호 입력" },

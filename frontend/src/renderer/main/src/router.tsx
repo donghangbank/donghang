@@ -371,58 +371,62 @@ const router = createHashRouter([
 						path: "products",
 						children: [
 							{
-								path: "deposit",
+								path: "option",
+								element: <GeneralProductsPage />
+							}
+						]
+					},
+					{
+						path: "depositproducts",
+						children: [
+							{
+								path: "products",
+								element: <DepositProducts />
+							},
+							{
+								path: ":id",
+								element: <DepositProduct />
+							},
+							{
+								path: "warning",
 								children: [
 									{
-										path: "",
-										element: <DepositProducts />
-									},
-									{
-										path: ":id",
-										element: <DepositProduct />
-									},
-									{
-										path: "warning",
-										children: [
-											{
-												path: "card",
-												element: <DepositProductCardWarningPage />
-											}
-										]
-									},
-									{
-										path: "option",
-										element: <DepositProductOption />
-									},
-									{
 										path: "card",
-										children: [
-											{
-												path: "input",
-												element: <DepositProductCardInputPage />
-											},
-											{
-												path: "auth",
-												element: <DepositProductCardAuthPage />
-											},
-											{
-												path: "password",
-												element: <DepositProductCardPasswordPage />
-											}
-										]
+										element: <DepositProductCardWarningPage />
+									}
+								]
+							},
+							{
+								path: "option",
+								element: <DepositProductOption />
+							},
+							{
+								path: "card",
+								children: [
+									{
+										path: "input",
+										element: <DepositProductCardInputPage />
 									},
 									{
-										path: "info",
-										children: [
-											{
-												path: "amount",
-												element: <DepositProductInfoAmountPage />
-											},
-											{
-												path: "specsheet",
-												element: <DepositProductInfoSpecSheetPage />
-											}
-										]
+										path: "auth",
+										element: <DepositProductCardAuthPage />
+									},
+									{
+										path: "password",
+										element: <DepositProductCardPasswordPage />
+									}
+								]
+							},
+							{
+								path: "info",
+								children: [
+									{
+										path: "amount",
+										element: <DepositProductInfoAmountPage />
+									},
+									{
+										path: "specsheet",
+										element: <DepositProductInfoSpecSheetPage />
 									}
 								]
 							}
