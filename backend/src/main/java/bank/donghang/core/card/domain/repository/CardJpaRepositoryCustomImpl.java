@@ -32,7 +32,8 @@ public class CardJpaRepositoryCustomImpl implements CardJpaRepositoryCustom {
 						account.branchCode,
 						account.accountNumber
 					),
-					member.name
+					member.name,
+					member.id
 				))
 			.from(card)
 			.leftJoin(account)
@@ -46,10 +47,9 @@ public class CardJpaRepositoryCustomImpl implements CardJpaRepositoryCustom {
 	@Override
 	public Long findAccountIdByCardNumber(String cardNumber) {
 		return queryFactory.select(card.accountId)
-				.from(card)
-				.where(card.cardNumber.eq(cardNumber))
-				.fetchOne();
+			.from(card)
+			.where(card.cardNumber.eq(cardNumber))
+			.fetchOne();
 	}
-
 
 }
