@@ -38,48 +38,38 @@ public class LedgerEventHandler {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handleTransfer(TransferEvent transferEvent) {
-		JournalEntry withdrawalEntry = createJournalEntry(
-			transferEvent.senderTransactionId(),
-			"계좌 이체 출금",
+		// 이체 거래는 1개의 JournalEntry에 2개의 JournalLine을 생성 (DEBIT + CREDIT)
+		JournalEntry transferEntry = createJournalEntry(
+			transferEvent.senderTransactionId(), // 메인 트랜잭션 ID 사용
+			"계좌 이체",
 			transferEvent.transactionTime(),
 			TransactionType.TRANSFER,
 			transferEvent.amount(),
 			transferEvent.senderAccountId().toString(),
 			transferEvent.receiverAccountId().toString(),
-			"송금 처리"
+			"계좌 이체 처리"
 		);
 
-		ledgerRepository.saveJournalEntry(withdrawalEntry);
+		ledgerRepository.saveJournalEntry(transferEntry);
 
-		JournalLine withdrawalLine = JournalLine.create(
-			withdrawalEntry.getId(),
+		// 송금 측 (DEBIT)
+		JournalLine debitLine = JournalLine.create(
+			transferEntry.getId(),
 			transferEvent.senderAccountId(),
 			EntryType.DEBIT,
 			transferEvent.amount()
 		);
 
-		JournalEntry depositEntry = createJournalEntry(
-			transferEvent.receiverTransactionId(),
-			"계좌 이체 입금",
-			transferEvent.transactionTime(),
-			TransactionType.TRANSFER,
-			transferEvent.amount(),
-			transferEvent.senderAccountId().toString(),
-			transferEvent.receiverAccountId().toString(),
-			"입금 처리"
-		);
-
-		ledgerRepository.saveJournalEntry(depositEntry);
-
-		JournalLine depositLine = JournalLine.create(
-			depositEntry.getId(),
+		// 입금 측 (CREDIT)
+		JournalLine creditLine = JournalLine.create(
+			transferEntry.getId(),
 			transferEvent.receiverAccountId(),
 			EntryType.CREDIT,
 			transferEvent.amount()
 		);
 
-		ledgerRepository.saveJournalLine(withdrawalLine);
-		ledgerRepository.saveJournalLine(depositLine);
+		ledgerRepository.saveJournalLine(debitLine);
+		ledgerRepository.saveJournalLine(creditLine);
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)

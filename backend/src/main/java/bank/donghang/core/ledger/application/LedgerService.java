@@ -48,19 +48,20 @@ public class LedgerService {
 		List<ErrorDetail> errors = new ArrayList<>();
 		long totalDebit = 0;
 		long totalCredit = 0;
-		int successfulEntries = 0;
-		int failedEntries = 0;
+		int successfulEntries = 0; // JournalEntry 기준 카운트
+		int failedEntries = 0;     // JournalEntry 기준 카운트
 
 		Map<Long, List<DailyReconciliationQuery>> entriesByJournal = queries.stream()
 			.collect(Collectors.groupingBy(DailyReconciliationQuery::journalEntryId));
 
 		for (List<DailyReconciliationQuery> entryLines : entriesByJournal.values()) {
 			if (!validateJournalEntry(entryLines, errors)) {
-				failedEntries += entryLines.size();
+				failedEntries++; // 실패한 JournalEntry 1건 증가
 				continue;
 			}
-			successfulEntries += entryLines.size();
+			successfulEntries++; // 성공한 JournalEntry 1건 증가
 
+			// 금액 집계 (기존과 동일)
 			for (DailyReconciliationQuery line : entryLines) {
 				if (line.entryType() == EntryType.DEBIT) {
 					totalDebit += line.amount();
@@ -132,9 +133,9 @@ public class LedgerService {
 				isValid = false;
 			}
 		}
-		// 이체 거래는 1개의 라인만 있어도 유효 (DEBIT 또는 CREDIT)
+		// 이체 거래는 2개의 라인 필요 (DEBIT 1개 + CREDIT 1개)
 		else if (firstLine.transactionType() == TransactionType.TRANSFER) {
-			if (entryLines.size() != 1) {
+			if (entryLines.size() != 2) {
 				errors.add(new ErrorDetail(
 					firstLine.transactionId(),
 					null,
@@ -143,15 +144,40 @@ public class LedgerService {
 				return false;
 			}
 
-			for (DailyReconciliationQuery line : entryLines) {
-				if (!isEntryTypeConsistent(line.transactionType(), line.entryType())) {
-					errors.add(new ErrorDetail(
-						line.transactionId(),
-						line.accountId(),
-						ReconciliationCode.ENTRY_TYPE_MISMATCH
-					));
-					isValid = false;
-				}
+			// DEBIT과 CREDIT이 각각 1개씩 있는지 확인
+			long debitCount = entryLines.stream()
+				.filter(line -> line.entryType() == EntryType.DEBIT)
+				.count();
+			long creditCount = entryLines.stream()
+				.filter(line -> line.entryType() == EntryType.CREDIT)
+				.count();
+
+			if (debitCount != 1 || creditCount != 1) {
+				errors.add(new ErrorDetail(
+					firstLine.transactionId(),
+					null,
+					ReconciliationCode.ENTRY_TYPE_MISMATCH
+				));
+				isValid = false;
+			}
+
+			// 금액 일치 검증
+			long debitSum = entryLines.stream()
+				.filter(line -> line.entryType() == EntryType.DEBIT)
+				.mapToLong(DailyReconciliationQuery::amount)
+				.sum();
+			long creditSum = entryLines.stream()
+				.filter(line -> line.entryType() == EntryType.CREDIT)
+				.mapToLong(DailyReconciliationQuery::amount)
+				.sum();
+
+			if (debitSum != creditSum) {
+				errors.add(new ErrorDetail(
+					firstLine.transactionId(),
+					null,
+					ReconciliationCode.AMOUNT_MISMATCH
+				));
+				isValid = false;
 			}
 		}
 
