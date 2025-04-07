@@ -29,7 +29,7 @@ export default function JobChoiceCheck({ job, audioFile, prev, link }: JobCheckP
 			navigate(link);
 			setCurrentJob(job);
 		} else if (construction === "부정" || construction === "홈") {
-			navigate("/");
+			navigate("/senior/final");
 		}
 	}, [construction, navigate, setCurrentJob, job, link]);
 

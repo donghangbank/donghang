@@ -10,6 +10,7 @@ export function useVADSTT(): {
 	isDetecting: boolean;
 	start: () => void;
 	stop: () => void;
+	volume: number;
 } {
 	const [transcript, setTranscript] = useState("");
 	const [isDetecting, setIsDetecting] = useState(false);
@@ -19,6 +20,7 @@ export function useVADSTT(): {
 	const startTimeRef = useRef<number | null>(null);
 	const { setIsTalking } = useContext(UserContext);
 	const { setConstruction } = useContext(AIContext);
+	const [volume, setVolume] = useState(0);
 
 	const startRecording = useCallback(
 		(stream: MediaStream): void => {
@@ -69,7 +71,13 @@ export function useVADSTT(): {
 	const startVAD = useCallback(async (): Promise<void> => {
 		setIsDetecting(true);
 
-		const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+		const stream = await navigator.mediaDevices.getUserMedia({
+			audio: {
+				noiseSuppression: true,
+				echoCancellation: true,
+				autoGainControl: true
+			}
+		});
 		const audioContext = new AudioContext();
 		const source = audioContext.createMediaStreamSource(stream);
 		const analyser = audioContext.createAnalyser();
@@ -80,7 +88,7 @@ export function useVADSTT(): {
 		const detectVoice = (): void => {
 			analyser.getByteTimeDomainData(data);
 			const avg = data.reduce((sum, v) => sum + Math.abs(v - 128), 0) / data.length;
-
+			setVolume(avg);
 			if (avg > 12) {
 				if (!mediaRecorderRef.current || mediaRecorderRef.current.state === "inactive") {
 					startRecording(stream);
@@ -110,6 +118,7 @@ export function useVADSTT(): {
 		transcript,
 		isDetecting,
 		start: () => setIsDetecting(true),
-		stop: () => setIsDetecting(false)
+		stop: () => setIsDetecting(false),
+		volume
 	};
 }
