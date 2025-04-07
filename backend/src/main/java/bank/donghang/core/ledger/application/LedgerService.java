@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import bank.donghang.core.account.domain.enums.TransactionStatus;
 import bank.donghang.core.account.domain.enums.TransactionType;
-import bank.donghang.core.ledger.domain.JournalEntry;
 import bank.donghang.core.ledger.domain.enums.EntryType;
 import bank.donghang.core.ledger.domain.enums.ReconciliationCode;
 import bank.donghang.core.ledger.domain.enums.ReconciliationStatus;
