@@ -6,7 +6,7 @@ export default function SeniorDepositPaymentPage(): JSX.Element {
 	const navigate = useNavigate();
 
 	useActionPlay({
-		dialogue: "현금투입구에 지폐를 넣어주세요!",
+		dialogue: "현금으로 준비하셨나요? 수표도 있으신가요?",
 		shouldActivate: true,
 		avatarState: "idle",
 		onComplete: () => {

@@ -19,7 +19,7 @@ export default function SeniorTransferInfoAccountPage(): JSX.Element {
 	const [ownerConfirmedTrigger, setOwnerConfirmedTrigger] = useState(false);
 	const { receivingAccountNumber, setReceivingAccountNumber, setDisabled } =
 		useContext(InputContext);
-	const { construction } = useContext(AIContext);
+	const { construction, setConstruction } = useContext(AIContext);
 	const { setCurrentJob } = useContext(PageContext);
 	const navigate = useNavigate();
 
@@ -78,11 +78,11 @@ export default function SeniorTransferInfoAccountPage(): JSX.Element {
 	useActionPlay({
 		dialogue: `${data?.ownerName} 님 맞으신가요?`,
 		shouldActivate: ownerConfirmedTrigger,
-		avatarState: "idle",
-		onComplete: () => {
-			console.log("계좌번호 확인 완료");
-			navigate("/senior/transfer/info/amount");
-		}
+		avatarState: "idle"
+		// onComplete: () => {
+		// 	console.log("계좌번호 확인 완료");
+		// 	navigate("/senior/transfer/info/amount");
+		// }
 	});
 
 	useActionPlay({
@@ -103,7 +103,7 @@ export default function SeniorTransferInfoAccountPage(): JSX.Element {
 			numberClear();
 			setFirstInput(true);
 		}
-	}, [construction, navigate, setCurrentJob, numberClear]);
+	}, [construction, setConstruction, navigate, setCurrentJob, numberClear]);
 
 	useEffect(() => {
 		setReceivingAccountNumber("");

@@ -8,8 +8,8 @@ export default function SeniorTransferInfoSpecSheetPage(): JSX.Element {
 
 	const sections = [
 		{ label: "받는 사람", value: recipientName },
-		{ label: "잔액", value: sendingAccountBalance, formatValue: true },
-		{ label: `${recipientName} 님께 보낸 돈`, value: amount, formatValue: true }
+		{ label: "잔액", value: sendingAccountBalance, formatType: "amount" as const },
+		{ label: `${recipientName} 님께 보낸 돈`, value: amount, formatType: "amount" as const }
 	];
 
 	return <SpecSheet sections={sections} />;
