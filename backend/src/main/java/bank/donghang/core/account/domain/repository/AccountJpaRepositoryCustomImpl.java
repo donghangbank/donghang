@@ -70,14 +70,11 @@ public class AccountJpaRepositoryCustomImpl implements AccountJpaRepositoryCusto
 		QAccountProduct accountProduct = QAccountProduct.accountProduct;
 		QBank bank = QBank.bank;
 
-		// 기본 조건: memberId 일치
 		BooleanExpression predicate = account.memberId.eq(memberId);
-		// 커서 보다 큰 row
 		if (cursor != null) {
 			predicate = predicate.and(account.accountId.goe(cursor));
 		}
 
-		// limit은 요청 사이즈 + 1(다음 페이지 존재여부 확인용)
 		int pageSize = DEFAULT_PAGE_SIZE;
 		List<Tuple> results = queryFactory
 				.select(
@@ -97,16 +94,13 @@ public class AccountJpaRepositoryCustomImpl implements AccountJpaRepositoryCusto
 				.limit(pageSize + 1)
 				.fetch();
 
-		// 다음 페이지가 있는지 확인 (요청 건수보다 1개 더 조회됨)
 		boolean hasNext = results.size() > pageSize;
 		Long nextCursor = null;
 		if (hasNext) {
-			// 마지막 튜플은 다음 페이지를 위한 커서로 사용하고 리스트에서 제거
 			Tuple last = results.remove(results.size() - 1);
 			nextCursor = last.get(account.accountId);
 		}
 
-		// 조회 결과를 AccountSummaryResponse로 매핑
 		List<AccountSummaryResponse> summaries = results.stream()
 				.map(tuple -> new AccountSummaryResponse(
 						tuple.get(bank.name),
@@ -151,15 +145,37 @@ public class AccountJpaRepositoryCustomImpl implements AccountJpaRepositoryCusto
 	@Override
 	public AccountPasswordResponse getAccountPassword(String accountTypeCode, String branchCode, String accountNumber) {
 		QAccount account = QAccount.account;
-		String password = queryFactory
-				.select(account.password)
-				.from(account)
-				.where(
-						account.accountTypeCode.eq(accountTypeCode)
-								.and(account.branchCode.eq(branchCode))
-								.and(account.accountNumber.eq(accountNumber))
-				)
-				.fetchOne();
-		return new AccountPasswordResponse(password);
+		QMember member = QMember.member;
+
+		Tuple result = queryFactory
+			.select(
+				account.accountTypeCode,
+				account.branchCode,
+				account.accountNumber,
+				account.password,
+				member.name
+			)
+			.from(account)
+			.join(member).on(account.memberId.eq(member.id))
+			.where(
+				account.accountTypeCode.eq(accountTypeCode)
+					.and(account.branchCode.eq(branchCode))
+					.and(account.accountNumber.eq(accountNumber))
+			)
+			.fetchOne();
+
+		if (result == null) {
+			return new AccountPasswordResponse("", "", "");
+		}
+
+		String fullAccountNumber = result.get(account.accountTypeCode)
+			+ "-" + result.get(account.branchCode)
+			+ "-" + result.get(account.accountNumber);
+
+		return new AccountPasswordResponse(
+			fullAccountNumber,
+			result.get(account.password),
+			result.get(member.name)
+		);
 	}
 }

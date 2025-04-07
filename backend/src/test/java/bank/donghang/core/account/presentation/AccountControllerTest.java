@@ -41,6 +41,7 @@ import bank.donghang.core.account.dto.request.DepositAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.InstallmentAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.MyAccountsRequest;
 import bank.donghang.core.account.dto.response.AccountOwnerNameResponse;
+import bank.donghang.core.account.dto.response.AccountPasswordResponse;
 import bank.donghang.core.account.dto.response.AccountRegisterResponse;
 import bank.donghang.core.account.dto.response.AccountSummaryResponse;
 import bank.donghang.core.account.dto.response.BalanceResponse;
@@ -260,18 +261,24 @@ class AccountControllerTest extends ControllerTest {
 	@DisplayName("계좌번호와 비밀번호로 인증할 수 있다.")
 	void can_check_account_password() throws Exception {
 		// given
-		String accountNumber = "100001123456";
-		String password = "0000";
-		AccountPasswordRequest request = new AccountPasswordRequest(accountNumber, password);
+		String accountNumber = "10000112345678";
+		String password = "5678";
+		String ownerName = "홍길동";
 
-		// 비밀번호 인증 로직은 void이므로 성공 시 200 OK만 확인하면 됨
-		willDoNothing().given(accountService).checkAccountPassword(any(AccountPasswordRequest.class));
+		AccountPasswordRequest request = new AccountPasswordRequest(accountNumber, password);
+		AccountPasswordResponse response = new AccountPasswordResponse(accountNumber, password, ownerName);
+
+		given(accountService.checkAccountPassword(any(AccountPasswordRequest.class)))
+			.willReturn(response);
 
 		// when & then
 		mockMvc.perform(post("/api/v1/accounts/check")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.fullAccountNumber").value(accountNumber))
+			.andExpect(jsonPath("$.password").value(password))
+			.andExpect(jsonPath("$.ownerName").value(ownerName))
 			.andDo(document("check-account-password"));
 	}
 

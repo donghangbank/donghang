@@ -18,6 +18,7 @@ import bank.donghang.core.account.dto.request.DepositAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.InstallmentAccountRegisterRequest;
 import bank.donghang.core.account.dto.request.MyAccountsRequest;
 import bank.donghang.core.account.dto.response.AccountOwnerNameResponse;
+import bank.donghang.core.account.dto.response.AccountPasswordResponse;
 import bank.donghang.core.account.dto.response.AccountRegisterResponse;
 import bank.donghang.core.account.dto.response.AccountSummaryResponse;
 import bank.donghang.core.account.dto.response.BalanceResponse;
@@ -76,9 +77,8 @@ public class AccountController {
 	}
 
 	@PostMapping("/check")
-	public ResponseEntity<Void> checkAccountPassword(@RequestBody AccountPasswordRequest request) {
-		accountService.checkAccountPassword(request);
-		return ResponseEntity.ok().build();
+	public ResponseEntity<AccountPasswordResponse> checkAccountPassword(@RequestBody AccountPasswordRequest request) {
+		return ResponseEntity.ok(accountService.checkAccountPassword(request));
 	}
 
 	@PostMapping("/installments/payments/due")
