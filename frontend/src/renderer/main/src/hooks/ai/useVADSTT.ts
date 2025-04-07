@@ -91,7 +91,7 @@ export function useVADSTT(): {
 				vadTimerRef.current = setTimeout(() => {
 					stopRecording();
 					setIsTalking(false);
-				}, 3000); // 3초 무음 시 종료
+				}, 1500); // 1.5초 무음 시 종료
 			}
 
 			requestAnimationFrame(detectVoice);
