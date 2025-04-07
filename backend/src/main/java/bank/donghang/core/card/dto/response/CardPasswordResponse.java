@@ -4,6 +4,7 @@ public record CardPasswordResponse(
 	String cardNumber,
 	String password,
 	String fullAccountNumber,
-	String ownerName
+	String ownerName,
+	Long ownerId
 ) {
 }
