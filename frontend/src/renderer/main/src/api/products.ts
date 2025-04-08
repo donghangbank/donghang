@@ -1,5 +1,7 @@
 import type {
+	DemandProduct,
 	DepositProduct,
+	getDemandProductsAPIResponse,
 	getDepositProductsAPIResponse,
 	getInstallmentProductsAPIResponse,
 	InstallmentProduct,
@@ -108,5 +110,41 @@ export const registerInstallmentProductAPI = async ({
 			disableMasking
 		}
 	);
+	return response.data;
+};
+
+export const getDemandProductsAPI = async ({
+	pageToken
+}: {
+	pageToken?: number;
+}): Promise<getDemandProductsAPIResponse> => {
+	const response = await localAxios.get<getDemandProductsAPIResponse>("/accountproducts/demands", {
+		params: { pageToken }
+	});
+	return response.data;
+};
+
+export const getDemandProductAPI = async ({ id }: { id: string }): Promise<DemandProduct> => {
+	const response = await localAxios.get<DemandProduct>(`/accountproducts/${id}`);
+	return response.data;
+};
+
+export const registerDemandProductAPI = async ({
+	memberId,
+	accountProductId,
+	password,
+	disableMasking
+}: {
+	memberId: number;
+	accountProductId: number;
+	password: string;
+	disableMasking: boolean;
+}): Promise<registerDepositProductAPIResponse> => {
+	const response = await localAxios.post<registerDepositProductAPIResponse>("/accounts/demands", {
+		memberId,
+		accountProductId,
+		password,
+		disableMasking
+	});
 	return response.data;
 };
