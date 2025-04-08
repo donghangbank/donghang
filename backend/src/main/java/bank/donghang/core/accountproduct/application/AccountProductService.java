@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import bank.donghang.core.accountproduct.domain.AccountProduct;
 import bank.donghang.core.accountproduct.domain.enums.AccountProductType;
+import bank.donghang.core.accountproduct.domain.repository.AccountProductJpaRepositoryCustomImpl;
 import bank.donghang.core.accountproduct.domain.repository.AccountProductRepository;
 import bank.donghang.core.accountproduct.dto.request.AccountProductCreationRequest;
 import bank.donghang.core.accountproduct.dto.response.AccountProductDetail;
@@ -51,15 +52,6 @@ public class AccountProductService {
 		);
 	}
 
-	public AccountProductDetail getAccountProductDetail(Long id) {
-		if (!accountProductRepository.existsAccountProductById(id)) {
-			throw new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND);
-		}
-
-		AccountProduct accountProduct = accountProductRepository.getAccountProductById(id);
-		return AccountProductDetail.from(accountProduct);
-	}
-
 	public AccountProductSummary registerAccountProduct(AccountProductCreationRequest request) {
 		Optional<Bank> optBank = bankRepository.findById(request.bankId());
 		if (optBank.isEmpty()) {
@@ -72,5 +64,23 @@ public class AccountProductService {
 			request.toEntity());
 
 		return AccountProductSummary.from(accountProduct, bank.getName(), bank.getLogoUrl());
+	}
+
+	public AccountProductDetail searchAccountProductDetailByName(String keyword) {
+		AccountProductDetail accountProductDetail = accountProductRepository.getAccountProductByName(keyword);
+		if (accountProductDetail == null) {
+			throw new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND);
+		}
+
+		return accountProductDetail;
+	}
+
+	public AccountProductDetail getAccountProductDetail(Long productId) {
+		AccountProductDetail accountProductDetail = accountProductRepository.getAccountProductDetailById(productId);
+		if (accountProductDetail == null) {
+			throw new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND);
+		}
+
+		return accountProductDetail;
 	}
 }

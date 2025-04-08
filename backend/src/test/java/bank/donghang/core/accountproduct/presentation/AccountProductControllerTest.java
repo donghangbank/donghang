@@ -84,10 +84,11 @@ class AccountProductControllerTest extends ControllerTest {
 				"샘플 상품",
 				"샘플 상품 설명",
 				2L,
+				"샘플 은행",
+				"https://logo.mockbank.com/logo.png",
 				2.5,
 				"변동 금리",
-				"저축 상품",
-				100,
+				"DEMAND",
 				12,
 				1000L,
 				100000L
@@ -373,5 +374,69 @@ class AccountProductControllerTest extends ControllerTest {
 						.contentType(MediaType.APPLICATION_JSON))
 				.andDo(print())
 				.andExpect(status().isNotFound());
+	}
+
+	@Test
+	@DisplayName("상품명으로 계좌 상품을 검색한다.")
+	void searchAccountProduct_shouldReturnProductDetail() throws Exception {
+		// given
+		String keyword = "저축예금";
+		AccountProductDetail expected = new AccountProductDetail(
+			1L,
+			"저축예금",
+			"고금리 저축예금 상품",
+			1L,
+			"샘플 은행",
+			"https://logo.mockbank.com/logo.png",
+			3.5,
+			"최대 3.5% 금리",
+			"DEPOSIT",
+			12,
+			10000L,
+			1000000L
+		);
+
+		when(productService.searchAccountProductDetailByName(keyword)).thenReturn(expected);
+
+		// when & then
+		MvcResult result = mockMvc.perform(get("/api/v1/accountproducts/search")
+				.param("keyword", keyword)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andReturn();
+
+		AccountProductDetail response = objectMapper.readValue(
+			result.getResponse().getContentAsString(),
+			AccountProductDetail.class
+		);
+
+		Assertions.assertThat(response).usingRecursiveComparison().isEqualTo(expected);
+	}
+
+	@Test
+	@DisplayName("검색 결과가 없을 경우 예외를 반환한다.")
+	void searchAccountProduct_whenNotFound_shouldReturnNotFound() throws Exception {
+		// given
+		String keyword = "존재하지않는상품";
+		when(productService.searchAccountProductDetailByName(keyword))
+			.thenThrow(new BadRequestException(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND));
+
+		// when & then
+		mockMvc.perform(get("/api/v1/accountproducts/search")
+				.param("keyword", keyword)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andDo(print())
+			.andExpect(status().isNotFound());
+	}
+
+	@Test
+	@DisplayName("키워드 없이 검색 요청 시 Bad Request를 반환한다.")
+	void searchAccountProduct_withoutKeyword_shouldReturnBadRequest() throws Exception {
+		// when & then
+		mockMvc.perform(get("/api/v1/accountproducts/search")
+				.contentType(MediaType.APPLICATION_JSON))
+			.andDo(print())
+			.andExpect(status().isBadRequest());
 	}
 }

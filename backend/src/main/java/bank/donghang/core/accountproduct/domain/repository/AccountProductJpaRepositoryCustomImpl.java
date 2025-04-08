@@ -11,6 +11,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import bank.donghang.core.accountproduct.domain.QAccountProduct;
 import bank.donghang.core.accountproduct.domain.enums.AccountProductType;
+import bank.donghang.core.accountproduct.dto.response.AccountProductDetail;
 import bank.donghang.core.accountproduct.dto.response.AccountProductSummary;
 import bank.donghang.core.bank.domain.QBank;
 import lombok.RequiredArgsConstructor;
@@ -74,5 +75,55 @@ public class AccountProductJpaRepositoryCustomImpl implements AccountProductJpaR
 		} catch (NumberFormatException e) {
 			return null;
 		}
+	}
+
+	public AccountProductDetail getAccountProductByName(String keyword) {
+		QAccountProduct accountProduct = QAccountProduct.accountProduct;
+		QBank bank = QBank.bank;
+
+		return queryFactory.select(Projections.constructor(AccountProductDetail.class,
+				accountProduct.accountProductId,
+				accountProduct.accountProductName,
+				accountProduct.accountProductDescription,
+				accountProduct.bankId,
+				bank.name,
+				bank.logoUrl,
+				accountProduct.interestRate,
+				accountProduct.rateDescription,
+				accountProduct.accountProductType.stringValue(),
+				accountProduct.subscriptionPeriod,
+				accountProduct.minSubscriptionBalance,
+				accountProduct.maxSubscriptionBalance
+			))
+			.from(accountProduct)
+			.join(bank)
+			.on(accountProduct.bankId.eq(bank.id))
+			.where(accountProduct.accountProductName.eq(keyword))
+			.fetchOne();
+	}
+
+	public AccountProductDetail getAccountProductDetail(Long productId) {
+		QAccountProduct accountProduct = QAccountProduct.accountProduct;
+		QBank bank = QBank.bank;
+
+		return queryFactory.select(Projections.constructor(AccountProductDetail.class,
+				accountProduct.accountProductId,
+				accountProduct.accountProductName,
+				accountProduct.accountProductDescription,
+				accountProduct.bankId,
+				bank.name,
+				bank.logoUrl,
+				accountProduct.interestRate,
+				accountProduct.rateDescription,
+				accountProduct.accountProductType.stringValue(),
+				accountProduct.subscriptionPeriod,
+				accountProduct.minSubscriptionBalance,
+				accountProduct.maxSubscriptionBalance
+			))
+			.from(accountProduct)
+			.join(bank)
+			.on(accountProduct.bankId.eq(bank.id))
+			.where(accountProduct.accountProductId.eq(productId))
+			.fetchOne();
 	}
 }
