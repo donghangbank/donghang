@@ -1,6 +1,8 @@
 package bank.donghang.core.ledger.application;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -43,6 +45,8 @@ public class LedgerEventHandler {
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handleTransfer(TransferEvent transferEvent) {
 
+		List<JournalLine> journalLines = new ArrayList<>();
+
 		JournalEntry transferEntry = createJournalEntry(
 			transferEvent.senderTransactionId(),
 			"계좌 이체",
@@ -70,14 +74,19 @@ public class LedgerEventHandler {
 			transferEvent.amount()
 		);
 
-		ledgerRepository.saveJournalLine(debitLine);
-		ledgerRepository.saveJournalLine(creditLine);
+		journalLines.add(debitLine);
+		journalLines.add(creditLine);
+
+		ledgerRepository.bulkInsertJournalLines(journalLines);
 	}
 
 	@Async("ledgerExecutor")
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handleDeposit(DepositEvent event) {
+
+		List<JournalLine> journalLines = new ArrayList<>();
+
 		JournalEntry depositEntry = createJournalEntry(
 			event.transactionId(),
 			"계좌 입금",
@@ -105,14 +114,19 @@ public class LedgerEventHandler {
 			event.amount()
 		);
 
-		ledgerRepository.saveJournalLine(customerLine);
-		ledgerRepository.saveJournalLine(bankLine);
+		journalLines.add(customerLine);
+		journalLines.add(bankLine);
+
+		ledgerRepository.bulkInsertJournalLines(journalLines);
 	}
 
 	@Async("ledgerExecutor")
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handleWithdrawal(WithdrawalEvent event) {
+
+		List<JournalLine> journalLines = new ArrayList<>();
+
 		JournalEntry withdrawalEntry = createJournalEntry(
 			event.transactionId(),
 			"계좌 출금",
@@ -140,8 +154,10 @@ public class LedgerEventHandler {
 			event.amount()
 		);
 
-		ledgerRepository.saveJournalLine(customerLine);
-		ledgerRepository.saveJournalLine(bankLine);
+		journalLines.add(customerLine);
+		journalLines.add(bankLine);
+
+		ledgerRepository.bulkInsertJournalLines(journalLines);
 	}
 
 	private JournalEntry createJournalEntry(

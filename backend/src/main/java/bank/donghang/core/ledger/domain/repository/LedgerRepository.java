@@ -18,6 +18,7 @@ public class LedgerRepository {
 	private final JournalEntryJpaRepository journalEntryJpaRepository;
 	private final JournalEntryJpaRepositoryCustomImpl journalEntryJpaRepositoryCustom;
 	private final JournalLineJpaRepository journalLineJpaRepository;
+	private final JournalLineJdbcRepository journalLineJdbcRepository;
 
 	public void saveJournalEntry(JournalEntry journalEntry) {
 		journalEntryJpaRepository.save(journalEntry);
@@ -46,5 +47,9 @@ public class LedgerRepository {
 				status,
 				journalEntryIds
 		);
+	}
+
+	public void bulkInsertJournalLines(List<JournalLine> journalLines) {
+		journalLineJdbcRepository.batchInsert(journalLines);
 	}
 }
