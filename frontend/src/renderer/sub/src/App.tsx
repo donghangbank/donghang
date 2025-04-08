@@ -23,7 +23,7 @@ declare global {
 export default function App(): JSX.Element {
 	const [localValue, setLocalValue] = useState("");
 	const [showButton, setShowButton] = useState(false);
-	const [subType, setSubType] = useState<"password" | "account" | "resident" | "amount">(
+	const [subType, setSubType] = useState<"password" | "account" | "resident" | "amount" | "day">(
 		"password"
 	);
 	const [mode, setMode] = useState<"numpad" | "scam-warning" | "card-warning" | "default">(
@@ -36,7 +36,7 @@ export default function App(): JSX.Element {
 		});
 
 		window.subAPI.onSubTypeUpdate((newType) => {
-			setSubType(newType as "password" | "account" | "resident" | "amount");
+			setSubType(newType as "password" | "account" | "resident" | "amount" | "day");
 			setLocalValue("");
 		});
 

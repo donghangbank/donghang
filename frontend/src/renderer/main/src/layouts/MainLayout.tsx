@@ -40,7 +40,8 @@ export const MainLayout = (): JSX.Element => {
 				path.includes("password") ||
 				path.includes("account") ||
 				path.includes("amount") ||
-				path.includes("resident")
+				path.includes("resident") ||
+				path.includes("day")
 			) {
 				window.mainAPI.updateSubType(
 					path.includes("password")
@@ -49,7 +50,9 @@ export const MainLayout = (): JSX.Element => {
 							? "account"
 							: path.includes("amount")
 								? "amount"
-								: "resident"
+								: path.includes("resident")
+									? "resident"
+									: "day"
 				);
 				window.mainAPI.send("set-sub-mode", "numpad");
 			} else if (path.includes("warning")) {

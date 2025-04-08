@@ -9,7 +9,7 @@ export function getMaxLength(type?: string): number {
 		case "amount":
 			return 11;
 		default:
-			return 11;
+			return 2;
 	}
 }
 

@@ -1,19 +1,25 @@
 import { useEffect, useState } from "react";
-import { getDepositProductsAPI } from "@renderer/api/products";
+import { getInstallmentProductsAPI } from "@renderer/api/products";
 import { formatAmount } from "@renderer/utils/formatters";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import type { DepositProduct, getDepositProductsAPIResponse } from "@renderer/types/products";
+import type {
+	getInstallmentProductsAPIResponse,
+	InstallmentProduct
+} from "@renderer/types/products";
 
-export const DepositProducts = (): JSX.Element => {
-	const [allProducts, setAllProducts] = useState<DepositProduct[]>([]);
+export const InstallmentProducts = (): JSX.Element => {
+	const [allProducts, setAllProducts] = useState<InstallmentProduct[]>([]);
 	const [currentPage, setCurrentPage] = useState(0);
 	const [pageTokens, setPageTokens] = useState<(number | null)[]>([null]);
 	const [hasNext, setHasNext] = useState(false);
 
-	const { data, isError, isFetching, isSuccess } = useQuery<getDepositProductsAPIResponse, Error>({
-		queryKey: ["products", "deposit", pageTokens[currentPage]],
-		queryFn: () => getDepositProductsAPI({ pageToken: pageTokens[currentPage] ?? undefined })
+	const { data, isError, isFetching, isSuccess } = useQuery<
+		getInstallmentProductsAPIResponse,
+		Error
+	>({
+		queryKey: ["products", "installment", pageTokens[currentPage]],
+		queryFn: () => getInstallmentProductsAPI({ pageToken: pageTokens[currentPage] ?? undefined })
 	});
 
 	useEffect(() => {
@@ -50,24 +56,25 @@ export const DepositProducts = (): JSX.Element => {
 		setCurrentPage((prev) => Math.max(prev - 1, 0));
 	};
 
-	const visibleDepositProducts = allProducts.slice(currentPage * 4, (currentPage + 1) * 4);
+	const visibleInstallmentProducts = allProducts.slice(currentPage * 4, (currentPage + 1) * 4);
 
 	if (isError) {
 		return <div>데이터를 불러오는 데 실패했습니다</div>;
 	}
 
 	if (!data) {
-		return <div>예금상품이 존재하지 않습니다</div>;
+		return <div>적금상품이 존재하지 않습니다</div>;
 	}
+
 	return (
 		<div className="flex flex-col gap-6 bg-white p-10 rounded-3xl shadow-custom">
-			<span className="text-4xl font-bold text-center">예금 상품 목록</span>
+			<span className="text-4xl font-bold text-center">적금 상품 목록</span>
 
 			{data && (
 				<div className="flex flex-col gap-4 min-h-[528px]">
-					{visibleDepositProducts.map((product) => (
+					{visibleInstallmentProducts.map((product) => (
 						<Link
-							to={`/general/depositproducts/${product.accountProductId}`}
+							to={`/general/installmentproducts/${product.accountProductId}`}
 							key={product.accountProductId}
 						>
 							<div
@@ -87,7 +94,7 @@ export const DepositProducts = (): JSX.Element => {
 										<span className="text-2xl">연</span> {product.interestRate}%
 									</span>
 									<span className="text-xl font-bold">
-										최소 {formatAmount(String(product.minSubscriptionBalance))}
+										최소 월 {formatAmount(String(product.minSubscriptionBalance))}
 									</span>
 								</div>
 							</div>
@@ -123,4 +130,4 @@ export const DepositProducts = (): JSX.Element => {
 	);
 };
 
-export default DepositProducts;
+export default InstallmentProducts;
