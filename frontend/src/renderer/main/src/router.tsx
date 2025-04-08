@@ -90,6 +90,16 @@ import SeniorDepositProductCardAuthPage from "./pages/senior/products/deposit/Se
 import SeniorDepositProductCardPasswordPage from "./pages/senior/products/deposit/SeniorDepositProductCardPasswordPage";
 import SeniorDepositProductInfoAmountPage from "./pages/senior/products/deposit/SeniorDepositProductInfoAmountPage";
 import SeniorDepositProductInfoSpecSheetPage from "./pages/senior/products/deposit/SeniorDepositProductInfoSpecSheetPage";
+import InstallmentProductInfoSpecSheetPage from "./pages/general/products/installment/InstallmentProductInfoSpecSheetPage";
+import InstallmentProductInfoDayPage from "./pages/general/products/installment/InstallmentProductInfoDayPage";
+import InstallmentProductInfoAmountPage from "./pages/general/products/installment/InstallmentProductInfoAmountPage";
+import InstallmentProductCardPasswordPage from "./pages/general/products/installment/InstallmentProductCardPasswordPage";
+import InstallmentProductCardAuthPage from "./pages/general/products/installment/InstallmentProductCardAuthPage";
+import InstallmentProductCardInputPage from "./pages/general/products/installment/InstallmentProductCardInputPage";
+import InstallmentProductOption from "./pages/general/products/installment/InstallmentProductOption";
+import InstallmentProductCardWarningPage from "./pages/general/products/installment/InstallmentProductCardWarningPage";
+import InstallmentProduct from "./pages/general/products/installment/InstallmentProduct";
+import InstallmentProducts from "./pages/general/products/installment/InstallmentProducts";
 
 const router = createHashRouter([
 	{
@@ -437,6 +447,66 @@ const router = createHashRouter([
 									{
 										path: "specsheet",
 										element: <DepositProductInfoSpecSheetPage />
+									}
+								]
+							}
+						]
+					},
+					{
+						path: "installmentproducts",
+						children: [
+							{
+								path: "products",
+								element: <InstallmentProducts />
+							},
+							{
+								path: ":id",
+								element: <InstallmentProduct />
+							},
+							{
+								path: "warning",
+								children: [
+									{
+										path: "card",
+										element: <InstallmentProductCardWarningPage />
+									}
+								]
+							},
+							{
+								path: "option",
+								element: <InstallmentProductOption />
+							},
+							{
+								path: "card",
+								children: [
+									{
+										path: "input",
+										element: <InstallmentProductCardInputPage />
+									},
+									{
+										path: "auth",
+										element: <InstallmentProductCardAuthPage />
+									},
+									{
+										path: "password",
+										element: <InstallmentProductCardPasswordPage />
+									}
+								]
+							},
+							{
+								path: "info",
+								children: [
+									{
+										path: "amount",
+										element: <InstallmentProductInfoAmountPage />
+									},
+									{
+										path: "day",
+										element: <InstallmentProductInfoDayPage />
+									},
+									{
+										path: "specsheet",
+										element: <InstallmentProductInfoSpecSheetPage />
 									}
 								]
 							}
