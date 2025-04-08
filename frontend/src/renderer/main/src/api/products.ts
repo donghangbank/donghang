@@ -1,6 +1,8 @@
 import type {
 	DepositProduct,
 	getDepositProductsAPIResponse,
+	getInstallmentProductsAPIResponse,
+	InstallmentProduct,
 	registerDepositProductAPIResponse
 } from "@renderer/types/products";
 import localAxios from "./http-commons";
@@ -48,5 +50,63 @@ export const registerDepositProductAPI = async ({
 		initDepositAmount: amount,
 		disableMasking
 	});
+	return response.data;
+};
+
+export const getInstallmentProductsAPI = async ({
+	pageToken
+}: {
+	pageToken?: number;
+}): Promise<getInstallmentProductsAPIResponse> => {
+	const response = await localAxios.get<getInstallmentProductsAPIResponse>(
+		"/accountproducts/installments",
+		{
+			params: { pageToken }
+		}
+	);
+	return response.data;
+};
+
+export const getInstallmentProductAPI = async ({
+	id
+}: {
+	id: string;
+}): Promise<InstallmentProduct> => {
+	const response = await localAxios.get<InstallmentProduct>(`/accountproducts/${id}`);
+	return response.data;
+};
+
+export const registerInstallmentProductAPI = async ({
+	memberId,
+	accountProductId,
+	password,
+	withdrawalAccountNumber,
+	payoutAccountNumber,
+	amount,
+	day,
+	disableMasking
+}: {
+	memberId: number;
+	accountProductId: number;
+	password: string;
+	withdrawalAccountNumber: string;
+	payoutAccountNumber: string;
+	amount: string;
+	day: string;
+	disableMasking: boolean;
+}): Promise<registerDepositProductAPIResponse> => {
+	const response = await localAxios.post<registerDepositProductAPIResponse>(
+		"/accounts/installments",
+		{
+			memberId,
+			accountProductId,
+			password,
+			withdrawalAccountNumber,
+			payoutAccountNumber,
+			monthlyInstallmentAmount: Number(amount),
+			monthlyInstallmentDay: Number(day),
+			disableMasking
+		}
+	);
 	return response.data;
 };
