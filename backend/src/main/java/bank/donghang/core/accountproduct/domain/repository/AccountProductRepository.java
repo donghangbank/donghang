@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import bank.donghang.core.accountproduct.domain.AccountProduct;
 import bank.donghang.core.accountproduct.domain.enums.AccountProductType;
+import bank.donghang.core.accountproduct.dto.response.AccountProductDetail;
 import bank.donghang.core.accountproduct.dto.response.AccountProductSummary;
 import bank.donghang.core.common.dto.PageInfo;
 import lombok.RequiredArgsConstructor;
@@ -61,5 +62,13 @@ public class AccountProductRepository {
 		String nextPageToken = String.valueOf(lastData.accountProductId());
 
 		return PageInfo.of(nextPageToken, data, true);
+	}
+
+	public AccountProductDetail getAccountProductByName(String keyword) {
+		return accountProductJpaRepositoryCustomImpl.getAccountProductByName(keyword);
+	}
+
+	public AccountProductDetail getAccountProductDetailById(Long productId) {
+		return accountProductJpaRepositoryCustomImpl.getAccountProductDetail(productId);
 	}
 }

@@ -45,37 +45,37 @@ class AccountProductServiceTest {
 	void getAllAccountProducts_shouldReturnProductList() {
 		// given
 		List<AccountProductSummary> mockSummaries = List.of(
-				new AccountProductSummary(
-						1L,
-						"Saving Account",
-						1L,
-						"Mock Bank",
-						"https://logo.mockbank.com/logo.png",
-						0.3,
-						null,
-						0L,
-						0L,
-						AccountProductType.DEMAND.name()),
-				new AccountProductSummary(
-						2L,
-						"Checking Account",
-						1L,
-						"Mock Bank",
-						"https://logo.mockbank.com/logo.png",
-						0.2,
-						null,
-						0L,
-						0L,
-						AccountProductType.DEMAND.name())
+			new AccountProductSummary(
+				1L,
+				"Saving Account",
+				1L,
+				"Mock Bank",
+				"https://logo.mockbank.com/logo.png",
+				0.3,
+				null,
+				0L,
+				0L,
+				AccountProductType.DEMAND.name()),
+			new AccountProductSummary(
+				2L,
+				"Checking Account",
+				1L,
+				"Mock Bank",
+				"https://logo.mockbank.com/logo.png",
+				0.2,
+				null,
+				0L,
+				0L,
+				AccountProductType.DEMAND.name())
 		);
 
 		PageInfo<AccountProductSummary> expectedPage = PageInfo.of(null, mockSummaries, false);
 
 		when(accountProductRepository.getPaginatedAccountProductsByAccountProductType(
-				null,
-				null)
+			null,
+			null)
 		)
-				.thenReturn(expectedPage);
+			.thenReturn(expectedPage);
 
 		// when
 		PageInfo<AccountProductSummary> response = accountProductService.getAllAccountProducts(null);
@@ -89,24 +89,29 @@ class AccountProductServiceTest {
 	@Test
 	@DisplayName("특정 계좌 상품의 상세 정보를 가져올 수 있다.")
 	void getAccountProductDetail_shouldReturnDetail() {
-		AccountProduct mockProduct = AccountProduct.builder()
-				.accountProductId(1L)
-				.accountProductName("Saving Account")
-				.accountProductDescription("High Interest Savings")
-				.bankId(1L)
-				.interestRate(0.3)
-				.accountProductType(AccountProductType.DEMAND)
-				.subscriptionPeriod(null)
-				.rateDescription("기본 이율")
-				.minSubscriptionBalance(0L)
-				.maxSubscriptionBalance(0L)
-				.build();
+		// given
+		AccountProductDetail mockDetail = new AccountProductDetail(
+			1L,
+			"Saving Account",
+			"High Interest Savings",
+			1L,
+			"Mock Bank",
+			"https://logo.mockbank.com/logo.png",
+			0.3,
+			"기본 이율",
+			AccountProductType.DEMAND.name(),
+			null,
+			0L,
+			0L
+		);
 
-		when(accountProductRepository.existsAccountProductById(1L)).thenReturn(true);
-		when(accountProductRepository.getAccountProductById(1L)).thenReturn(mockProduct);
+		when(accountProductRepository.getAccountProductDetailById(1L))
+			.thenReturn(mockDetail);
 
+		// when
 		AccountProductDetail result = accountProductService.getAccountProductDetail(1L);
 
+		// then
 		assertThat(result.productName()).isEqualTo("Saving Account");
 		assertThat(result.productDescription()).isEqualTo("High Interest Savings");
 	}
@@ -114,13 +119,14 @@ class AccountProductServiceTest {
 	@Test
 	@DisplayName("존재하지 않는 계좌 상품을 조회하면 예외가 발생해야 한다.")
 	void getAccountProductDetail_shouldThrowExceptionWhenNotFound() {
-		when(accountProductRepository.existsAccountProductById(99L)).thenReturn(false);
+		when(accountProductRepository.getAccountProductDetailById(99L))
+			.thenReturn(null);
 
 		BadRequestException exception = assertThrows(
-				BadRequestException.class,
-				() -> accountProductService.getAccountProductDetail(99L)
+			BadRequestException.class,
+			() -> accountProductService.getAccountProductDetail(99L)
 		);
-		System.out.println(exception.getCode() + " : " + exception.getMessage());
+
 		assertThat(exception.getCode()).isEqualTo(ErrorCode.ACCOUNT_PRODUCT_NOT_FOUND.getCode());
 	}
 
@@ -129,22 +135,22 @@ class AccountProductServiceTest {
 	void registerAccountProduct_shouldCreateProduct() {
 		// given
 		AccountProductCreationRequest request = new AccountProductCreationRequest(
-				"New Account",
-				"Special benefits",
-				1L,
-				0.1,
-				"Standard Rate",
-				1,
-				12,
-				1000L,
-				100000L
+			"New Account",
+			"Special benefits",
+			1L,
+			0.1,
+			"Standard Rate",
+			1,
+			12,
+			1000L,
+			100000L
 		);
 		AccountProduct savedProduct = request.toEntity();
 
 		Bank mockBank = Bank.createBank("Mock Bank", "https://logo.mockbank.com");
 		given(bankRepository.findById(request.bankId())).willReturn(Optional.of(mockBank));
 		when(accountProductRepository.saveAccountProduct(any(AccountProduct.class)))
-				.thenReturn(savedProduct);
+			.thenReturn(savedProduct);
 
 		// when
 		AccountProductSummary result = accountProductService.registerAccountProduct(request);
@@ -158,24 +164,24 @@ class AccountProductServiceTest {
 	void getDemandProducts_shouldReturnDemandList() {
 		// given
 		List<AccountProductSummary> mockList = List.of(
-				new AccountProductSummary(
-						1L,
-						"자유입출금",
-						1L,
-						"샘플 은행",
-						"https://logo.mockbank.com/logo.png",
-						0.5,
-						null,
-						0L,
-						0L,
-						AccountProductType.DEMAND.name())
+			new AccountProductSummary(
+				1L,
+				"자유입출금",
+				1L,
+				"샘플 은행",
+				"https://logo.mockbank.com/logo.png",
+				0.5,
+				null,
+				0L,
+				0L,
+				AccountProductType.DEMAND.name())
 		);
 
 		PageInfo<AccountProductSummary> expectedPage = PageInfo.of(null, mockList, false);
 
 		when(accountProductRepository.getPaginatedAccountProductsByAccountProductType(
-				AccountProductType.DEMAND, null))
-				.thenReturn(expectedPage);
+			AccountProductType.DEMAND, null))
+			.thenReturn(expectedPage);
 
 		// when
 		PageInfo<AccountProductSummary> result = accountProductService.getDemandProducts(null);
@@ -183,7 +189,7 @@ class AccountProductServiceTest {
 		// then
 		assertThat(result.data()).hasSize(1);
 		assertThat(result.data().get(0).accountProductType())
-				.isEqualTo(AccountProductType.DEMAND.name());
+			.isEqualTo(AccountProductType.DEMAND.name());
 	}
 
 	@Test
@@ -191,24 +197,24 @@ class AccountProductServiceTest {
 	void getDepositProducts_shouldReturnDepositList() {
 		// given
 		List<AccountProductSummary> mockList = List.of(
-				new AccountProductSummary(
-						2L,
-						"예금 상품",
-						1L,
-						"샘플 은행",
-						"https://logo.mockbank.com/logo.png",
-						2.0,
-						12,
-						1000L,
-						100000L,
-						AccountProductType.DEPOSIT.name())
+			new AccountProductSummary(
+				2L,
+				"예금 상품",
+				1L,
+				"샘플 은행",
+				"https://logo.mockbank.com/logo.png",
+				2.0,
+				12,
+				1000L,
+				100000L,
+				AccountProductType.DEPOSIT.name())
 		);
 
 		PageInfo<AccountProductSummary> expectedPage = PageInfo.of(null, mockList, false);
 
 		when(accountProductRepository.getPaginatedAccountProductsByAccountProductType(
-				AccountProductType.DEPOSIT, null))
-				.thenReturn(expectedPage);
+			AccountProductType.DEPOSIT, null))
+			.thenReturn(expectedPage);
 
 		// when
 		PageInfo<AccountProductSummary> result = accountProductService.getDepositProducts(null);
@@ -216,7 +222,7 @@ class AccountProductServiceTest {
 		// then
 		assertThat(result.data()).hasSize(1);
 		assertThat(result.data().get(0).accountProductType())
-				.isEqualTo(AccountProductType.DEPOSIT.name());
+			.isEqualTo(AccountProductType.DEPOSIT.name());
 	}
 
 	@Test
@@ -224,24 +230,24 @@ class AccountProductServiceTest {
 	void getInstallmentProducts_shouldReturnInstallmentList() {
 		// given
 		List<AccountProductSummary> mockList = List.of(
-				new AccountProductSummary(
-						3L,
-						"적금 상품",
-						1L,
-						"샘플 은행",
-						"https://logo.mockbank.com/logo.png",
-						3.0,
-						12,
-						500L,
-						50000L,
-						AccountProductType.INSTALLMENT.name())
+			new AccountProductSummary(
+				3L,
+				"적금 상품",
+				1L,
+				"샘플 은행",
+				"https://logo.mockbank.com/logo.png",
+				3.0,
+				12,
+				500L,
+				50000L,
+				AccountProductType.INSTALLMENT.name())
 		);
 
 		PageInfo<AccountProductSummary> expectedPage = PageInfo.of(null, mockList, false);
 
 		when(accountProductRepository.getPaginatedAccountProductsByAccountProductType(
-				AccountProductType.INSTALLMENT, null))
-				.thenReturn(expectedPage);
+			AccountProductType.INSTALLMENT, null))
+			.thenReturn(expectedPage);
 
 		// when
 		PageInfo<AccountProductSummary> result = accountProductService.getInstallmentProducts(null);
@@ -249,6 +255,6 @@ class AccountProductServiceTest {
 		// then
 		assertThat(result.data()).hasSize(1);
 		assertThat(result.data().get(0).accountProductType())
-				.isEqualTo(AccountProductType.INSTALLMENT.name());
+			.isEqualTo(AccountProductType.INSTALLMENT.name());
 	}
 }

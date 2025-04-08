@@ -34,13 +34,13 @@ public class AccountProductController {
 
 	@GetMapping("/{productId}")
 	public ResponseEntity<AccountProductDetail> getAccountProductDetail(
-			@PathVariable(name = "productId", required = true) Long productId) {
+		@PathVariable(name = "productId", required = true) Long productId) {
 		return ResponseEntity.ok(productService.getAccountProductDetail(productId));
 	}
 
 	@PostMapping()
 	public ResponseEntity<AccountProductSummary> createAccountProduct(
-			@RequestBody @Valid AccountProductCreationRequest accountProductCreationRequest) {
+		@RequestBody @Valid AccountProductCreationRequest accountProductCreationRequest) {
 		return ResponseEntity.ok(productService.registerAccountProduct(accountProductCreationRequest));
 	}
 
@@ -63,5 +63,10 @@ public class AccountProductController {
 		@RequestParam(required = false) String pageToken
 	) {
 		return ResponseEntity.ok(productService.getInstallmentProducts(pageToken));
+	}
+
+	@GetMapping("/search")
+	public ResponseEntity<AccountProductDetail> searchAccountProduct(@RequestParam String keyword) {
+		return ResponseEntity.ok(productService.searchAccountProductDetailByName(keyword));
 	}
 }

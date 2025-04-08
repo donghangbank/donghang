@@ -50,6 +50,16 @@ include::{snippets}/account-product-controller-test/get_product_detail/http-requ
 
 include::{snippets}/account-product-controller-test/get_product_detail/http-response.adoc[]
 
+=== 이름으로 계좌 상품 검색 (GET /api/v1/accountproducts/search?keyword={keyword})
+
+==== 요청
+
+include::{snippets}/account-product-controller-test/search-account-product_should-return-product-detail/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/account-product-controller-test/search-account-product_should-return-product-detail/http-response.adoc[]
+
 === 계좌 상품 등록 (POST /api/v1/accountproducts)
 
 ==== 요청
