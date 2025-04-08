@@ -3,6 +3,7 @@ package bank.donghang.core.ledger.application;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +38,7 @@ public class LedgerEventHandler {
 
 	private final LedgerRepository ledgerRepository;
 
+	@Async("ledgerExecutor")
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handleTransfer(TransferEvent transferEvent) {
@@ -72,6 +74,7 @@ public class LedgerEventHandler {
 		ledgerRepository.saveJournalLine(creditLine);
 	}
 
+	@Async("ledgerExecutor")
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handleDeposit(DepositEvent event) {
@@ -106,6 +109,7 @@ public class LedgerEventHandler {
 		ledgerRepository.saveJournalLine(bankLine);
 	}
 
+	@Async("ledgerExecutor")
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handleWithdrawal(WithdrawalEvent event) {
