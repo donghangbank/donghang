@@ -2,6 +2,7 @@ package bank.donghang.core.account.application;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -127,6 +128,7 @@ public class AccountService {
 			savedAccount,
 			accountProduct,
 			null,
+			null,
 			null
 		);
 	}
@@ -177,6 +179,7 @@ public class AccountService {
 		return AccountRegisterResponse.from(
 			savedDepositAccount,
 			data.accountProduct,
+			null,
 			req.withdrawalAccountNumber(),
 			req.payoutAccountNumber()
 		);
@@ -200,7 +203,17 @@ public class AccountService {
 			"300",
 			"001"
 		);
-		LocalDate expiryDate = LocalDate.now().plusMonths(data.accountProduct.getSubscriptionPeriod());
+		LocalDate nextInstallmentScheduleDate = LocalDate.now()
+			.plusMonths(1)
+			.withDayOfMonth(
+				Math.min(req.monthlyInstallmentDay(),
+					YearMonth
+						.from(
+							LocalDate
+								.now()
+								.plusMonths(1))
+						.lengthOfMonth()));
+		LocalDate expiryDate = nextInstallmentScheduleDate.plusMonths(data.accountProduct.getSubscriptionPeriod());
 
 		Account newInstallmentAccount = req.toEntity(
 			newAccountNumber,
@@ -211,13 +224,15 @@ public class AccountService {
 		);
 
 		Account savedInstallmentAccount = accountRepository.saveInstallmentAccount(
-				newInstallmentAccount,
-				data.accountProduct
+			newInstallmentAccount,
+			data.accountProduct,
+			nextInstallmentScheduleDate
 		);
 
 		return AccountRegisterResponse.from(
 			savedInstallmentAccount,
 			data.accountProduct,
+			nextInstallmentScheduleDate,
 			req.withdrawalAccountNumber(),
 			req.payoutAccountNumber()
 		);

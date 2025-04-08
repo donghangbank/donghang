@@ -37,18 +37,12 @@ public class AccountRepository {
 
 	// 적금 계좌 저장 + 적금 납입 스케줄 저장
 	@Transactional
-	public Account saveInstallmentAccount(Account account, AccountProduct accountProduct) {
+	public Account saveInstallmentAccount(
+		Account account,
+		AccountProduct accountProduct,
+		LocalDate nextInstallmentScheduleDate
+	) {
 		Account savedAccount = saveAccount(account);
-		LocalDate nextInstallmentDate = LocalDate.now()
-				.plusMonths(1)
-				.withDayOfMonth(
-						Math.min(account.getMonthlyInstallmentDay(),
-								YearMonth
-										.from(
-												LocalDate
-														.now()
-														.plusMonths(1))
-										.lengthOfMonth()));
 
 		InstallmentSchedule installmentSchedule =
 				InstallmentSchedule
@@ -57,7 +51,7 @@ public class AccountRepository {
 						.installmentAmount(savedAccount.getMonthlyInstallmentAmount())
 						.installmentSequence(1)
 						.installmentStatus(InstallmentStatus.SCHEDULED)
-						.installmentScheduledDate(nextInstallmentDate)
+						.installmentScheduledDate(nextInstallmentScheduleDate)
 						.subscriptionPeriod(accountProduct.getSubscriptionPeriod())
 						.build();
 

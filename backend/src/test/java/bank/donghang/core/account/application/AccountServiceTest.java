@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.List;
@@ -100,8 +101,8 @@ class AccountServiceTest {
 
 		String nextAccountNumber = "000001";
 		when(accountRepository.getNextAccountNumber(
-			"100",
-			"001"
+				"100",
+				"001"
 			)
 		)
 			.thenReturn(nextAccountNumber);
@@ -178,8 +179,8 @@ class AccountServiceTest {
 
 		String newDepositAccountNumber = "200001000010";
 		when(accountRepository.getNextAccountNumber(
-			"200",
-			"001"
+				"200",
+				"001"
 			)
 		).thenReturn(newDepositAccountNumber);
 
@@ -418,6 +419,7 @@ class AccountServiceTest {
 		String withdrawalAccountNumber = "100001000004";
 		String payoutAccountNumber = "100001000005";
 		Long monthlyInstallmentAmount = 1000L;
+		Integer monthlyInstallmentDay = 30;
 
 		InstallmentAccountRegisterRequest request = mock(InstallmentAccountRegisterRequest.class);
 		when(request.accountProductId()).thenReturn(productId);
@@ -425,6 +427,7 @@ class AccountServiceTest {
 		when(request.withdrawalAccountNumber()).thenReturn(withdrawalAccountNumber);
 		when(request.payoutAccountNumber()).thenReturn(payoutAccountNumber);
 		when(request.monthlyInstallmentAmount()).thenReturn(monthlyInstallmentAmount);
+		when(request.monthlyInstallmentDay()).thenReturn(monthlyInstallmentDay);
 
 		AccountProduct accountProduct = mock(AccountProduct.class);
 		when(accountProduct.getInterestRate()).thenReturn(5.0);
@@ -445,15 +448,25 @@ class AccountServiceTest {
 
 		String newAccountNumber = "300001000010";
 		when(accountRepository.getNextAccountNumber(
-				"300",
-				"001")
+			"300",
+			"001")
 		).thenReturn(newAccountNumber);
 
 		when(withdrawalAccount.getAccountId()).thenReturn(111L);
 		when(payoutAccount.getAccountId()).thenReturn(222L);
 
 		Double interestRate = accountProduct.getInterestRate();
-		LocalDate expectedExpiryDate = LocalDate.now().plusMonths(24L);
+		LocalDate nextInstallmentScheduleDate = LocalDate.now()
+			.plusMonths(1)
+			.withDayOfMonth(
+				Math.min(monthlyInstallmentDay,
+					YearMonth
+						.from(
+							LocalDate
+								.now()
+								.plusMonths(1))
+						.lengthOfMonth()));
+		LocalDate expectedExpiryDate = nextInstallmentScheduleDate.plusMonths(24L);
 
 		Account installmentAccount = mock(Account.class);
 		when(request.toEntity(
@@ -465,8 +478,10 @@ class AccountServiceTest {
 			.thenReturn(installmentAccount);
 
 		when(accountRepository.saveInstallmentAccount(
-				installmentAccount,
-				accountProduct)
+			installmentAccount,
+			accountProduct,
+			nextInstallmentScheduleDate
+			)
 		).thenReturn(installmentAccount);
 
 		AccountRegisterResponse response = accountService.createInstallmentAccount(request);
@@ -478,7 +493,11 @@ class AccountServiceTest {
 		verify(withdrawalAccount).verifyWithdrawalAccount(memberId, monthlyInstallmentAmount);
 		verify(payoutAccount).verifyPayoutAccount(memberId);
 		verify(accountRepository).getNextAccountNumber("300", "001");
-		verify(accountRepository).saveInstallmentAccount(installmentAccount, accountProduct);
+		verify(accountRepository).saveInstallmentAccount(
+			installmentAccount,
+			accountProduct,
+			nextInstallmentScheduleDate
+		);
 	}
 
 	@Test
@@ -726,18 +745,18 @@ class AccountServiceTest {
 		// given
 		LocalDate today = LocalDate.now();
 		InstallmentSchedule schedule1 = createInstallmentSchedule(
-				1L,
-				2L,
-				10000L,
-				1,
-				15
+			1L,
+			2L,
+			10000L,
+			1,
+			15
 		);
 		InstallmentSchedule schedule2 = createInstallmentSchedule(
-				3L,
-				4L,
-				20000L,
-				2,
-				15
+			3L,
+			4L,
+			20000L,
+			2,
+			15
 		);
 
 		given(accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(today))
@@ -763,9 +782,9 @@ class AccountServiceTest {
 
 		// verify
 		then(transferFacade).should(times(2))
-				.transfer(any(TransferInfo.class));
+			.transfer(any(TransferInfo.class));
 		then(accountRepository).should(times(2))
-				.saveInstallmentSchedule(any(InstallmentSchedule.class));
+			.saveInstallmentSchedule(any(InstallmentSchedule.class));
 	}
 
 	@Test
@@ -774,11 +793,11 @@ class AccountServiceTest {
 		// given
 		LocalDate today = LocalDate.now();
 		InstallmentSchedule schedule = createInstallmentSchedule(
-				1L,
-				2L,
-				10000L,
-				1,
-				15
+			1L,
+			2L,
+			10000L,
+			1,
+			15
 		);
 
 		given(accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(today))
@@ -800,7 +819,7 @@ class AccountServiceTest {
 		// verify
 		then(transferFacade).should(never()).transfer(any());
 		then(accountRepository).should(times(1))
-				.saveInstallmentSchedule(any(InstallmentSchedule.class));
+			.saveInstallmentSchedule(any(InstallmentSchedule.class));
 	}
 
 	@Test
@@ -809,11 +828,11 @@ class AccountServiceTest {
 		// given
 		LocalDate today = LocalDate.now();
 		InstallmentSchedule schedule = createInstallmentSchedule(
-				1L,
-				2L,
-				10000L,
-				1,
-				15
+			1L,
+			2L,
+			10000L,
+			1,
+			15
 		);
 
 		given(accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(today))
@@ -837,7 +856,7 @@ class AccountServiceTest {
 		// verify
 		then(transferFacade).should(never()).transfer(any());
 		then(accountRepository).should(times(1))
-				.saveInstallmentSchedule(any(InstallmentSchedule.class));
+			.saveInstallmentSchedule(any(InstallmentSchedule.class));
 	}
 
 	@Test
@@ -846,11 +865,11 @@ class AccountServiceTest {
 		// given
 		LocalDate today = LocalDate.now();
 		InstallmentSchedule schedule = createInstallmentSchedule(
-				1L,
-				2L,
-				10000L,
-				1,
-				15
+			1L,
+			2L,
+			10000L,
+			1,
+			15
 		);
 
 		given(accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(today))
@@ -876,9 +895,9 @@ class AccountServiceTest {
 
 		// verify
 		then(transferFacade).should(times(1))
-				.transfer(any(TransferInfo.class));
+			.transfer(any(TransferInfo.class));
 		then(accountRepository).should(times(1))
-				.saveInstallmentSchedule(any(InstallmentSchedule.class));
+			.saveInstallmentSchedule(any(InstallmentSchedule.class));
 	}
 
 	@Test
@@ -888,11 +907,11 @@ class AccountServiceTest {
 		LocalDate today = LocalDate.now();
 		// 출금계좌와 적금계좌가 동일한 경우
 		InstallmentSchedule schedule = createInstallmentSchedule(
-				1L,
-				1L,
-				10000L,
-				1,
-				15
+			1L,
+			1L,
+			10000L,
+			1,
+			15
 		);
 
 		given(accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(today))
@@ -900,8 +919,8 @@ class AccountServiceTest {
 
 		given(accountRepository.findAccountById(1L))
 			.willReturn(Optional.of(createAccount(
-					1L,
-					10000L))
+				1L,
+				10000L))
 			);
 
 		doThrow(new BadRequestException(ErrorCode.SAME_ACCOUNT_TRANSFER))
@@ -919,9 +938,9 @@ class AccountServiceTest {
 
 		// verify
 		then(transferFacade).should(times(1))
-				.transfer(any(TransferInfo.class));
+			.transfer(any(TransferInfo.class));
 		then(accountRepository).should(times(1))
-				.saveInstallmentSchedule(any(InstallmentSchedule.class));
+			.saveInstallmentSchedule(any(InstallmentSchedule.class));
 	}
 
 	@Test
@@ -930,11 +949,11 @@ class AccountServiceTest {
 		// given
 		LocalDate today = LocalDate.now();
 		InstallmentSchedule schedule = createInstallmentSchedule(
-				1L,
-				2L,
-				10000L,
-				1,
-				15
+			1L,
+			2L,
+			10000L,
+			1,
+			15
 		);
 
 		given(accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(today))
@@ -960,9 +979,9 @@ class AccountServiceTest {
 
 		// verify
 		then(transferFacade).should(times(1))
-				.transfer(any(TransferInfo.class));
+			.transfer(any(TransferInfo.class));
 		then(accountRepository).should(times(1))
-				.saveInstallmentSchedule(any(InstallmentSchedule.class));
+			.saveInstallmentSchedule(any(InstallmentSchedule.class));
 	}
 
 	@Test
@@ -971,11 +990,11 @@ class AccountServiceTest {
 		// given
 		LocalDate today = LocalDate.now();
 		InstallmentSchedule schedule = createInstallmentSchedule(
-				1L,
-				2L,
-				10000L,
-				1,
-				15
+			1L,
+			2L,
+			10000L,
+			1,
+			15
 		);
 
 		given(accountRepository.findInstallmentScheduleByInstallmentDateAndScheduled(today))
@@ -1005,7 +1024,7 @@ class AccountServiceTest {
 
 		// verify
 		verify(accountRepository, times(1))
-				.saveInstallmentSchedule(any(InstallmentSchedule.class));
+			.saveInstallmentSchedule(any(InstallmentSchedule.class));
 	}
 
 	private InstallmentSchedule createInstallmentSchedule(
