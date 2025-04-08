@@ -8,7 +8,7 @@ export const ProductProvider = ({ children }: { children: React.ReactNode }): JS
 	const [withdrawalAccountNumber, setWithdrawalAccountNumber] = useState("");
 	const [payoutAccountNumber, setPayoutAccountNumber] = useState("");
 	const [amount, setAmount] = useState("");
-	const [day, setDay] = useState(0);
+	const [day, setDay] = useState("");
 	const [minAmount, setMinAmount] = useState(0);
 	const [maxAmount, setMaxAmount] = useState(0);
 	const [productName, setProductName] = useState("");
@@ -16,6 +16,7 @@ export const ProductProvider = ({ children }: { children: React.ReactNode }): JS
 	const [accountBalance, setAccountBalance] = useState(0);
 	const [interestRate, setInterestRate] = useState(0);
 	const [accountExpiryDate, setAccountExpiryDate] = useState("");
+	const [nextInstallmentScheduleDate, setNextInstallmentScheduleDate] = useState("");
 
 	const resetAll = useCallback(() => {
 		setMemberId(0);
@@ -24,7 +25,7 @@ export const ProductProvider = ({ children }: { children: React.ReactNode }): JS
 		setWithdrawalAccountNumber("");
 		setPayoutAccountNumber("");
 		setAmount("");
-		setDay(0);
+		setDay("");
 		setMinAmount(0);
 		setMaxAmount(0);
 		setProductName("");
@@ -32,6 +33,7 @@ export const ProductProvider = ({ children }: { children: React.ReactNode }): JS
 		setAccountBalance(0);
 		setInterestRate(0);
 		setAccountExpiryDate("");
+		setNextInstallmentScheduleDate("");
 	}, []);
 
 	return (
@@ -51,6 +53,7 @@ export const ProductProvider = ({ children }: { children: React.ReactNode }): JS
 				accountBalance,
 				interestRate,
 				accountExpiryDate,
+				nextInstallmentScheduleDate,
 				setMemberId,
 				setAccountProductId,
 				setPassword,
@@ -65,6 +68,7 @@ export const ProductProvider = ({ children }: { children: React.ReactNode }): JS
 				setAccountBalance,
 				setInterestRate,
 				setAccountExpiryDate,
+				setNextInstallmentScheduleDate,
 				resetAll
 			}}
 		>
