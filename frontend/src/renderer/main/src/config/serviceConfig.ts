@@ -81,7 +81,19 @@ const SERVICE_CONFIG: Record<string, ServiceConfig> = {
 			{ path: "option", name: "인증 수단 선택" },
 			{ path: "password", name: "비밀번호 입력" },
 			{ path: "amount", name: "예치금 입력" },
-			{ path: "specsheet", name: "상품 가입" },
+			{ path: "specsheet", name: "예금 상품 가입" },
+			{ path: "final", name: "완료" }
+		]
+	},
+	installmentproducts: {
+		title: "적금 상품 가입",
+		steps: [
+			{ path: "products", name: "적금 상품 목록" },
+			{ path: "warning", name: "금융 사기" },
+			{ path: "option", name: "인증 수단 선택" },
+			{ path: "password", name: "비밀번호 입력" },
+			{ path: "amount", name: "월 납입액 입력" },
+			{ path: "specsheet", name: "적금 상품 가입" },
 			{ path: "final", name: "완료" }
 		]
 	}
