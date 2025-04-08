@@ -51,3 +51,27 @@ export interface getInstallmentProductsAPIResponse {
 	data: InstallmentProduct[];
 	hasNext: boolean;
 }
+
+export interface DemandProduct {
+	productName?: string;
+	productDescription?: string;
+	accountProductId: number;
+	accountProductName: string;
+	bankId: number;
+	bankName: string;
+	bankLogoUrl: string;
+	interestRate: number;
+	minSubscriptionBalance: number;
+	maxSubscriptionBalance: number;
+	subscriptionPeriod: number;
+	accountProductType: string;
+	productTypeCode?: number;
+	productTypeName: string;
+	rateDescription: string;
+}
+
+export interface getDemandProductsAPIResponse {
+	pageToken: number | null;
+	data: DemandProduct[];
+	hasNext: boolean;
+}
