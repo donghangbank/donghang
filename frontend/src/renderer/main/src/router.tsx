@@ -100,6 +100,13 @@ import InstallmentProductOption from "./pages/general/products/installment/Insta
 import InstallmentProductCardWarningPage from "./pages/general/products/installment/InstallmentProductCardWarningPage";
 import InstallmentProduct from "./pages/general/products/installment/InstallmentProduct";
 import InstallmentProducts from "./pages/general/products/installment/InstallmentProducts";
+import DemandProducts from "./pages/general/demands/DemandProducts";
+import DemandProduct from "./pages/general/demands/DemandProduct";
+import DemandProductResidentWarningPage from "./pages/general/demands/DemandProductResidentWarningPage";
+import DemandProductResidentInputPage from "./pages/general/demands/DemandProductResidentInputPage";
+import DemandProductResidentAuthPage from "./pages/general/demands/DemandProductResidentAuthPage";
+import DemandProductInfoPasswordPage from "./pages/general/demands/DemandProductInfoPasswordPage";
+import DemandProductInfoSpecSheetPage from "./pages/general/demands/DemandProductInfoSpecSheetPage";
 
 const router = createHashRouter([
 	{
@@ -507,6 +514,54 @@ const router = createHashRouter([
 									{
 										path: "specsheet",
 										element: <InstallmentProductInfoSpecSheetPage />
+									}
+								]
+							}
+						]
+					},
+					{
+						path: "demandproducts",
+						children: [
+							{
+								path: "products",
+								element: <DemandProducts />
+							},
+							{
+								path: ":id",
+								element: <DemandProduct />
+							},
+							{
+								path: "warning",
+								children: [
+									{
+										path: "residentwarning",
+										element: <DemandProductResidentWarningPage />
+									}
+								]
+							},
+							{
+								path: "resident",
+								children: [
+									{
+										path: "input",
+										element: <DemandProductResidentInputPage />
+									},
+									{
+										path: "auth",
+										element: <DemandProductResidentAuthPage />
+									}
+								]
+							},
+							{
+								path: "info",
+								children: [
+									{
+										path: "password",
+										element: <DemandProductInfoPasswordPage />
+									},
+									{
+										path: "specsheet",
+										element: <DemandProductInfoSpecSheetPage />
 									}
 								]
 							}

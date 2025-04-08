@@ -96,6 +96,17 @@ const SERVICE_CONFIG: Record<string, ServiceConfig> = {
 			{ path: "specsheet", name: "적금 상품 가입" },
 			{ path: "final", name: "완료" }
 		]
+	},
+	demandproducts: {
+		title: "입출금 계좌 개설",
+		steps: [
+			{ path: "products", name: "입출금 계좌 목록" },
+			{ path: "warning", name: "금융 사기" },
+			{ path: "resident", name: "신분증 투입" },
+			{ path: "password", name: "비밀번호 입력" },
+			{ path: "specsheet", name: "적금 상품 가입" },
+			{ path: "final", name: "완료" }
+		]
 	}
 };
 
