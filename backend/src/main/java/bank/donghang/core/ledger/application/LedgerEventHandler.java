@@ -43,10 +43,6 @@ public class LedgerEventHandler {
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handleTransfer(TransferEvent transferEvent) {
 
-		String currentThreadName = Thread.currentThread().getName();
-		log.info("current thread name: {}", currentThreadName);
-		long start = System.currentTimeMillis();
-
 		JournalEntry transferEntry = createJournalEntry(
 			transferEvent.senderTransactionId(),
 			"계좌 이체",
@@ -76,10 +72,6 @@ public class LedgerEventHandler {
 
 		ledgerRepository.saveJournalLine(debitLine);
 		ledgerRepository.saveJournalLine(creditLine);
-
-		long end = System.currentTimeMillis();
-
-		log.info("***handleTransaction*** 작업 시간: {}ms", (end - start));
 	}
 
 	@Async("ledgerExecutor")
