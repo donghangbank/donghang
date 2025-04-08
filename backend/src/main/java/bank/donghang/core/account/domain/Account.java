@@ -139,8 +139,8 @@ public class Account {
 		return this.accountBalance >= initialDepositAmount;
 	}
 
-	public void verifyWithdrawalAccount(Long memeberId, Long initDepositAmount) {
-		if (!isOwner(memeberId)) {
+	public void verifyWithdrawalAccount(Long memberId, Long initDepositAmount) {
+		if (!isOwner(memberId)) {
 			throw new BadRequestException(ErrorCode.WITHDRAWAL_ACCOUNT_NOT_OWNED);
 		}
 
