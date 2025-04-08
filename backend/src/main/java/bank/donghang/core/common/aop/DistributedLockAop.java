@@ -23,6 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DistributedLockAop {
 	private static final String REDISSON_LOCK_PREFIX = "LOCK:";
+	private static final int MAX_RETRIES = 5;
+	private static final long RETRY_DELAY_MS = 500;
 
 	private final RedissonClient redissonClient;
 	private final AopForTransaction aopForTransaction;
@@ -42,22 +44,40 @@ public class DistributedLockAop {
 
 		RLock rLock = redissonClient.getLock(key);
 
-		try {
-			boolean available = rLock.tryLock(
-				distributedLock.waitTime(),
-				distributedLock.leaseTime(),
-				distributedLock.timeUnit()
-			);
-			if (!available) {
-				log.warn("Lock not available for key: {}", key);
-				return false;
-			}
+		int retryCount = 0;
+		boolean lockAcquired = false;
 
-			log.info("Lock acquired for key: {}", key);
+		while (!lockAcquired && retryCount < MAX_RETRIES) {
+			try {
+				lockAcquired = rLock.tryLock(
+					distributedLock.waitTime(),
+					distributedLock.leaseTime(),
+					distributedLock.timeUnit()
+				);
+
+				if (!lockAcquired) {
+					retryCount++;
+					log.warn("Failed to acquire lock for key: {}, retry count: {}/{}", key, retryCount, MAX_RETRIES);
+
+					if (retryCount < MAX_RETRIES) {
+						Thread.sleep(RETRY_DELAY_MS);
+					}
+				}
+			} catch (InterruptedException e) {
+				log.error("InterruptedException while acquiring lock for key: {}", key, e);
+				Thread.currentThread().interrupt();
+				throw new RuntimeException("Thread was interrupted while acquiring lock", e);
+			}
+		}
+
+		if (!lockAcquired) {
+			log.error("Failed to acquire lock after {} retries for key: {}", MAX_RETRIES, key);
+			throw new RuntimeException("Failed to acquire distributed lock after maximum retries");
+		}
+
+		try {
+			log.info("Lock acquired for key: {} after {} retries", key, retryCount);
 			return aopForTransaction.proceed(joinPoint);
-		} catch (InterruptedException e) {
-			log.error("InterruptedException while acquiring lock for key: {}", key, e);
-			throw new InterruptedException();
 		} finally {
 			try {
 				rLock.unlock();
@@ -98,53 +118,83 @@ public class DistributedLockAop {
 
 		boolean lock1Acquired = false;
 		boolean lock2Acquired = false;
+		int retryCount = 0;
 
-		try {
-			lock1Acquired = rLock1.tryLock(
-				distributedLock.waitTime(),
-				distributedLock.leaseTime(),
-				distributedLock.timeUnit()
-			);
-			if (!lock1Acquired) {
-				log.warn("Lock not available for key: {}", key1);
-				return false;
-			}
+		while (retryCount < MAX_RETRIES) {
+			try {
+				lock1Acquired = rLock1.tryLock(
+					distributedLock.waitTime(),
+					distributedLock.leaseTime(),
+					distributedLock.timeUnit()
+				);
 
-			lock2Acquired = rLock2.tryLock(
-				distributedLock.waitTime(),
-				distributedLock.leaseTime(),
-				distributedLock.timeUnit()
-			);
-			if (!lock2Acquired) {
-				log.warn("Lock not available for key: {}", key2);
-				return false;
-			}
+				if (!lock1Acquired) {
+					retryCount++;
+					log.warn("Failed to acquire first lock for key: {}, retry count: {}/{}", key1, retryCount,
+						MAX_RETRIES);
 
-			log.info("Lock acquired for key: {}", key1);
-			log.info("Lock acquired for key: {}", key2);
-
-			return aopForTransaction.proceed(joinPoint);
-		} catch (InterruptedException e) {
-			log.error("InterruptedException while acquiring lock for key: {}", key1, e);
-			Thread.currentThread().interrupt();
-			throw new RuntimeException("Thread was interrupted while acquiring lock", e);
-		} finally {
-			if (lock2Acquired) {
-				try {
-					rLock2.unlock();
-					log.info("Lock released for key: {}", key2);
-				} catch (IllegalMonitorStateException e) {
-					log.info("Redisson Lock Already UnLock {} {}", method.getName(), key2);
+					if (retryCount < MAX_RETRIES) {
+						Thread.sleep(RETRY_DELAY_MS);
+						continue;
+					} else {
+						log.error("Failed to acquire first lock after {} retries for key: {}", MAX_RETRIES, key1);
+						throw new RuntimeException("Failed to acquire first distributed lock after maximum retries");
+					}
 				}
-			}
-			if (lock1Acquired) {
-				try {
-					rLock1.unlock();
-					log.info("Lock released for key: {}", key1);
-				} catch (IllegalMonitorStateException e) {
-					log.info("Redisson Lock Already UnLock {} {}", method.getName(), key1);
+
+				lock2Acquired = rLock2.tryLock(
+					distributedLock.waitTime(),
+					distributedLock.leaseTime(),
+					distributedLock.timeUnit()
+				);
+
+				if (!lock2Acquired) {
+					try {
+						rLock1.unlock();
+						lock1Acquired = false;
+					} catch (IllegalMonitorStateException e) {
+						log.info("Redisson Lock Already UnLock {} {}", method.getName(), key1);
+					}
+
+					retryCount++;
+					log.warn("Failed to acquire second lock for key: {}, releasing first lock and retrying: {}/{}",
+						key2, retryCount, MAX_RETRIES);
+
+					if (retryCount < MAX_RETRIES) {
+						Thread.sleep(RETRY_DELAY_MS);
+						continue;
+					} else {
+						log.error("Failed to acquire second lock after {} retries for key: {}", MAX_RETRIES, key2);
+						throw new RuntimeException("Failed to acquire second distributed lock after maximum retries");
+					}
+				}
+
+				log.info("Locks acquired for keys: {} and {} after {} retries", key1, key2, retryCount);
+				return aopForTransaction.proceed(joinPoint);
+			} catch (InterruptedException e) {
+				log.error("InterruptedException while acquiring locks", e);
+				Thread.currentThread().interrupt();
+				throw new RuntimeException("Thread was interrupted while acquiring locks", e);
+			} finally {
+				if (lock2Acquired) {
+					try {
+						rLock2.unlock();
+						log.info("Lock released for key: {}", key2);
+					} catch (IllegalMonitorStateException e) {
+						log.info("Redisson Lock Already UnLock {} {}", method.getName(), key2);
+					}
+				}
+				if (lock1Acquired) {
+					try {
+						rLock1.unlock();
+						log.info("Lock released for key: {}", key1);
+					} catch (IllegalMonitorStateException e) {
+						log.info("Redisson Lock Already UnLock {} {}", method.getName(), key1);
+					}
 				}
 			}
 		}
+
+		throw new RuntimeException("Failed to acquire distributed locks after maximum retries");
 	}
 }
