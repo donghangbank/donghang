@@ -46,3 +46,8 @@ export const formatTransactionTime = (transactionTime: string): string => {
 export const formatDefault = (value: string): string => {
 	return value;
 };
+
+export const formatDay = (value: string): string => {
+	const number = Number(value);
+	return `${number}일`;
+};
