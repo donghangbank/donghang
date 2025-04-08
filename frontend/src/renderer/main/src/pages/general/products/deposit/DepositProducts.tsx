@@ -17,14 +17,26 @@ export const DepositProducts = (): JSX.Element => {
 	});
 
 	useEffect(() => {
+		return (): void => {
+			setAllProducts([]);
+			setCurrentPage(0);
+			setPageTokens([null]);
+			setHasNext(false);
+		};
+	}, []);
+
+	useEffect(() => {
 		if (isSuccess && data) {
 			if (currentPage === pageTokens.length - 1) {
-				setAllProducts((prev) => [...prev, ...data.data]);
+				const newProducts = data.data.filter(
+					(product) => !allProducts.some((p) => p.accountProductId === product.accountProductId)
+				);
+				setAllProducts((prev) => [...prev, ...newProducts]);
 				setPageTokens((prev) => [...prev, data.pageToken]);
 				setHasNext(data.hasNext);
 			}
 		}
-	}, [isSuccess, data, currentPage, pageTokens]);
+	}, [isSuccess, data, currentPage, pageTokens, allProducts]);
 
 	const handleNext = (): void => {
 		if ((currentPage + 1) * 3 >= setAllProducts.length && hasNext) {
