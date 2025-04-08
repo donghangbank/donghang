@@ -16,9 +16,14 @@ public record AccountRegisterResponse(
 	String accountNumber,
 	Long accountBalance,
 	Double interestRate,
-	LocalDate accountExpiryDate
+	LocalDate accountExpiryDate,
+	LocalDate nextInstallmentScheduleDate
 ) {
-	public static AccountRegisterResponse from(Account account, AccountProduct product, String withdrawalAccountNumber,
+	public static AccountRegisterResponse from(
+		Account account,
+		AccountProduct product,
+		LocalDate nextInstallmentScheduleDate,
+		String withdrawalAccountNumber,
 		String payoutAccountNumber) {
 		return new AccountRegisterResponse(
 			product.getAccountProductName(),
@@ -27,7 +32,8 @@ public record AccountRegisterResponse(
 			account.getAccountTypeCode() + account.getBranchCode() + account.getAccountNumber(),
 			account.getAccountBalance(),
 			product.getInterestRate(),
-			account.getAccountExpiryDate()
+			account.getAccountExpiryDate(),
+			nextInstallmentScheduleDate
 		);
 	}
 }

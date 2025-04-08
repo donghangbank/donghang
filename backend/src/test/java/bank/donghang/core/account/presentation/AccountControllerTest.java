@@ -112,8 +112,16 @@ class AccountControllerTest extends ControllerTest {
 		DemandAccountRegisterRequest request = new DemandAccountRegisterRequest(memberId, accountProductId, password,
 			true);
 
-		AccountRegisterResponse response = new AccountRegisterResponse("Savings Product", null, null, "100001000001",
-			0L, 0.05, LocalDate.of(2025, 3, 20));
+		AccountRegisterResponse response = new AccountRegisterResponse(
+			"Savings Product",
+			null,
+			null,
+			"100001000001",
+			0L,
+			0.05,
+			LocalDate.of(2025, 3, 20),
+			null
+		);
 
 		when(accountService.createDemandAccount(any(DemandAccountRegisterRequest.class))).thenReturn(response);
 
@@ -140,8 +148,16 @@ class AccountControllerTest extends ControllerTest {
 		DepositAccountRegisterRequest request = new DepositAccountRegisterRequest(memberId, accountProductId, password,
 			withdrawalAccountNumber, payoutAccountNumber, initialDepositAmount, true);
 
-		AccountRegisterResponse response = new AccountRegisterResponse("Deposit Product", withdrawalAccountNumber,
-			payoutAccountNumber, "200001000001", 0L, 0.5, LocalDate.of(2025, 3, 20));
+		AccountRegisterResponse response = new AccountRegisterResponse(
+			"Deposit Product",
+			withdrawalAccountNumber,
+			payoutAccountNumber,
+			"200001000001",
+			0L,
+			0.5,
+			LocalDate.of(2025, 3, 20),
+			null
+		);
 
 		when(accountService.createDepositAccount(any(DepositAccountRegisterRequest.class))).thenReturn(response);
 
@@ -178,7 +194,9 @@ class AccountControllerTest extends ControllerTest {
 			"300001000001",
 			0L,
 			5.0,
-			LocalDate.of(2027, 3, 25));
+			LocalDate.of(2027, 3, 20),
+			LocalDate.of(2025, 3, 20)
+		);
 
 		Mockito.when(accountService.createInstallmentAccount(any(InstallmentAccountRegisterRequest.class)))
 			.thenReturn(response);
@@ -191,6 +209,7 @@ class AccountControllerTest extends ControllerTest {
 			.andExpect(jsonPath("$.accountBalance").value(0))
 			.andExpect(jsonPath("$.interestRate").value(5.0))
 			.andExpect(jsonPath("$.accountExpiryDate").exists())
+			.andExpect(jsonPath("$.nextInstallmentScheduleDate").exists())
 			.andDo(document("installment-account-register"));
 	}
 
