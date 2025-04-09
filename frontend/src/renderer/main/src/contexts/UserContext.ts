@@ -11,6 +11,9 @@ export const UserContext = createContext<{
 	setIsTalking: (value: boolean) => void;
 	userMsg: string;
 	setUserMsg: (value: string) => void;
+	isNotFishing: boolean;
+	setIsNotFishing: (value: boolean) => void;
+	resetAll: () => void;
 }>({
 	isUserExist: false,
 	setIsUserExist: () => {},
@@ -21,5 +24,8 @@ export const UserContext = createContext<{
 	isTalking: false,
 	setIsTalking: () => {},
 	userMsg: "",
-	setUserMsg: () => {}
+	setUserMsg: () => {},
+	isNotFishing: false,
+	setIsNotFishing: () => {},
+	resetAll: () => {}
 });

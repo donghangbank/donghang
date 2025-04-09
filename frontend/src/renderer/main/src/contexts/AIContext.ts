@@ -16,7 +16,8 @@ export const CONSTRUCTION_VALUES = [
 	"보이스피싱",
 	"통장선택",
 	"계좌선택",
-	"카드선택"
+	"카드선택",
+	"예금통장개설"
 ] as const;
 
 export const AIContext = createContext<{
@@ -26,11 +27,15 @@ export const AIContext = createContext<{
 	setDialogue: (value: string) => void;
 	construction: Construction;
 	setConstruction: (value: Construction) => void;
+	audioStop: boolean;
+	setAudioStop: (value: boolean) => void;
 }>({
 	avatarState: "idle",
 	setAvatarState: () => {},
 	dialogue: "",
 	setDialogue: () => {},
 	construction: "etc",
-	setConstruction: () => {}
+	setConstruction: () => {},
+	audioStop: false,
+	setAudioStop: () => {}
 });

@@ -53,6 +53,7 @@ export interface getInstallmentProductsAPIResponse {
 }
 
 export interface DemandProduct {
+	productId?: number;
 	productName?: string;
 	productDescription?: string;
 	accountProductId: number;

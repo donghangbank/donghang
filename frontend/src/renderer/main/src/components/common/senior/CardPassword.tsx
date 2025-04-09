@@ -18,7 +18,7 @@ interface CardPasswordProps {
 }
 
 export default function CardPassword({
-	cardNumber = "9999999999999999",
+	cardNumber = "1234567812345678",
 	isSender = true,
 	prev,
 	link
@@ -26,7 +26,12 @@ export default function CardPassword({
 	const navigate = useNavigate();
 	const [passwordNotMatch, setPasswordNotMatch] = useState(false);
 	const { setSendingAccountNumber, password, setPassword, setDisabled } = useContext(InputContext);
-	const { setRecipientName, setReceivingAccountNumber } = useContext(SpecSheetContext);
+	const {
+		setRecipientName,
+		setReceivingAccountNumber,
+		setUserId,
+		setPassword: setPasswordSpecSheet
+	} = useContext(SpecSheetContext);
 
 	useActionPlay({
 		dialogue: "비밀번호 4자리를 입력해주세요!",
@@ -51,10 +56,13 @@ export default function CardPassword({
 			else {
 				setReceivingAccountNumber(data?.fullAccountNumber ?? "");
 				setRecipientName(data?.ownerName ?? "");
+				setUserId(data?.ownerId ?? "");
+				setPasswordSpecSheet(data?.password ?? "");
 			}
 			navigate(link);
 		},
 		onError: () => {
+			console.log("비밀번호가 틀렸습니다.");
 			setPasswordNotMatch(true);
 		}
 	});

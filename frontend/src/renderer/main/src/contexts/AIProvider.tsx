@@ -5,6 +5,7 @@ export function AIProvider({ children }: { children: React.ReactNode }): JSX.Ele
 	const [avatarState, setAvatarState] = useState<AvatarState>("idle");
 	const [dialogue, setDialogue] = useState<string>("");
 	const [construction, setConstruction] = useState<Construction>("etc");
+	const [audioStop, setAudioStop] = useState<boolean>(false);
 
 	return (
 		<AIContext.Provider
@@ -14,7 +15,9 @@ export function AIProvider({ children }: { children: React.ReactNode }): JSX.Ele
 				dialogue,
 				setDialogue,
 				construction,
-				setConstruction
+				setConstruction,
+				audioStop,
+				setAudioStop
 			}}
 		>
 			{children}

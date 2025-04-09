@@ -129,6 +129,18 @@ export const getDemandProductAPI = async ({ id }: { id: string }): Promise<Deman
 	return response.data;
 };
 
+export const getDemandProductByNameAPI = async ({
+	name
+}: {
+	name: string;
+}): Promise<DemandProduct> => {
+	console.log("name: " + name);
+	const response = await localAxios.get<DemandProduct>(`/accountproducts/search`, {
+		params: { keyword: name }
+	});
+	return response.data;
+};
+
 export const registerDemandProductAPI = async ({
 	memberId,
 	accountProductId,

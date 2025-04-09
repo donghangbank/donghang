@@ -7,6 +7,16 @@ export function UserProvider({ children }: { children: React.ReactNode }): JSX.E
 	const [isUsingPhone, setIsUsingPhone] = useState(false);
 	const [userMsg, setUserMsg] = useState("");
 	const [isTalking, setIsTalking] = useState(false);
+	const [isNotFishing, setIsNotFishing] = useState(false);
+
+	const resetAll = (): void => {
+		setIsUserExist(false);
+		setIsElderly(0);
+		setIsUsingPhone(false);
+		setUserMsg("");
+		setIsTalking(false);
+		setIsNotFishing(false);
+	};
 
 	return (
 		<UserContext.Provider
@@ -20,7 +30,10 @@ export function UserProvider({ children }: { children: React.ReactNode }): JSX.E
 				isTalking,
 				setIsTalking,
 				userMsg,
-				setUserMsg
+				setUserMsg,
+				isNotFishing,
+				setIsNotFishing,
+				resetAll
 			}}
 		>
 			{children}

@@ -5,12 +5,16 @@ import { useContextReset } from "@renderer/hooks/useContextReset";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import thank from "@renderer/assets/audios/thank.mp3?url";
+import { ProductContext } from "@renderer/contexts/ProductContext";
+import { UserContext } from "@renderer/contexts/UserContext";
 
 export function SeniorFinalPage(): JSX.Element {
 	const navigate = useNavigate();
 	const { resetAll } = useContext(InputContext);
 	const { resetSpecSheet } = useContext(SpecSheetContext);
 	const { resetContext } = useContextReset();
+	const { resetAll: productResetAll } = useContext(ProductContext);
+	const { resetAll: userResetAll } = useContext(UserContext);
 
 	useActionPlay({
 		audioFile: thank,
@@ -20,8 +24,10 @@ export function SeniorFinalPage(): JSX.Element {
 		onComplete: () => {
 			// 1. 모든 Context 상태 초기화
 			resetAll();
+			productResetAll();
 			resetSpecSheet();
 			resetContext();
+			userResetAll();
 
 			// 2. 서브 윈도우 초기화
 			window.mainAPI.updateSubState(false); // 서브 윈도우 로고 표시
