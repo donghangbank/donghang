@@ -11,7 +11,7 @@ import bank.donghang.core.common.enums.MaskingType;
 
 public record TransactionResponse(
 	String sendingAccountNumber,
-	// @Mask(type = MaskingType.ACCOUNT_NUMBER)
+	@Mask(type = MaskingType.ACCOUNT_NUMBER)
 	String receivingAccountNumber,
 	Long sendingAccountBalance,
 	String recipientName,

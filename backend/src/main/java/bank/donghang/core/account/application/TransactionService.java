@@ -47,7 +47,7 @@ public class TransactionService {
 		waitTime = 15L,
 		leaseTime = 15L
 	)
-	// @MaskApply(typeValue = TransactionResponse.class)
+	@MaskApply(typeValue = TransactionResponse.class)
 	public TransactionResponse transferByAccount(TransactionRequest request) {
 
 		if (request.sendingAccountNumber().equals(request.receivingAccountNumber())) {
