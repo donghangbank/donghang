@@ -31,10 +31,8 @@ import bank.donghang.core.ledger.dto.event.WithdrawalEvent;
 import bank.donghang.core.member.domain.Member;
 import bank.donghang.core.member.domain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class TransactionService {
 
@@ -46,8 +44,8 @@ public class TransactionService {
 	@TransferDistributedLock(
 		key1 = "#request.sendingAccountNumber",
 		key2 = "#request.receivingAccountNumber",
-		waitTime = 30L,
-		leaseTime = 10L
+		waitTime = 15L,
+		leaseTime = 15L
 	)
 	@MaskApply(typeValue = TransactionResponse.class)
 	public TransactionResponse transferByAccount(TransactionRequest request) {
