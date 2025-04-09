@@ -4,22 +4,28 @@ import { formatAccountNumber, formatAmount } from "@renderer/utils/formatters";
 import { useQuery } from "@tanstack/react-query";
 import { useContext } from "react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 export const InquiryBalanceSpecSheetPage = (): JSX.Element => {
 	const { receivingAccountNumber, password } = useContext(InputContext);
 
-	const { data, isError } = useQuery({
+	const { data, isError, isSuccess } = useQuery({
 		queryKey: ["balance", receivingAccountNumber],
 		queryFn: () => balanceAPI({ receivingAccountNumber, password }),
 		enabled: !!receivingAccountNumber && !!password
 	});
 
 	if (!data || isError) {
-		return <div>데이터를 불러오는 데 실패했습니다.</div>;
+		return <div></div>;
 	}
 
 	return (
-		<div className="flex flex-col gap-6 bg-white p-10 rounded-3xl shadow-custom">
+		<motion.div
+			initial={{ opacity: 0, y: 20 }}
+			animate={isSuccess ? { opacity: 1, y: 0 } : { opacity: 0 }}
+			transition={{ duration: 0.5 }}
+			className="flex flex-col gap-6 bg-white p-10 rounded-3xl shadow-custom"
+		>
 			<span className="text-5xl font-bold text-center">잔액 확인</span>
 			<div className="flex justify-between gap-20 items-center">
 				<span className="text-blue text-3xl font-bold">은행</span>
@@ -46,7 +52,7 @@ export const InquiryBalanceSpecSheetPage = (): JSX.Element => {
 					</Link>
 				</button>
 			</div>
-		</div>
+		</motion.div>
 	);
 };
 

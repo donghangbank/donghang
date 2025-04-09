@@ -7,6 +7,7 @@ import { formatPassword } from "@renderer/utils/formatters";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 export const TransferCardPasswordPage = (): JSX.Element => {
 	const navigate = useNavigate();
@@ -48,7 +49,12 @@ export const TransferCardPasswordPage = (): JSX.Element => {
 					</div>
 				</div>
 				{isPopupVisible && (
-					<div className="flex flex-col gap-5 text-3xl bg-white shadow-custom rounded-3xl p-5 h-[45%]">
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={isPopupVisible ? { opacity: 1, y: 0 } : { opacity: 0 }}
+						transition={{ duration: 0.5 }}
+						className="flex flex-col gap-5 text-3xl bg-white shadow-custom rounded-3xl p-5 h-[45%]"
+					>
 						<span className="text-red">비밀번호가 올바르지 않습니다.</span>
 						<button
 							type="button"
@@ -57,7 +63,7 @@ export const TransferCardPasswordPage = (): JSX.Element => {
 						>
 							닫기
 						</button>
-					</div>
+					</motion.div>
 				)}
 			</div>
 		</div>

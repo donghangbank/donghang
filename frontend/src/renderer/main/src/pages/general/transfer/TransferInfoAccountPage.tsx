@@ -8,6 +8,7 @@ import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 export const TransferInfoAccountPage = (): JSX.Element => {
 	const navigate = useNavigate();
@@ -89,7 +90,12 @@ export const TransferInfoAccountPage = (): JSX.Element => {
 				</div>
 
 				{isPopupVisible && (
-					<div className="flex flex-col gap-5 text-3xl bg-white shadow-custom rounded-3xl p-5 h-[40%]">
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={isPopupVisible ? { opacity: 1, y: 0 } : { opacity: 0 }}
+						transition={{ duration: 0.5 }}
+						className="flex flex-col gap-5 text-3xl bg-white shadow-custom rounded-3xl p-5 h-[40%]"
+					>
 						{disabled ? (
 							<>
 								<span>
@@ -128,7 +134,7 @@ export const TransferInfoAccountPage = (): JSX.Element => {
 								</button>
 							</>
 						)}
-					</div>
+					</motion.div>
 				)}
 
 				{isErrorPopupVisible && (

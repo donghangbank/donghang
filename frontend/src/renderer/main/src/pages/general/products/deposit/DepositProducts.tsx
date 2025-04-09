@@ -11,7 +11,7 @@ export const DepositProducts = (): JSX.Element => {
 	const [pageTokens, setPageTokens] = useState<(number | null)[]>([null]);
 	const [hasNext, setHasNext] = useState(false);
 
-	const { data, isError, isFetching, isSuccess } = useQuery<getDepositProductsAPIResponse, Error>({
+	const { data, isFetching, isSuccess, isError } = useQuery<getDepositProductsAPIResponse, Error>({
 		queryKey: ["products", "deposit", pageTokens[currentPage]],
 		queryFn: () => getDepositProductsAPI({ pageToken: pageTokens[currentPage] ?? undefined })
 	});
@@ -52,12 +52,8 @@ export const DepositProducts = (): JSX.Element => {
 
 	const visibleDepositProducts = allProducts.slice(currentPage * 4, (currentPage + 1) * 4);
 
-	if (isError) {
-		return <div>데이터를 불러오는 데 실패했습니다</div>;
-	}
-
-	if (!data) {
-		return <div>예금상품이 존재하지 않습니다</div>;
+	if (!data || isError) {
+		return <div></div>;
 	}
 	return (
 		<div className="flex flex-col gap-6 bg-white p-10 rounded-3xl shadow-custom">

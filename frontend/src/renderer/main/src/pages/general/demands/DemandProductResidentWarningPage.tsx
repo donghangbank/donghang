@@ -1,8 +1,14 @@
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 export const DemandProductResidentWarningPage = (): JSX.Element => {
 	return (
-		<div className="flex flex-col gap-10">
+		<motion.div
+			initial={{ opacity: 0, y: 100 }}
+			animate={{ opacity: 1, y: 0 }}
+			exit={{ opacity: 0, y: 100 }}
+			className="flex flex-col gap-10"
+		>
 			<div className="flex flex-col gap-5 bg-white rounded-3xl p-10 shadow-custom text-center">
 				<span className="text-7xl font-bold break-all leading-tight">
 					<span className="text-red">신분증 도용</span> 관련
@@ -21,7 +27,7 @@ export const DemandProductResidentWarningPage = (): JSX.Element => {
 					<Link to="/general/final">거래 취소</Link>
 				</button>
 			</div>
-		</div>
+		</motion.div>
 	);
 };
 
