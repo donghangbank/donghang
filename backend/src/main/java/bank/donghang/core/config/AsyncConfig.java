@@ -20,18 +20,13 @@ public class AsyncConfig implements AsyncConfigurer {
 	@Override
 	@Bean(name = "ledgerExecutor")
 	public Executor getAsyncExecutor() {
-		int availableProcessors = Runtime.getRuntime().availableProcessors();
-
 		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-		executor.setCorePoolSize(availableProcessors);
-		executor.setMaxPoolSize(availableProcessors * 2);
-		executor.setQueueCapacity(100);
+		executor.setCorePoolSize(3);
+		executor.setMaxPoolSize(10);
+		executor.setQueueCapacity(30);
 		executor.setThreadNamePrefix("LedgerAsync-");
 		executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
 		executor.initialize();
-
-		log.info("Initialized LedgerExecutor - Core: {}, Max: {}, Queue: {}", availableProcessors,
-			availableProcessors * 2, 100);
 		return executor;
 	}
 
