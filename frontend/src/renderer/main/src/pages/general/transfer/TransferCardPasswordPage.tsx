@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 export const TransferCardPasswordPage = (): JSX.Element => {
 	const navigate = useNavigate();
 	const { setSendingAccountNumber, password, setPassword } = useContext(InputContext);
-	const cardNumber = "1234567812345678";
+	const cardNumber = import.meta.env.VITE_CARD_NUMBER as string;
 	const [isPopupVisible, setIsPopupVisible] = useState(false);
 
 	const { mutate: cardCheck } = useMutation({

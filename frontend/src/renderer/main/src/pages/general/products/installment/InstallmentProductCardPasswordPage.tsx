@@ -12,7 +12,7 @@ export const InstallmentProductCardPasswordPage = (): JSX.Element => {
 	const navigate = useNavigate();
 	const { setWithdrawalAccountNumber, setPayoutAccountNumber, password, setPassword, setMemberId } =
 		useContext(ProductContext);
-	const cardNumber = "1234567812345678";
+	const cardNumber = import.meta.env.VITE_CARD_NUMBER as string;
 	const [isPopupVisible, setIsPopupVisible] = useState(false);
 
 	const { mutate: cardCheck } = useMutation({
