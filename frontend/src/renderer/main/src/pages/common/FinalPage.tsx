@@ -6,6 +6,7 @@ import { useContextReset } from "@renderer/hooks/useContextReset";
 import { useQueryClient } from "@tanstack/react-query";
 import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import thank from "@renderer/assets/audios/thank.mp3?url";
 
 export const FinalPage = (): JSX.Element => {
 	const navigate = useNavigate();
@@ -35,10 +36,11 @@ export const FinalPage = (): JSX.Element => {
 		const timer = setTimeout(() => navigate("/"), 2000);
 
 		return (): void => clearTimeout(timer);
-	}, [navigate, resetAll, resetSpecSheet, resetContext, queryClient, productResetAll]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	useActionPlay({
-		audioFile: "thank_you.mp3",
+		audioFile: thank,
 		dialogue: "감사합니다.",
 		shouldActivate: true,
 		avatarState: "bow"
