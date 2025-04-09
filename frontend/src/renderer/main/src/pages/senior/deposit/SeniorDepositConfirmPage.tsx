@@ -52,10 +52,7 @@ export default function SeniorDepositConfirmPage(): JSX.Element {
 	useActionPlay({
 		dialogue: `${recipientName} 님 계좌에 ${amount} 원 입금하시는거 맞나요?`,
 		shouldActivate: !!recipientName,
-		avatarState: "idle",
-		onComplete: () => {
-			deposit();
-		}
+		avatarState: "idle"
 	});
 
 	useEffect(() => {

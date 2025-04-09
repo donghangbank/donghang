@@ -4,7 +4,7 @@ export default function SeniorDepositProductCardPasswordPage(): JSX.Element {
 	return (
 		<CardPassword
 			prev="/senior/depositproducts/card/auth"
-			isSender={true}
+			isSender={false}
 			link="/senior/depositproducts/info/amount"
 		/>
 	);

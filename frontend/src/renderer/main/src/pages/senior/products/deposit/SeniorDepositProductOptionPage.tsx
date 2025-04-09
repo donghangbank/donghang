@@ -16,7 +16,7 @@ export default function SeniorDepositProductOption(): JSX.Element {
 
 	useEffect(() => {
 		if (construction === "카드선택") {
-			navigate("/senior/deposit/card/input");
+			navigate("/senior/depositproducts/warning/card");
 		}
 	}, [construction, navigate]);
 
@@ -24,7 +24,7 @@ export default function SeniorDepositProductOption(): JSX.Element {
 		<div className="w-full h-full flex justify-center items-center">
 			<TestButton
 				prevRoute="/senior/depositproducts/dicision"
-				nextRoute="/senior/depositproducts/card/input"
+				nextRoute="/senior/depositproducts/warning/card"
 			/>
 		</div>
 	);

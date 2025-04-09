@@ -7,6 +7,8 @@ export const SpecSheetProvider = ({ children }: { children: React.ReactNode }): 
 	const [receivingAccountNumber, setReceivingAccountNumber] = useState<string>("");
 	const [amount, setAmount] = useState<number>(0);
 	const [sendingAccountBalance, setSendingAccountBalance] = useState<number>(0);
+	const [userId, setUserId] = useState<number>(0);
+	const [password, setPassword] = useState<string>("");
 
 	const resetSpecSheet = useCallback(() => {
 		setAmount(0);
@@ -24,12 +26,16 @@ export const SpecSheetProvider = ({ children }: { children: React.ReactNode }): 
 				receivingAccountNumber,
 				amount,
 				sendingAccountBalance,
+				userId,
+				password,
 				setTransactionTime,
 				setRecipientName,
 				setReceivingAccountNumber,
 				setAmount,
 				setSendingAccountBalance,
-				resetSpecSheet
+				resetSpecSheet,
+				setUserId,
+				setPassword
 			}}
 		>
 			{children}

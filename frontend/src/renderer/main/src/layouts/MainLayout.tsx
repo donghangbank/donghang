@@ -1,13 +1,16 @@
 import AICanvas from "@renderer/components/banker/AICanvas";
 import Header from "@renderer/components/common/Header";
 import Simulator from "@renderer/components/common/simulator/Simulator";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { useVADSTT } from "@renderer/hooks/ai/useVADSTT";
 import { PageContext } from "@renderer/contexts/PageContext";
 import { motion } from "framer-motion";
 import TestButton from "@renderer/components/common/senior/TestButton";
 import { AIContext } from "@renderer/contexts/AIContext";
+import { useMediaStream } from "@renderer/hooks/ai/useMediaStream";
+import { useVideoAnalysis } from "@renderer/hooks/ai/useVideoAnalysis";
+import VoiceFishingDetector from "@renderer/components/common/VoiceFishingDetector";
 
 declare global {
 	interface Window {
@@ -31,7 +34,9 @@ export const MainLayout = (): JSX.Element => {
 	const isSenior = location.pathname === "/" || location.pathname.includes("/senior");
 	const isSeniorTest = location.pathname.includes("/senior");
 	const { currentJob } = useContext(PageContext);
-	const { setConstruction } = useContext(AIContext);
+	const { audioStop } = useContext(AIContext);
+	const { videoRef, canvasRef, stream } = useMediaStream();
+	useVideoAnalysis(videoRef, canvasRef);
 
 	useEffect(() => {
 		if (window.mainAPI) {
@@ -66,19 +71,38 @@ export const MainLayout = (): JSX.Element => {
 		}
 	}, [location.pathname]);
 
-	useEffect(() => {
-		setConstruction("etc");
-	}, [location.pathname, setConstruction]);
+	const vad = useVADSTT(stream);
 
-	const { start, stop } = useVADSTT();
+	const startRef = useRef(vad.start);
+	const stopRef = useRef(vad.stop);
 
 	useEffect(() => {
-		start();
-		return (): void => stop();
-	}, [start, stop]);
+		if (audioStop && vad.isDetecting) {
+			console.log("Stopping VAD");
+			stopRef.current();
+		} else if (!audioStop && !vad.isDetecting) {
+			console.log("Starting VAD");
+			startRef.current();
+		}
+	}, [audioStop, vad.isDetecting, startRef, stopRef]);
 
 	return (
 		<div className="w-screen h-screen flex flex-col overflow-hidden">
+			<div>
+				<video
+					ref={videoRef}
+					autoPlay
+					playsInline
+					muted
+					width={640}
+					height={640}
+					className="hidden"
+				/>
+				<canvas ref={canvasRef} width={640} height={640} className="hidden" />
+			</div>
+			<div className="absolute z-40">
+				<VoiceFishingDetector />
+			</div>
 			<div className="w-full h-full relative">
 				{isSenior ? (
 					<motion.div

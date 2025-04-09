@@ -75,7 +75,6 @@ export default function SeniorTransferInfoAmountPage(): JSX.Element {
 		}
 		accountOwnerCheck();
 		setAmount(parsedAmount);
-		setDisabled(true);
 	}, [amount, setAmount, setDisabled, accountOwnerCheck]);
 
 	useEffect(() => {
@@ -122,14 +121,11 @@ export default function SeniorTransferInfoAmountPage(): JSX.Element {
 	useActionPlay({
 		dialogue: `${data?.ownerName} 님께 ${amount} 원 보내겠습니다. 맞나요?`,
 		shouldActivate: !!data?.ownerName && isAmountConfirmed,
-		avatarState: "idle",
-		onComplete: () => {
-			transfer();
-			navigate("/senior/transfer/info/specsheet");
-		}
+		avatarState: "idle"
 	});
 
 	useEffect(() => {
+		if (!(!!data?.ownerName && isAmountConfirmed)) return;
 		if (construction === "긍정") {
 			transfer();
 			navigate("/senior/transfer/info/specsheet");
@@ -139,7 +135,16 @@ export default function SeniorTransferInfoAmountPage(): JSX.Element {
 			setFirstInput(true);
 			setDisabled(false);
 		}
-	}, [construction, navigate, setCurrentJob, numberClear, transfer, setDisabled]);
+	}, [
+		construction,
+		navigate,
+		setCurrentJob,
+		numberClear,
+		transfer,
+		setDisabled,
+		data?.ownerName,
+		isAmountConfirmed
+	]);
 
 	useEffect(() => {
 		setDisabled(false);

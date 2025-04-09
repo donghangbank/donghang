@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { UserContext } from "../../contexts/UserContext";
 import { useWebSocket } from "../websocket/useWebSocket";
 import { responseMsg } from "../websocket/socketMsg";
@@ -9,74 +9,10 @@ export function useVideoAnalysis(
 ): void {
 	const { setIsElderly, setIsUsingPhone, setIsUserExist } = useContext(UserContext);
 
-	// Use a more robust state management for age detection
 	const ageBufferRef = useRef<number[]>([]);
 	const [ageConfirmed, setAgeConfirmed] = useState(false);
 	const lastSentTimeRef = useRef<number>(0);
 	const continousDetectionRef = useRef<number>(10);
-
-	// Memoize WebSocket options to prevent unnecessary recreations
-	const wsOptions = useMemo(
-		() => ({
-			onMessage: (data: responseMsg): void => {
-				try {
-					// Age detection logic
-					if (!ageConfirmed && data.predicted_age !== undefined) {
-						const ageIndex = Number(data.predicted_age);
-						if (ageIndex === 0) {
-							return;
-						}
-
-						if (!isNaN(ageIndex)) {
-							const nextBuffer = [...ageBufferRef.current, ageIndex].slice(-5); // Keep last 5 readings
-							ageBufferRef.current = nextBuffer;
-
-							if (nextBuffer.length >= 5) {
-								const medianAge = calculateMedianAge(nextBuffer);
-								if (medianAge >= 6.8) {
-									setIsElderly(2);
-								} else {
-									setIsElderly(1);
-								}
-								setAgeConfirmed(true);
-							}
-						}
-					}
-
-					if (data.predicted_age !== undefined) {
-						const ageIndex = Number(data.predicted_age);
-						if (ageIndex === 0) {
-							continousDetectionRef.current += 1;
-						} else {
-							continousDetectionRef.current = 0;
-						}
-
-						if (continousDetectionRef.current >= 10) {
-							setIsUserExist(false);
-						} else {
-							setIsUserExist(true);
-						}
-					}
-
-					// Phone detection
-					if (data.calling_detection !== undefined) {
-						setIsUsingPhone(Boolean(data.calling_detection));
-					}
-				} catch (error) {
-					console.error("Error processing video analysis message:", error);
-				}
-			},
-			onError: (error: Event): void => {
-				console.error("Video WebSocket error:", error);
-			},
-			onClose: (): void => {
-				console.log("Video WebSocket connection closed");
-			}
-		}),
-		[setIsElderly, setIsUsingPhone, setIsUserExist, ageConfirmed]
-	);
-
-	const { send } = useWebSocket("ws://localhost:8000/ws/video", wsOptions);
 
 	// Helper function to calculate median age
 	const calculateMedianAge = (ages: number[]): number => {
@@ -85,25 +21,85 @@ export function useVideoAnalysis(
 		return sorted.length % 2 !== 0 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
 	};
 
-	// Throttled image capture and send
+	// 메시지 처리 콜백 분리
+	const handleMessage = useCallback(
+		(data: responseMsg): void => {
+			try {
+				// Age detection logic
+				if (!ageConfirmed && data.predicted_age !== undefined) {
+					const ageIndex = Number(data.predicted_age);
+					if (ageIndex !== 0 && !isNaN(ageIndex)) {
+						const nextBuffer = [...ageBufferRef.current, ageIndex].slice(-5);
+						ageBufferRef.current = nextBuffer;
+
+						if (nextBuffer.length >= 3) {
+							const medianAge = calculateMedianAge(nextBuffer);
+							if (medianAge >= 6.5) {
+								setIsElderly(2);
+							} else {
+								setIsElderly(1);
+							}
+							setAgeConfirmed(true);
+						}
+					}
+				}
+
+				// 유저 존재 여부 판단
+				if (data.predicted_age !== undefined) {
+					const ageIndex = Number(data.predicted_age);
+					if (ageIndex === 0) {
+						continousDetectionRef.current += 1;
+					} else {
+						continousDetectionRef.current = 0;
+					}
+
+					setIsUserExist(continousDetectionRef.current < 10);
+				}
+
+				// 핸드폰 사용 감지
+				if (data.calling_detection !== undefined) {
+					setIsUsingPhone(Boolean(data.calling_detection));
+				}
+			} catch (error) {
+				console.error("Error processing video analysis message:", error);
+			}
+		},
+		[ageConfirmed, setIsElderly, setIsUsingPhone, setIsUserExist]
+	);
+
+	// WebSocket 옵션 메모이제이션
+	const wsOptions = useMemo(
+		() => ({
+			onMessage: handleMessage,
+			onError: (error: Event): void => {
+				console.error("Video WebSocket error:", error);
+			},
+			onClose: (): void => {
+				console.log("Video WebSocket connection closed");
+			}
+		}),
+		[handleMessage]
+	);
+
+	// WebSocket 연결
+	const { send } = useWebSocket("ws://localhost:8000/ws/video", wsOptions);
+
+	// 프레임 전송
 	useEffect(() => {
 		const captureAndSend = (): void => {
 			const now = Date.now();
-			if (now - lastSentTimeRef.current < 1000) return; // Throttle to 1 second
+			if (now - lastSentTimeRef.current < 1000) return;
 
 			const video = videoRef.current;
 			const canvas = canvasRef.current;
-			if (!video || !canvas || video.readyState < 2) return; // Check if video is ready
+			if (!video || !canvas || video.readyState < 2) return;
 
 			try {
 				const ctx = canvas.getContext("2d");
 				if (!ctx) return;
 
-				// Capture frame
 				ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-				// Optimize image quality vs size
-				const quality = 0.7; // Adjust based on performance
+				const quality = 0.7;
 				const imageData = canvas.toDataURL("image/jpeg", quality).split(",")[1];
 
 				if (imageData && send) {
@@ -115,11 +111,11 @@ export function useVideoAnalysis(
 			}
 		};
 
-		const interval = setInterval(captureAndSend, 300); // Check more frequently but throttle sends
+		const interval = setInterval(captureAndSend, 1000);
 		return (): void => clearInterval(interval);
 	}, [send, videoRef, canvasRef]);
 
-	// Cleanup on unmount
+	// Cleanup
 	useEffect(() => {
 		return (): void => {
 			ageBufferRef.current = [];

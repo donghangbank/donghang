@@ -1,5 +1,5 @@
-// sub/index.tsx
 import logo from "@renderer/assets/logo.png";
+import AudioManagePanel from "@renderer/components/common/AudioManagePanel";
 import SubCardWarning from "@renderer/components/common/SubCardWarning";
 import { SubNumberPad } from "@renderer/components/common/SubNumberPad";
 import SubScamWarning from "@renderer/components/common/SubScamWarning";
@@ -23,10 +23,12 @@ declare global {
 export default function App(): JSX.Element {
 	const [localValue, setLocalValue] = useState("");
 	const [showButton, setShowButton] = useState(false);
-	const [subType, setSubType] = useState<"password" | "account" | "amount" | "day">("password");
-	const [mode, setMode] = useState<"numpad" | "scam-warning" | "card-warning" | "default">(
-		"default"
+	const [subType, setSubType] = useState<"password" | "account" | "resident" | "amount" | "day">(
+		"password"
 	);
+	const [mode, setMode] = useState<
+		"numpad" | "scam-warning" | "card-warning" | "voice-manage" | "default"
+	>("default");
 
 	useEffect(() => {
 		window.subAPI.onInputLinkUpdated((hasInput) => {
@@ -34,12 +36,12 @@ export default function App(): JSX.Element {
 		});
 
 		window.subAPI.onSubTypeUpdate((newType) => {
-			setSubType(newType as "password" | "account" | "amount" | "day");
+			setSubType(newType as "password" | "account" | "resident" | "amount" | "day");
 			setLocalValue("");
 		});
 
 		window.subAPI.onSubModeUpdate(({ mode }) => {
-			setMode(mode as "numpad" | "scam-warning" | "card-warning" | "default");
+			setMode(mode as "numpad" | "scam-warning" | "card-warning" | "voice-manage" | "default");
 			if (mode === "numpad") {
 				setShowButton(true);
 			} else {
@@ -61,6 +63,11 @@ export default function App(): JSX.Element {
 					<SubScamWarning />
 				) : mode === "card-warning" ? (
 					<SubCardWarning />
+				) : mode === "voice-manage" ? (
+					<AudioManagePanel
+						onConfirm={() => window.subAPI.notifyButtonAction("confirm")}
+						onRestart={() => window.subAPI.notifyButtonAction("cancel")}
+					/>
 				) : (
 					<img src={logo} alt="logo" />
 				)}

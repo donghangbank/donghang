@@ -7,26 +7,18 @@ import {
 	DepthOfField,
 	EffectComposer
 } from "@react-three/postprocessing";
-import { useVideoAnalysis } from "@renderer/hooks/ai/useVideoAnalysis";
 import { UserContext } from "@renderer/contexts/UserContext";
 import { useContext } from "react";
-import { useMediaStream } from "@renderer/hooks/ai/useMediaStream";
 import { AIContext } from "@renderer/contexts/AIContext";
 import Dialogue from "./Dialogue";
 
 export default function AICanvas(): JSX.Element {
 	const { isElderly, isUsingPhone, userMsg, isTalking } = useContext(UserContext);
 	const { dialogue } = useContext(AIContext);
-	const { videoRef, canvasRef } = useMediaStream();
-	useVideoAnalysis(videoRef, canvasRef);
 
 	return (
 		<div className="relative w-full h-full">
-			<div>
-				<video ref={videoRef} autoPlay playsInline width={640} height={640} className="hidden" />
-				<canvas ref={canvasRef} width={640} height={640} className="hidden" />
-			</div>
-			<div className="absolute w-full flex justify-center top-12 text-3xl z-10">
+			<div className="absolute w-full flex justify-center top-24 text-3xl z-10">
 				<Dialogue text={dialogue} />
 			</div>
 			<Canvas

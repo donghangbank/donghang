@@ -107,6 +107,7 @@ import DemandProductResidentInputPage from "./pages/general/demands/DemandProduc
 import DemandProductResidentAuthPage from "./pages/general/demands/DemandProductResidentAuthPage";
 import DemandProductInfoPasswordPage from "./pages/general/demands/DemandProductInfoPasswordPage";
 import DemandProductInfoSpecSheetPage from "./pages/general/demands/DemandProductInfoSpecSheetPage";
+import SeniorDepositProductCardWarningPage from "./pages/senior/products/deposit/SeniorDepositProductCardWarning";
 
 const router = createHashRouter([
 	{
@@ -723,6 +724,15 @@ const router = createHashRouter([
 							{
 								path: "option",
 								element: <SeniorDepositProductOption />
+							},
+							{
+								path: "warning",
+								children: [
+									{
+										path: "card",
+										element: <SeniorDepositProductCardWarningPage />
+									}
+								]
 							},
 							{
 								path: "card",

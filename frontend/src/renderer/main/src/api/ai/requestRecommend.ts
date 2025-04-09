@@ -1,11 +1,6 @@
-type AccountRecommendation = {
-	account: string;
-	reason: string;
-};
-
 type RecommendationResponse = {
-	user_text: string;
-	recommendation: AccountRecommendation;
+	recommended_account: string;
+	reason: string;
 };
 
 export async function requestRecommendation(
@@ -29,8 +24,8 @@ export async function requestRecommendation(
 
 		return {
 			response: {
-				user_text: result.user_text,
-				recommendation: result.recommendation
+				recommended_account: result.recommended_account,
+				reason: result.reason
 			}
 		};
 	} catch (error) {

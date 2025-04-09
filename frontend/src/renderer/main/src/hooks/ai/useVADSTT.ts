@@ -1,26 +1,30 @@
 import { requestPrediction } from "@renderer/api/ai/requestPrediction";
 import { AIContext } from "@renderer/contexts/AIContext";
 import { UserContext } from "@renderer/contexts/UserContext";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 const MINIMUM_RECORDING_DURATION = 1500;
 
-export function useVADSTT(): {
+export function useVADSTT(externalStream: MediaStream | null = null): {
 	transcript: string;
 	isDetecting: boolean;
 	start: () => void;
 	stop: () => void;
-	volume: number;
 } {
 	const [transcript, setTranscript] = useState("");
 	const [isDetecting, setIsDetecting] = useState(false);
+
 	const audioChunks = useRef<Blob[]>([]);
 	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 	const vadTimerRef = useRef<NodeJS.Timeout | null>(null);
 	const startTimeRef = useRef<number | null>(null);
+	const rafIdRef = useRef<number | null>(null);
+	const streamRef = useRef<MediaStream | null>(null);
+	const externalStreamRef = useRef<MediaStream | null>(externalStream);
+	const isDetectingRef = useRef<boolean>(false);
+
 	const { setIsTalking } = useContext(UserContext);
 	const { setConstruction } = useContext(AIContext);
-	const [volume, setVolume] = useState(0);
 
 	const startRecording = useCallback(
 		(stream: MediaStream): void => {
@@ -38,6 +42,7 @@ export function useVADSTT(): {
 			mediaRecorder.onstop = async (): Promise<void> => {
 				const duration = startTimeRef.current ? Date.now() - startTimeRef.current : 0;
 				startTimeRef.current = null;
+
 				const audioBlob = new Blob(audioChunks.current, { type: "audio/webm" });
 				audioChunks.current = [];
 
@@ -69,15 +74,23 @@ export function useVADSTT(): {
 	}, []);
 
 	const startVAD = useCallback(async (): Promise<void> => {
+		if (isDetectingRef.current) return;
+		console.log("Starting VAD");
+		isDetectingRef.current = true;
 		setIsDetecting(true);
 
-		const stream = await navigator.mediaDevices.getUserMedia({
-			audio: {
-				noiseSuppression: true,
-				echoCancellation: true,
-				autoGainControl: true
-			}
-		});
+		const stream =
+			externalStreamRef.current ||
+			(await navigator.mediaDevices.getUserMedia({
+				audio: {
+					noiseSuppression: true,
+					echoCancellation: true,
+					autoGainControl: true
+				}
+			}));
+
+		streamRef.current = stream;
+
 		const audioContext = new AudioContext();
 		const source = audioContext.createMediaStreamSource(stream);
 		const analyser = audioContext.createAnalyser();
@@ -88,37 +101,58 @@ export function useVADSTT(): {
 		const detectVoice = (): void => {
 			analyser.getByteTimeDomainData(data);
 			const avg = data.reduce((sum, v) => sum + Math.abs(v - 128), 0) / data.length;
-			setVolume(avg);
+
 			if (avg > 12) {
 				if (!mediaRecorderRef.current || mediaRecorderRef.current.state === "inactive") {
 					startRecording(stream);
 					setIsTalking(true);
 				}
-
 				if (vadTimerRef.current) clearTimeout(vadTimerRef.current);
 				vadTimerRef.current = setTimeout(() => {
 					stopRecording();
 					setIsTalking(false);
-				}, 1500); // 1.5초 무음 시 종료
+				}, 1500);
 			}
-
-			requestAnimationFrame(detectVoice);
+			rafIdRef.current = requestAnimationFrame(detectVoice);
 		};
 
-		detectVoice();
-	}, [startRecording, stopRecording, setIsTalking]);
+		rafIdRef.current = requestAnimationFrame(detectVoice);
+	}, [setIsTalking, startRecording, stopRecording]);
+
+	const stopVAD = useCallback((): void => {
+		console.log("Stopping VAD");
+		isDetectingRef.current = false;
+		setIsDetecting(false);
+
+		if (rafIdRef.current) {
+			cancelAnimationFrame(rafIdRef.current);
+			rafIdRef.current = null;
+		}
+		if (vadTimerRef.current) {
+			clearTimeout(vadTimerRef.current);
+			vadTimerRef.current = null;
+		}
+		stopRecording();
+		if (streamRef.current && !externalStreamRef.current) {
+			streamRef.current.getTracks().forEach((track) => track.stop());
+			streamRef.current = null;
+		}
+	}, [stopRecording]);
+
+	const start = useCallback(() => startVAD(), [startVAD]);
+	const stop = useCallback(() => stopVAD(), [stopVAD]);
 
 	useEffect(() => {
-		if (isDetecting) {
-			startVAD();
-		}
-	}, [isDetecting, startVAD]);
+		return (): void => stopVAD();
+	}, [stopVAD]);
 
-	return {
-		transcript,
-		isDetecting,
-		start: () => setIsDetecting(true),
-		stop: () => setIsDetecting(false),
-		volume
-	};
+	return useMemo(
+		() => ({
+			transcript,
+			isDetecting,
+			start,
+			stop
+		}),
+		[transcript, isDetecting, start, stop]
+	);
 }
