@@ -7,6 +7,7 @@ import org.hibernate.annotations.SQLRestriction;
 
 import bank.donghang.core.account.domain.enums.AccountStatus;
 import bank.donghang.core.account.domain.enums.TransactionType;
+import bank.donghang.core.common.entity.BaseEntity;
 import bank.donghang.core.common.exception.BadRequestException;
 import bank.donghang.core.common.exception.ErrorCode;
 import jakarta.persistence.Column;
@@ -38,7 +39,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Builder
-public class Account {
+public class Account extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(nullable = false, name = "account_id")
