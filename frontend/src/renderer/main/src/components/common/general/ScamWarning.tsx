@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 interface ScamWarningProps {
 	link: string;
@@ -6,7 +7,12 @@ interface ScamWarningProps {
 
 export const ScamWarning = ({ link }: ScamWarningProps): JSX.Element => {
 	return (
-		<div className="flex flex-col gap-10">
+		<motion.div
+			initial={{ opacity: 0, y: 100 }}
+			animate={{ opacity: 1, y: 0 }}
+			exit={{ opacity: 0, y: 100 }}
+			className="flex flex-col gap-10"
+		>
 			<div className="bg-white rounded-3xl p-10 shadow-custom text-center">
 				<span className="text-6xl font-bold break-all leading-tight">
 					최근 <span className="text-red">공공기관</span>
@@ -25,7 +31,7 @@ export const ScamWarning = ({ link }: ScamWarningProps): JSX.Element => {
 					<Link to={"/general/final"}>거래 취소</Link>
 				</button>
 			</div>
-		</div>
+		</motion.div>
 	);
 };
 

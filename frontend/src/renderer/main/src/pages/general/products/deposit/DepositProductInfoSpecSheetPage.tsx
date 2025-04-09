@@ -2,13 +2,19 @@ import { ProductContext } from "@renderer/contexts/ProductContext";
 import { formatAccountNumber, formatAmount } from "@renderer/utils/formatters";
 import { useContext } from "react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 export const DepositProductInfoSpecSheetPage = (): JSX.Element => {
 	const { productName, accountBalance, accountNumber, interestRate, accountExpiryDate } =
 		useContext(ProductContext);
 
 	return (
-		<div className="flex flex-col gap-6 bg-white p-10 rounded-3xl shadow-custom">
+		<motion.div
+			initial={{ opacity: 0, y: 100 }}
+			animate={{ opacity: 1, y: 0 }}
+			exit={{ opacity: 0, y: 100 }}
+			className="flex flex-col gap-6 bg-white p-10 rounded-3xl shadow-custom"
+		>
 			<span className="text-5xl font-bold text-center">가입을 완료했어요</span>
 			<div className="flex justify-between gap-20 items-center">
 				<span className="text-blue text-3xl font-bold">상품명</span>
@@ -47,7 +53,7 @@ export const DepositProductInfoSpecSheetPage = (): JSX.Element => {
 					</Link>
 				</button>
 			</div>
-		</div>
+		</motion.div>
 	);
 };
 

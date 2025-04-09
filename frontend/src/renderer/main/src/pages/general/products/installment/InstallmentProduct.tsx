@@ -4,20 +4,21 @@ import { formatAmount } from "@renderer/utils/formatters";
 import { useQuery } from "@tanstack/react-query";
 import { useContext } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { motion } from "framer-motion";
 
 export const InstallmentProduct = (): JSX.Element => {
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
 	const { setAccountProductId, setMinAmount, setMaxAmount } = useContext(ProductContext);
 
-	const { data, isError } = useQuery({
+	const { data, isSuccess, isError } = useQuery({
 		queryKey: ["products", "installment", id],
 		queryFn: () => getInstallmentProductAPI({ id: id ?? "" }),
 		enabled: !!id
 	});
 
 	if (!data || isError) {
-		return <div>데이터를 불러오는 데 실패했습니다</div>;
+		return <div></div>;
 	}
 
 	const handleOnClick = (): void => {
@@ -28,7 +29,12 @@ export const InstallmentProduct = (): JSX.Element => {
 	};
 
 	return (
-		<div className="flex flex-col gap-6">
+		<motion.div
+			initial={{ opacity: 0, y: 20 }}
+			animate={isSuccess ? { opacity: 1, y: 0 } : { opacity: 0 }}
+			transition={{ duration: 0.5 }}
+			className="flex flex-col gap-6"
+		>
 			<div className="flex flex-col gap-6 bg-white p-10 rounded-3xl shadow-custom">
 				<span className="text-5xl font-bold text-center">{data.productName}</span>
 				<div className="flex justify-between gap-20 items-center">
@@ -72,7 +78,7 @@ export const InstallmentProduct = (): JSX.Element => {
 					<span className="text-3xl text-white">가입하기</span>
 				</button>
 			</div>
-		</div>
+		</motion.div>
 	);
 };
 

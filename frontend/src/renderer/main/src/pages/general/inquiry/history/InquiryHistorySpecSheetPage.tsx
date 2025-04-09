@@ -52,12 +52,8 @@ export const InquiryHistorySpecSheetPage = (): JSX.Element => {
 
 	const visibleTransactions = allTransactions.slice(currentPage * 3, (currentPage + 1) * 3);
 
-	if (isError) {
-		return <div>데이터를 불러오는 데 실패했습니다</div>;
-	}
-
-	if (!data) {
-		return <div>거래내역이 존재하지 않습니다</div>;
+	if (!data || isError) {
+		return <div></div>;
 	}
 
 	return (

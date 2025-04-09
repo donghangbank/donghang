@@ -58,12 +58,8 @@ export const InstallmentProducts = (): JSX.Element => {
 
 	const visibleInstallmentProducts = allProducts.slice(currentPage * 4, (currentPage + 1) * 4);
 
-	if (isError) {
-		return <div>데이터를 불러오는 데 실패했습니다</div>;
-	}
-
-	if (!data) {
-		return <div>적금상품이 존재하지 않습니다</div>;
+	if (!data || isError) {
+		return <div></div>;
 	}
 
 	return (

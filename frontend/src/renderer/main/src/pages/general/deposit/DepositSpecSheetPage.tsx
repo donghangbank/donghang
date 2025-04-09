@@ -6,13 +6,19 @@ import {
 } from "@renderer/utils/formatters";
 import { useContext } from "react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 export const DepositSpecSheetPage = (): JSX.Element => {
 	const { amount, receivingAccountNumber, sendingAccountBalance, transactionTime } =
 		useContext(SpecSheetContext);
 
 	return (
-		<div className="flex flex-col gap-6 bg-white p-10 rounded-3xl shadow-custom">
+		<motion.div
+			initial={{ opacity: 0, y: 100 }}
+			animate={{ opacity: 1, y: 0 }}
+			exit={{ opacity: 0, y: 100 }}
+			className="flex flex-col gap-6 bg-white p-10 rounded-3xl shadow-custom"
+		>
 			<span className="text-5xl font-bold text-center">거래 명세표</span>
 			<div className="flex justify-between gap-20 items-center">
 				<span className="text-blue text-3xl font-bold">거래 일시</span>
@@ -45,7 +51,7 @@ export const DepositSpecSheetPage = (): JSX.Element => {
 					</Link>
 				</button>
 			</div>
-		</div>
+		</motion.div>
 	);
 };
 

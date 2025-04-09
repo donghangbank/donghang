@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import warningCard from "@renderer/assets/images/warning_card.png";
+import { motion } from "framer-motion";
 
 interface CardWarningProps {
 	link: string;
@@ -7,7 +8,12 @@ interface CardWarningProps {
 
 export const CardWarning = ({ link }: CardWarningProps): JSX.Element => {
 	return (
-		<div className="flex flex-col gap-10">
+		<motion.div
+			initial={{ opacity: 0, y: 100 }}
+			animate={{ opacity: 1, y: 0 }}
+			exit={{ opacity: 0, y: 100 }}
+			className="flex flex-col gap-10"
+		>
 			<div className="flex flex-col gap-5 bg-white rounded-3xl p-10 shadow-custom text-center">
 				<span className="text-7xl font-bold break-all leading-tight">
 					<span className="text-red">불법 카드</span> 복제 관련
@@ -31,7 +37,7 @@ export const CardWarning = ({ link }: CardWarningProps): JSX.Element => {
 					<Link to="/general/final">거래 취소</Link>
 				</button>
 			</div>
-		</div>
+		</motion.div>
 	);
 };
 

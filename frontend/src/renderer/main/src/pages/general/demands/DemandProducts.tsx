@@ -51,14 +51,9 @@ export const DemandProducts = (): JSX.Element => {
 
 	const visibleDemandProducts = allProducts.slice(currentPage * 4, (currentPage + 1) * 4);
 
-	if (isError) {
-		return <div>데이터를 불러오는 데 실패했습니다</div>;
+	if (!data || isError) {
+		return <div></div>;
 	}
-
-	if (!data) {
-		return <div>자유 입출금 계좌가 존재하지 않습니다</div>;
-	}
-	console.log(data);
 
 	return (
 		<div className="flex flex-col gap-6 bg-white p-10 rounded-3xl shadow-custom">

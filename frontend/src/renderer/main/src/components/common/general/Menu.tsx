@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 interface MenuProps {
 	prompts: { prompt: string; link: string }[];
@@ -6,7 +7,12 @@ interface MenuProps {
 
 export const Menu = ({ prompts }: MenuProps): JSX.Element => {
 	return (
-		<div className="flex flex-col bg-white rounded-3xl p-10 shadow-custom gap-10">
+		<motion.div
+			initial={{ opacity: 0, y: 100 }}
+			animate={{ opacity: 1, y: 0 }}
+			exit={{ opacity: 0, y: 100 }}
+			className="flex flex-col bg-white rounded-3xl p-10 shadow-custom gap-10"
+		>
 			<span className="text-6xl font-bold text-center">
 				<span className="text-blue">어떤 업무</span>를 도와드릴까요?
 			</span>
@@ -21,7 +27,7 @@ export const Menu = ({ prompts }: MenuProps): JSX.Element => {
 					</Link>
 				))}
 			</div>
-		</div>
+		</motion.div>
 	);
 };
 
