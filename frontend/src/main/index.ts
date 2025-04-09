@@ -6,7 +6,7 @@ import icon from "../../resources/icon.png?asset";
 let mainWindow: BrowserWindow | null = null;
 let subWindow: BrowserWindow | null = null;
 
-const USE_SINGLE_MONITOR = true;
+const USE_SINGLE_MONITOR = false;
 
 function createWindows(): void {
 	const displays = screen.getAllDisplays();
@@ -76,7 +76,7 @@ function createWindows(): void {
 	}
 
 	mainWindow.on("ready-to-show", () => {
-		console.log("[MainWindow] bounds:", mainWindow?.getBounds());
+		// console.log("[MainWindow] bounds:", mainWindow?.getBounds());
 		mainWindow?.show();
 	});
 
@@ -88,7 +88,7 @@ function createWindows(): void {
 	}
 
 	subWindow.on("ready-to-show", () => {
-		console.log("[SubWindow] bounds:", subWindow?.getBounds());
+		// console.log("[SubWindow] bounds:", subWindow?.getBounds());
 		subWindow?.show();
 	});
 }
