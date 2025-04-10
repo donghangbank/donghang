@@ -104,7 +104,7 @@ const SERVICE_CONFIG: Record<string, ServiceConfig> = {
 			{ path: "warning", name: "금융 사기" },
 			{ path: "resident", name: "신분증 투입" },
 			{ path: "password", name: "비밀번호 입력" },
-			{ path: "specsheet", name: "적금 상품 가입" },
+			{ path: "specsheet", name: "입출금 계좌 개설" },
 			{ path: "final", name: "완료" }
 		]
 	}

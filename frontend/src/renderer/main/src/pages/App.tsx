@@ -16,6 +16,7 @@ export const App = (): JSX.Element => {
 	});
 
 	useEffect(() => {
+		navigate("/general");
 		if (!isAudioPlaying && isUserExist) {
 			if (isElderly === 1) navigate("/general");
 			else if (isElderly === 2) navigate("/senior");

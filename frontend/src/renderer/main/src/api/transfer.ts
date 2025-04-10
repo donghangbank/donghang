@@ -34,6 +34,20 @@ export const cardCheckAPI = async ({
 	return response.data;
 };
 
+export const accountCheckAPI = async ({
+	accountNumber,
+	password
+}: {
+	accountNumber: string;
+	password: string;
+}): Promise<CardCheckAPIResponse> => {
+	const response = await localAxios.post<CardCheckAPIResponse>("/accounts/check", {
+		accountNumber,
+		password
+	});
+	return response.data;
+};
+
 export const accountOwnerCheckAPI = async ({
 	receivingAccountNumber
 }: {

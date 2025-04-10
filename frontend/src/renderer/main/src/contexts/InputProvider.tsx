@@ -12,6 +12,7 @@ export const InputProvider = ({ children }: { children: React.ReactNode }): JSX.
 
 	const resetAll = useCallback(() => {
 		setPassword("");
+		setSendingAccountNumber("");
 		setReceivingAccountNumber("");
 		setAmount("");
 		setResidentNumber("");

@@ -54,7 +54,7 @@ export const InputPanel = ({
 					</span>
 				)}
 			</div>
-			<div className="flex flex-col justify-center items-center rounded-3xl bg-cloudyBlue">
+			<div className="flex flex-col justify-center items-right rounded-3xl bg-cloudyBlue">
 				<input
 					className="flex-1 p-2.5 rounded-3xl text-4xl bg-cloudyBlue text-right px-2.5 focus:border-none"
 					value={format(inputValue)}
