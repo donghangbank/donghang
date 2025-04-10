@@ -10,7 +10,7 @@ export async function requestRecommendation(
 		const formData = new FormData();
 		formData.append("file", audio, "audio.webm");
 
-		const response = await fetch("https://stirred-solely-hippo.ngrok-free.app/recommend", {
+		const response = await fetch(import.meta.env.VITE_PYTHON_API_URL + "recommend", {
 			method: "POST",
 			body: formData
 		});

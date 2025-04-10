@@ -1,5 +1,4 @@
 import { useActionPlay } from "@renderer/hooks/ai/useActionPlay";
-import TestButton from "@renderer/components/common/senior/TestButton";
 import NumberPanel from "@renderer/components/common/senior/NumberPanel";
 import receiver_input from "@renderer/assets/audios/receiver_input.mp3?url";
 import { formatAccountNumber } from "@renderer/utils/formatters";
@@ -20,6 +19,7 @@ export default function SeniorTransferInfoAccountPage(): JSX.Element {
 	const { receivingAccountNumber, setReceivingAccountNumber, setDisabled } =
 		useContext(InputContext);
 	const { construction, setConstruction } = useContext(AIContext);
+	const [constructionTrigger, setConstructionTrigger] = useState(false);
 	const { setCurrentJob } = useContext(PageContext);
 	const navigate = useNavigate();
 
@@ -78,11 +78,11 @@ export default function SeniorTransferInfoAccountPage(): JSX.Element {
 	useActionPlay({
 		dialogue: `${data?.ownerName} 님 맞으신가요?`,
 		shouldActivate: ownerConfirmedTrigger,
-		avatarState: "idle"
-		// onComplete: () => {
-		// 	console.log("계좌번호 확인 완료");
-		// 	navigate("/senior/transfer/info/amount");
-		// }
+		avatarState: "idle",
+		onComplete: () => {
+			setConstruction("etc");
+			setConstructionTrigger(true);
+		}
 	});
 
 	useActionPlay({
@@ -97,13 +97,14 @@ export default function SeniorTransferInfoAccountPage(): JSX.Element {
 	});
 
 	useEffect(() => {
+		if (!constructionTrigger) return;
 		if (construction === "긍정") {
 			navigate("/senior/transfer/info/amount");
 		} else if (construction === "부정") {
 			numberClear();
 			setFirstInput(true);
 		}
-	}, [construction, setConstruction, navigate, setCurrentJob, numberClear]);
+	}, [construction, setConstruction, navigate, setCurrentJob, numberClear, constructionTrigger]);
 
 	useEffect(() => {
 		setReceivingAccountNumber("");
@@ -124,10 +125,6 @@ export default function SeniorTransferInfoAccountPage(): JSX.Element {
 					/>
 				</div>
 			</div>
-			<TestButton
-				prevRoute="/senior/transfer/card/password"
-				nextRoute="/senior/transfer/info/amount"
-			/>
 		</div>
 	);
 }

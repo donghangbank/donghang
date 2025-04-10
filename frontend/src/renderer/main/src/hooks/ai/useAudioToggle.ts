@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { requestRecommendation } from "@renderer/api/ai/requestRecommend";
+import { UserContext } from "@renderer/contexts/UserContext";
 
 export function useAudioToggle(): {
 	recommended_account: string;
@@ -14,6 +15,7 @@ export function useAudioToggle(): {
 	const sendToServerRef = useRef<boolean>(false);
 	const [recommended_account, setRecommendedAccount] = useState("");
 	const [reason, setReason] = useState("");
+	const { setIsTalking } = useContext(UserContext);
 
 	const startRecording = useCallback(async () => {
 		try {
@@ -61,21 +63,26 @@ export function useAudioToggle(): {
 			};
 
 			mediaRecorder.start();
+			setIsTalking(true);
 		} catch (err) {
 			console.error("Failed to start recording:", err);
 		}
-	}, []);
+	}, [setIsTalking]);
 
-	const stopRecording = useCallback((sendToServer: boolean = false): void => {
-		if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
-			sendToServerRef.current = sendToServer; // Set the flag before stopping
-			mediaRecorderRef.current.stop();
-		}
-		if (streamRef.current) {
-			streamRef.current.getTracks().forEach((track) => track.stop());
-			streamRef.current = null;
-		}
-	}, []);
+	const stopRecording = useCallback(
+		(sendToServer: boolean = false): void => {
+			setIsTalking(false);
+			if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+				sendToServerRef.current = sendToServer; // Set the flag before stopping
+				mediaRecorderRef.current.stop();
+			}
+			if (streamRef.current) {
+				streamRef.current.getTracks().forEach((track) => track.stop());
+				streamRef.current = null;
+			}
+		},
+		[setIsTalking]
+	);
 
 	useEffect(() => {
 		return (): void => {

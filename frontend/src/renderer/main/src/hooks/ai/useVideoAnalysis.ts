@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useContext, useEffect, useMemo, useRef, useCallback } from "react";
 import { UserContext } from "../../contexts/UserContext";
 import { useWebSocket } from "../websocket/useWebSocket";
 import { responseMsg } from "../websocket/socketMsg";
@@ -7,10 +7,9 @@ export function useVideoAnalysis(
 	videoRef: React.RefObject<HTMLVideoElement>,
 	canvasRef: React.RefObject<HTMLCanvasElement>
 ): void {
-	const { setIsElderly, setIsUsingPhone, setIsUserExist } = useContext(UserContext);
+	const { isElderly, setIsElderly, setIsUsingPhone, setIsUserExist } = useContext(UserContext);
 
 	const ageBufferRef = useRef<number[]>([]);
-	const [ageConfirmed, setAgeConfirmed] = useState(false);
 	const lastSentTimeRef = useRef<number>(0);
 	const continousDetectionRef = useRef<number>(10);
 
@@ -21,12 +20,18 @@ export function useVideoAnalysis(
 		return sorted.length % 2 !== 0 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
 	};
 
+	useEffect(() => {
+		if (isElderly === 0) {
+			ageBufferRef.current = [];
+		}
+	}, [isElderly]);
+
 	// 메시지 처리 콜백 분리
 	const handleMessage = useCallback(
 		(data: responseMsg): void => {
 			try {
 				// Age detection logic
-				if (!ageConfirmed && data.predicted_age !== undefined) {
+				if (isElderly === 0 && data.predicted_age !== undefined) {
 					const ageIndex = Number(data.predicted_age);
 					if (ageIndex !== 0 && !isNaN(ageIndex)) {
 						const nextBuffer = [...ageBufferRef.current, ageIndex].slice(-5);
@@ -39,7 +44,6 @@ export function useVideoAnalysis(
 							} else {
 								setIsElderly(1);
 							}
-							setAgeConfirmed(true);
 						}
 					}
 				}
@@ -64,7 +68,7 @@ export function useVideoAnalysis(
 				console.error("Error processing video analysis message:", error);
 			}
 		},
-		[ageConfirmed, setIsElderly, setIsUsingPhone, setIsUserExist]
+		[isElderly, setIsElderly, setIsUserExist, setIsUsingPhone]
 	);
 
 	// WebSocket 옵션 메모이제이션
@@ -119,7 +123,7 @@ export function useVideoAnalysis(
 	useEffect(() => {
 		return (): void => {
 			ageBufferRef.current = [];
-			setAgeConfirmed(false);
+			setIsElderly(0);
 		};
-	}, []);
+	}, [setIsElderly]);
 }

@@ -1,4 +1,3 @@
-import TestButton from "@renderer/components/common/senior/TestButton";
 import { useActionPlay } from "@renderer/hooks/ai/useActionPlay";
 
 export default function SeniorDepositProductDicisionPage(): JSX.Element {
@@ -8,12 +7,5 @@ export default function SeniorDepositProductDicisionPage(): JSX.Element {
 		avatarState: "idle"
 	});
 
-	return (
-		<>
-			<TestButton
-				prevRoute="/senior/depositproducts/recommendation"
-				nextRoute="/senior/depositproducts/option"
-			/>
-		</>
-	);
+	return <></>;
 }

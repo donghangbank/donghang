@@ -1,5 +1,4 @@
 import { getDemandProductByNameAPI } from "@renderer/api/products";
-import TestButton from "@renderer/components/common/senior/TestButton";
 import { AIContext } from "@renderer/contexts/AIContext";
 import { useActionPlay } from "@renderer/hooks/ai/useActionPlay";
 import { useAudioToggle } from "@renderer/hooks/ai/useAudioToggle";
@@ -30,6 +29,7 @@ export default function SeniorDepositProductRecommendationPage(): JSX.Element {
 	const { recommended_account, reason, start, stop } = useAudioToggle();
 	const [isListening, setIsListening] = useState(false);
 	const [recommended, setRecommended] = useState(false);
+	const [nextTrigger, setNextTrigger] = useState(false); // State to trigger next action
 	const [showSpecSheet, setShowSpecSheet] = useState(false); // State to toggle SpecSheet
 	const { setAudioStop, construction } = useContext(AIContext);
 	const { setInterestRate, setMaxAmount, setProductName, setMinAmount, setAccountProductId } =
@@ -77,14 +77,27 @@ export default function SeniorDepositProductRecommendationPage(): JSX.Element {
 		}
 	});
 
+	const handleConfirm = (): void => {
+		stop(true);
+		setAudioStop(false);
+		window.mainAPI.send("set-sub-mode", "default");
+	};
+
+	const handleRestart = (): void => {
+		stop(false);
+		start();
+	};
+
 	useActionPlay({
 		dialogue: "원하시는 조건 말씀하시고 다 말씀하셨으면 아래 확인 버튼을 눌러주세요!",
 		shouldActivate: isListening,
 		avatarState: "focusBottom",
-		animationDelay: 2500,
+		animationDelay: 3000,
 		onComplete: () => {
 			setIsListening(false);
 			window.mainAPI.send("set-sub-mode", "voice-manage");
+			window.mainAPI.onCallConfirm(handleConfirm);
+			window.mainAPI.onCallCancel(handleRestart);
 			start();
 		}
 	});
@@ -102,7 +115,10 @@ export default function SeniorDepositProductRecommendationPage(): JSX.Element {
 		dialogue:
 			"확인해보시고 해당 예금 상품에 가입하고 싶으시거나 다른 예금 상품 알아보고 싶으시면 편하게 말씀해주세요!",
 		shouldActivate: showSpecSheet,
-		avatarState: "idle"
+		avatarState: "idle",
+		onComplete: () => {
+			setNextTrigger(true);
+		}
 	});
 
 	useEffect(() => {
@@ -112,30 +128,24 @@ export default function SeniorDepositProductRecommendationPage(): JSX.Element {
 	}, [recommended_account, refetch]);
 
 	// Handle confirm and restart from sub window
-	useEffect(() => {
-		const handleConfirm = (): void => {
-			stop(true);
-			setAudioStop(false);
-			window.mainAPI.send("set-sub-mode", "default");
-		};
+	// useEffect(() => {
+	// 	const handleConfirm = (): void => {
+	// 		stop(true);
+	// 		setAudioStop(false);
+	// 		window.mainAPI.send("set-sub-mode", "default");
+	// 	};
 
-		const handleRestart = (): void => {
-			stop(false);
-			start();
-		};
+	// 	const handleRestart = (): void => {
+	// 		stop(false);
+	// 		start();
+	// 	};
 
-		const unsubscribeConfirm = (): void => window.mainAPI.onCallConfirm(handleConfirm);
-		const unsubscribeRestart = (): void => window.mainAPI.onCallCancel(handleRestart);
-
-		return (): void => {
-			unsubscribeConfirm?.();
-			unsubscribeRestart?.();
-		};
-	}, [start, stop, setAudioStop]);
+	// 	window.mainAPI.onCallConfirm(handleConfirm);
+	// 	window.mainAPI.onCallCancel(handleRestart);
+	// }, [start, stop, setAudioStop]);
 
 	useEffect(() => {
-		console.log(recommended, reason, showSpecSheet, construction);
-		if (recommended && reason && showSpecSheet && construction === "긍정") {
+		if (nextTrigger && construction === "긍정") {
 			setProductName(data?.productName ?? "");
 			setInterestRate(data?.interestRate ?? 0);
 			setMinAmount(data?.minSubscriptionBalance ?? 0);
@@ -146,6 +156,7 @@ export default function SeniorDepositProductRecommendationPage(): JSX.Element {
 			setShowSpecSheet(false);
 			setRecommended(false);
 			setIsListening(true);
+			setAudioStop(true);
 		}
 	}, [
 		construction,
@@ -158,7 +169,9 @@ export default function SeniorDepositProductRecommendationPage(): JSX.Element {
 		setInterestRate,
 		setMinAmount,
 		setMaxAmount,
-		setAccountProductId
+		setAccountProductId,
+		setAudioStop,
+		nextTrigger
 	]);
 
 	// Define sections for SpecSheet with fallback values
@@ -175,7 +188,15 @@ export default function SeniorDepositProductRecommendationPage(): JSX.Element {
 				{ label: "가입 기간", value: `${data.subscriptionPeriod ?? 0}개월` }
 			]
 		: [];
-	console.log("데이터 뻐커" + data);
+
+	useEffect(() => {
+		if (recommended && reason && !showSpecSheet) {
+			window.mainAPI.send("set-sub-mode", "confirm", { label: "상품 자세히 보기" });
+
+			window.mainAPI.onCallConfirm(() => setShowSpecSheet(true));
+		}
+	}, [reason, recommended, showSpecSheet]);
+
 	return (
 		<>
 			{recommended && reason && !showSpecSheet && (
@@ -187,38 +208,18 @@ export default function SeniorDepositProductRecommendationPage(): JSX.Element {
 				>
 					<div className="flex flex-col gap-6 justify-center items-start">
 						<span className="text-blue text-3xl font-bold">추천 이유</span>
-						<div className="bg-cloudyBlue text-3xl p-5 text-right rounded-3xl font-bold w-[450px]">
+						<div className="bg-cloudyBlue text-3xl p-5 text-left rounded-3xl font-bold w-[550px] break-words whitespace-pre-wrap">
 							<span>{reason}</span>
 						</div>
-					</div>
-					<div className="flex justify-center items-center">
-						<button
-							type="button"
-							className="p-6 bg-blue rounded-xl w-full"
-							onClick={() => setShowSpecSheet(true)} // Show SpecSheet on click
-						>
-							<span className="text-3xl text-white">자세히 보기</span>
-						</button>
 					</div>
 				</motion.div>
 			)}
 
 			{recommended && data && showSpecSheet && (
-				<div className="fixed top-64 w-full">
-					<ProductSheet
-						sections={productSheetSections}
-						title="추천 상품 명세표"
-						buttonText1="이거로 할게요"
-						buttonText2="다른 상품 추천받을래요"
-						width={600}
-					/>
+				<div className="fixed top-52 w-full">
+					<ProductSheet sections={productSheetSections} title="추천 상품 명세표" width={600} />
 				</div>
 			)}
-
-			<TestButton
-				prevRoute="/senior/depositproducts/check"
-				nextRoute="/senior/depositproducts/option"
-			/>
 		</>
 	);
 }

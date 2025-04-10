@@ -1,8 +1,7 @@
 import { useActionPlay } from "@renderer/hooks/ai/useActionPlay";
-import TestButton from "@renderer/components/common/senior/TestButton";
 import NumberPanel from "@renderer/components/common/senior/NumberPanel";
 import { formatAmount } from "@renderer/utils/formatters";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { InputContext } from "@renderer/contexts/InputContext";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -23,11 +22,12 @@ export default function SeniorDepositConfirmPage(): JSX.Element {
 		recipientName,
 		setSendingAccountBalance
 	} = useContext(SpecSheetContext);
-	const { construction } = useContext(AIContext);
+	const { construction, setConstruction } = useContext(AIContext);
 	const { setCurrentJob } = useContext(PageContext);
 	const navigate = useNavigate();
 	const sessionStartTime = useKoreaTime();
 	const disableMasking = true;
+	const [canGo, setCanGo] = useState(false);
 
 	const { mutate: deposit } = useMutation({
 		mutationFn: () =>
@@ -38,7 +38,7 @@ export default function SeniorDepositConfirmPage(): JSX.Element {
 				disableMasking
 			}),
 		onSuccess: (data) => {
-			setSpecSheetAmount(10000);
+			setSpecSheetAmount(Number(data.amount));
 			setReceivingAccountNumber(data.accountNumber);
 			setSendingAccountBalance(data.balance);
 			setTransactionTime(data.transactionTime);
@@ -49,19 +49,29 @@ export default function SeniorDepositConfirmPage(): JSX.Element {
 		}
 	});
 
+	useEffect(() => {
+		setConstruction("etc");
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
 	useActionPlay({
 		dialogue: `${recipientName} 님 계좌에 ${amount} 원 입금하시는거 맞나요?`,
-		shouldActivate: !!recipientName,
-		avatarState: "idle"
+		shouldActivate: !!recipientName && !!amount,
+		avatarState: "idle",
+		onComplete: () => {
+			setConstruction("etc");
+			setCanGo(true);
+		}
 	});
 
 	useEffect(() => {
+		if (!canGo) return;
 		if (construction === "긍정") {
 			deposit();
 		} else if (construction === "부정") {
 			navigate("/senior/deposit/card/input");
 		}
-	}, [construction, navigate, setCurrentJob, deposit]);
+	}, [construction, navigate, setCurrentJob, deposit, recipientName, amount, canGo]);
 
 	return (
 		<div className="w-full h-full flex justify-center items-center">
@@ -72,7 +82,6 @@ export default function SeniorDepositConfirmPage(): JSX.Element {
 					</div>
 				)}
 			</div>
-			<TestButton prevRoute="/senior/deposit/card/input" nextRoute="/senior/deposit/specsheet" />
 		</div>
 	);
 }

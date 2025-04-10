@@ -1,4 +1,3 @@
-import TestButton from "@renderer/components/common/senior/TestButton";
 import { ProductContext } from "@renderer/contexts/ProductContext";
 import { SpecSheetContext } from "@renderer/contexts/SpecSheetContext";
 import { useCallback, useContext, useEffect, useState } from "react";
@@ -23,6 +22,9 @@ export default function SeniorDepositProductInfoAmountPage(): JSX.Element {
 		amount,
 		minAmount,
 		maxAmount,
+		accountNumber,
+		accountBalance,
+		accountExpiryDate,
 		setAmount,
 		setPassword,
 		setAccountNumber,
@@ -61,12 +63,17 @@ export default function SeniorDepositProductInfoAmountPage(): JSX.Element {
 			setAccountBalance(data.accountBalance);
 			setAccountExpiryDate(data.accountExpiryDate);
 			setDisabled(true);
-			navigate("/senior/depositproducts/info/specsheet");
 		},
 		onError: (error: AxiosError) => {
 			console.log(error);
 		}
 	});
+
+	useEffect(() => {
+		if (accountNumber && accountBalance && accountExpiryDate && disabled) {
+			navigate("/senior/depositproducts/info/specsheet");
+		}
+	}, [accountNumber, accountBalance, accountExpiryDate, disabled, navigate]);
 
 	useEffect(() => {
 		setMemberId(userId);
@@ -176,10 +183,6 @@ export default function SeniorDepositProductInfoAmountPage(): JSX.Element {
 					isCount={false}
 				/>
 			</motion.div>
-			<TestButton
-				prevRoute="/senior/depositproducts/card/password"
-				nextRoute="/senior/depositproducts/info/specsheet"
-			/>
 		</div>
 	);
 }

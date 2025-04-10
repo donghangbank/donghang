@@ -1,4 +1,3 @@
-import TestButton from "@renderer/components/common/senior/TestButton";
 import { useActionPlay } from "@renderer/hooks/ai/useActionPlay";
 import { useNavigate } from "react-router-dom";
 
@@ -6,7 +5,7 @@ export default function SeniorDepositPaymentPage(): JSX.Element {
 	const navigate = useNavigate();
 
 	useActionPlay({
-		dialogue: "현금으로 준비하셨나요? 수표도 있으신가요?",
+		dialogue: "현금으로 준비하셨나요?",
 		shouldActivate: true,
 		avatarState: "idle",
 		onComplete: () => {
@@ -14,12 +13,5 @@ export default function SeniorDepositPaymentPage(): JSX.Element {
 		}
 	});
 
-	return (
-		<div className="w-full h-full flex justify-center items-center">
-			<TestButton
-				prevRoute="/senior/deposit/card/password"
-				nextRoute="/senior/deposit/cash/input"
-			/>
-		</div>
-	);
+	return <></>;
 }

@@ -1,6 +1,5 @@
 import { useActionPlay } from "@renderer/hooks/ai/useActionPlay";
-import TestButton from "@renderer/components/common/senior/TestButton";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
 	formatAmount,
 	formatAccountNumber,
@@ -21,7 +20,6 @@ interface Section {
 
 interface SpecSheetProps {
 	sections: Section[];
-	prev?: string;
 	link?: string;
 	title?: string;
 	audioFile?: string;
@@ -42,7 +40,6 @@ const formatters: Record<NonNullable<Section["formatType"]>, (value: string) => 
 
 export default function SpecSheet({
 	sections,
-	prev = "/",
 	link = "/senior/final",
 	audioFile = billCheck,
 	dialogue = "명세표를 확인해주세요",
@@ -50,6 +47,7 @@ export default function SpecSheet({
 	buttonText = "확인",
 	width = 400 // Default width remains 400px
 }: SpecSheetProps): JSX.Element {
+	const navigate = useNavigate();
 	useActionPlay({
 		audioFile,
 		dialogue,
@@ -60,14 +58,17 @@ export default function SpecSheet({
 	const [isVisible, setIsVisible] = useState(false);
 
 	useEffect(() => {
-		const timer = setTimeout(() => setIsVisible(true), 1000);
+		const timer = setTimeout(() => {
+			setIsVisible(true);
+			window.mainAPI.send("set-sub-mode", "confirm", { label: buttonText });
+			window.mainAPI.onCallConfirm(() => navigate(link));
+		}, 1000);
 		return (): void => clearTimeout(timer);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	return (
 		<div className={`flex w-full h-full justify-end items-center ${className}`}>
-			<TestButton prevRoute={prev} nextRoute={link} />
-
 			<motion.div
 				initial={{ opacity: 0, y: 20 }}
 				animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0 }}
@@ -91,14 +92,6 @@ export default function SpecSheet({
 						</div>
 					);
 				})}
-
-				<div className="flex justify-center items-center">
-					<button type="button" className="p-6 bg-blue rounded-xl w-full">
-						<Link to={link}>
-							<span className="text-3xl text-white">{buttonText}</span>
-						</Link>
-					</button>
-				</div>
 			</motion.div>
 		</div>
 	);

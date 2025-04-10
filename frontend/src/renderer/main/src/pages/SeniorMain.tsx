@@ -3,7 +3,6 @@ import intro2 from "@renderer/assets/audios/intro2.mp3?url";
 import { useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { AIContext } from "@renderer/contexts/AIContext";
-import TestButton from "@renderer/components/common/senior/TestButton";
 
 export default function SeniorMain(): JSX.Element {
 	const { construction } = useContext(AIContext);
@@ -38,9 +37,5 @@ export default function SeniorMain(): JSX.Element {
 				break;
 		}
 	}, [construction, navigate]);
-	return (
-		<>
-			<TestButton prevRoute="/" nextRoute="/senior/depositproducts/check" />
-		</>
-	);
+	return <></>;
 }

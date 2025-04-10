@@ -1,18 +1,18 @@
 import { useActionPlay } from "@renderer/hooks/ai/useActionPlay";
-import TestButton from "@renderer/components/common/senior/TestButton";
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSubMonitorListeners } from "@renderer/hooks/useSubMonitorListeners";
+import check_screen from "@renderer/assets/audios/check_screen.mp3?url";
 
 interface ScamInfoProps {
-	prev: string;
 	link: string;
 }
 
-export default function ScamInfo({ prev, link }: ScamInfoProps): JSX.Element {
+export default function ScamInfo({ link }: ScamInfoProps): JSX.Element {
 	const navigate = useNavigate();
 
 	useActionPlay({
+		audioFile: check_screen,
 		dialogue: "아래 화면을 확인해주세요.",
 		shouldActivate: true,
 		avatarState: "focusBottom"
@@ -28,9 +28,5 @@ export default function ScamInfo({ prev, link }: ScamInfoProps): JSX.Element {
 		() => navigate("/senior/final")
 	);
 
-	return (
-		<div className="w-full h-full flex justify-center items-center">
-			<TestButton prevRoute={prev} nextRoute={link} />
-		</div>
-	);
+	return <></>;
 }
