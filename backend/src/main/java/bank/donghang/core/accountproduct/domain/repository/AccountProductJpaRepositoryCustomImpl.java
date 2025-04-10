@@ -71,7 +71,7 @@ public class AccountProductJpaRepositoryCustomImpl implements AccountProductJpaR
 		}
 		try {
 			Long lastId = Long.parseLong(pageToken);
-			return idPath.lt(lastId);
+			return idPath.loe(lastId);
 		} catch (NumberFormatException e) {
 			return null;
 		}
