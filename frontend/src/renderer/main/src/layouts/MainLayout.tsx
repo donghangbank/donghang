@@ -86,6 +86,10 @@ export const MainLayout = (): JSX.Element => {
 		}
 	}, [audioStop, vad.isDetecting, startRef, stopRef]);
 
+	useEffect(() => {
+		window.mainAPI.send("set-senior-mode", isSenior);
+	}, [isSenior]);
+
 	return (
 		<div className="w-screen h-screen flex flex-col overflow-hidden">
 			<div>
