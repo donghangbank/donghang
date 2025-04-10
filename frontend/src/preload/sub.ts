@@ -35,5 +35,10 @@ contextBridge.exposeInMainWorld("subAPI", {
 		});
 	},
 
-	onSubModeUpdate: (callback) => ipcRenderer.on("set-sub-mode", (event, data) => callback(data))
+	onSubModeUpdate: (callback) => ipcRenderer.on("set-sub-mode", (event, data) => callback(data)),
+
+	// sub 넘버패드 시니어인지 판별
+	onSeniorModeUpdate: (callback: (isSenior: boolean) => void) => {
+		ipcRenderer.on("senior-mode-updated", (event, isSenior) => callback(isSenior));
+	}
 });

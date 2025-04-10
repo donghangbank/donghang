@@ -162,6 +162,13 @@ app.whenReady().then(() => {
 			}
 		}
 	);
+
+	// Senior 모드 감지 핸들러 추가
+	ipcMain.on("set-senior-mode", (event, isSenior: boolean) => {
+		if (subWindow && !subWindow.isDestroyed()) {
+			subWindow.webContents.send("senior-mode-updated", isSenior);
+		}
+	});
 });
 
 app.on("window-all-closed", () => {
