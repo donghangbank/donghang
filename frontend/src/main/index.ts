@@ -10,8 +10,8 @@ const USE_SINGLE_MONITOR = false;
 
 function createWindows(): void {
 	const displays = screen.getAllDisplays();
-	const primaryDisplay = displays[0];
-	const secondaryDisplay = displays[1];
+	const primaryDisplay = displays[1];
+	const secondaryDisplay = displays[0];
 
 	// Common window options
 	const commonOptions = {

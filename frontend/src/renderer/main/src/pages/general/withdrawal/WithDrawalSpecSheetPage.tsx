@@ -21,7 +21,7 @@ export const WithDrawalSpecSheetPage = (): JSX.Element => {
 		>
 			<span className="text-5xl font-bold text-center">거래 명세표</span>
 			<div className="flex justify-between gap-20 items-center">
-				<span className="text-blue text-3xl font-bold">거래 일시</span>
+				<span className="text-blue text-2xl font-bold">거래 일시</span>
 				<div className="bg-cloudyBlue text-3xl p-5 text-right rounded-3xl font-bold w-[510px]">
 					<span>{formatTransactionTime(transactionTime)}</span>
 				</div>

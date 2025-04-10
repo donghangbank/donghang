@@ -7,7 +7,7 @@ export const InquiryBalanceOptionPage = (): JSX.Element => {
 	const prompts = [
 		{ prompt: "카드", link: "/general/balance/card/input", imageUrl: card },
 		{ prompt: "통장", link: "/general/balance/card/input", imageUrl: bankbook },
-		{ prompt: "계좌번호", link: "/general/balance/card/input", imageUrl: numberpad }
+		{ prompt: "계좌번호", link: "/general/balance/account/input", imageUrl: numberpad }
 	];
 	return <Option prompts={prompts} title="무엇을 가져오셨나요?" />;
 };

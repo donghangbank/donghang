@@ -108,6 +108,16 @@ import DemandProductResidentAuthPage from "./pages/general/demands/DemandProduct
 import DemandProductInfoPasswordPage from "./pages/general/demands/DemandProductInfoPasswordPage";
 import DemandProductInfoSpecSheetPage from "./pages/general/demands/DemandProductInfoSpecSheetPage";
 import SeniorDepositProductCardWarningPage from "./pages/senior/products/deposit/SeniorDepositProductCardWarning";
+import DepositAccountInputPage from "./pages/general/deposit/DepositAccountInputPage";
+import DepositAccountPasswordPage from "./pages/general/deposit/DepositAccountPasswordPage";
+import WithDrawalAccountInputPage from "./pages/general/withdrawal/WithDrawalAccountInputPage";
+import WithDrawalAccountPasswordPage from "./pages/general/withdrawal/WithDrawalAccountPasswordPage";
+import TransferAccountInputPage from "./pages/general/transfer/TransferAccountInputPage";
+import TransferAccountPasswordPage from "./pages/general/transfer/TransferAccountPasswordPage";
+import InquiryBalanceAccountInputPage from "./pages/general/inquiry/balance/InquiryBalanceAccountInputPage";
+import InquiryBalanceAccountPasswordPage from "./pages/general/inquiry/balance/InquiryBalanceAccountPasswordPage";
+import InquiryHistoryAccountInputPage from "./pages/general/inquiry/history/InquiryHistoryAccountInputPage";
+import InquiryHistoryAccountPasswordPage from "./pages/general/inquiry/history/InquiryHistoryAccountPasswordPage";
 
 const router = createHashRouter([
 	{
@@ -161,6 +171,19 @@ const router = createHashRouter([
 									{
 										path: "password",
 										element: <DepositCardPasswordPage />
+									}
+								]
+							},
+							{
+								path: "account",
+								children: [
+									{
+										path: "input",
+										element: <DepositAccountInputPage />
+									},
+									{
+										path: "password",
+										element: <DepositAccountPasswordPage />
 									}
 								]
 							},
@@ -229,6 +252,19 @@ const router = createHashRouter([
 								]
 							},
 							{
+								path: "account",
+								children: [
+									{
+										path: "input",
+										element: <WithDrawalAccountInputPage />
+									},
+									{
+										path: "password",
+										element: <WithDrawalAccountPasswordPage />
+									}
+								]
+							},
+							{
 								path: "cash",
 								children: [
 									{
@@ -286,6 +322,19 @@ const router = createHashRouter([
 									{
 										path: "password",
 										element: <TransferCardPasswordPage />
+									}
+								]
+							},
+							{
+								path: "account",
+								children: [
+									{
+										path: "input",
+										element: <TransferAccountInputPage />
+									},
+									{
+										path: "password",
+										element: <TransferAccountPasswordPage />
 									}
 								]
 							},
@@ -351,6 +400,19 @@ const router = createHashRouter([
 								]
 							},
 							{
+								path: "account",
+								children: [
+									{
+										path: "input",
+										element: <InquiryBalanceAccountInputPage />
+									},
+									{
+										path: "password",
+										element: <InquiryBalanceAccountPasswordPage />
+									}
+								]
+							},
+							{
 								path: "specsheet",
 								element: <InquiryBalanceSpecSheetPage />
 							}
@@ -386,6 +448,19 @@ const router = createHashRouter([
 									{
 										path: "password",
 										element: <InquiryHistoryCardPasswordPage />
+									}
+								]
+							},
+							{
+								path: "account",
+								children: [
+									{
+										path: "input",
+										element: <InquiryHistoryAccountInputPage />
+									},
+									{
+										path: "password",
+										element: <InquiryHistoryAccountPasswordPage />
 									}
 								]
 							},
