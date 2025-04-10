@@ -12,7 +12,7 @@ export async function requestPrediction(
 		const formData = new FormData();
 		formData.append("file", audio, "audio.webm");
 
-		const response = await fetch("https://stirred-solely-hippo.ngrok-free.app/prediction", {
+		const response = await fetch(import.meta.env.VITE_PYTHON_API_URL + "prediction", {
 			method: "POST",
 			body: formData
 		});

@@ -1,5 +1,4 @@
 import { useActionPlay } from "@renderer/hooks/ai/useActionPlay";
-import TestButton from "@renderer/components/common/senior/TestButton";
 import NumberPanel from "@renderer/components/common/senior/NumberPanel";
 import how_much from "@renderer/assets/audios/how_much.mp3?url";
 import { formatAmount, formatDefault } from "@renderer/utils/formatters";
@@ -162,10 +161,6 @@ export default function SeniorTransferInfoAmountPage(): JSX.Element {
 					<NumberPanel inputValue={amount} format={formatAmount} />
 				</div>
 			</div>
-			<TestButton
-				prevRoute="/senior/transfer/info/account"
-				nextRoute="/senior/transfer/info/specsheet"
-			/>
 		</div>
 	);
 }

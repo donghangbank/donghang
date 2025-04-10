@@ -148,8 +148,13 @@ app.whenReady().then(() => {
 
 	ipcMain.on(
 		"set-sub-mode",
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		(event, mode: "numpad" | "scam-warning" | "card-warning", data?: any) => {
+
+		(
+			event,
+			mode: "numpad" | "scam-warning" | "card-warning" | "voice-manage" | "confirm",
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			data?: any
+		) => {
 			if (subWindow && !subWindow.isDestroyed()) {
 				subWindow.webContents.send("set-sub-mode", { mode, data });
 			}

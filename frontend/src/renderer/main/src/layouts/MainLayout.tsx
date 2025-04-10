@@ -6,7 +6,6 @@ import { Outlet, useLocation } from "react-router-dom";
 import { useVADSTT } from "@renderer/hooks/ai/useVADSTT";
 import { PageContext } from "@renderer/contexts/PageContext";
 import { motion } from "framer-motion";
-import TestButton from "@renderer/components/common/senior/TestButton";
 import { AIContext } from "@renderer/contexts/AIContext";
 import { useMediaStream } from "@renderer/hooks/ai/useMediaStream";
 import { useVideoAnalysis } from "@renderer/hooks/ai/useVideoAnalysis";
@@ -30,9 +29,9 @@ declare global {
 }
 
 export const MainLayout = (): JSX.Element => {
+	console.log("MainLayout Rendered");
 	const location = useLocation();
 	const isSenior = location.pathname === "/" || location.pathname.includes("/senior");
-	const isSeniorTest = location.pathname.includes("/senior");
 	const { currentJob } = useContext(PageContext);
 	const { audioStop } = useContext(AIContext);
 	const { videoRef, canvasRef, stream } = useMediaStream();
@@ -138,7 +137,6 @@ export const MainLayout = (): JSX.Element => {
 					<Simulator />
 				</div>
 			</div>
-			{!isSeniorTest && <TestButton prevRoute="/" nextRoute="/senior" />}
 		</div>
 	);
 };

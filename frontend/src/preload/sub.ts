@@ -19,6 +19,7 @@ contextBridge.exposeInMainWorld("subAPI", {
 
 	// 버튼 액션을 메인 프로세스에 전달
 	notifyButtonAction: (action: "confirm" | "cancel") => {
+		console.log("notifyButtonAction", action);
 		ipcRenderer.send("sub-button-pressed", action);
 	},
 

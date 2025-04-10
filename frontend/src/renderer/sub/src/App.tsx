@@ -1,6 +1,7 @@
 import logo from "@renderer/assets/logo.png";
 import AudioManagePanel from "@renderer/components/common/AudioManagePanel";
 import SubCardWarning from "@renderer/components/common/SubCardWarning";
+import SubConfirm from "@renderer/components/common/SubConfirm";
 import { SubNumberPad } from "@renderer/components/common/SubNumberPad";
 import SubScamWarning from "@renderer/components/common/SubScamWarning";
 import { useEffect, useState } from "react";
@@ -27,8 +28,9 @@ export default function App(): JSX.Element {
 		"password"
 	);
 	const [mode, setMode] = useState<
-		"numpad" | "scam-warning" | "card-warning" | "voice-manage" | "default"
+		"numpad" | "scam-warning" | "card-warning" | "voice-manage" | "default" | "confirm"
 	>("default");
+	const [confirmLabel, setConfirmLabel] = useState("확인");
 
 	useEffect(() => {
 		window.subAPI.onInputLinkUpdated((hasInput) => {
@@ -40,15 +42,24 @@ export default function App(): JSX.Element {
 			setLocalValue("");
 		});
 
-		window.subAPI.onSubModeUpdate(({ mode }) => {
-			setMode(mode as "numpad" | "scam-warning" | "card-warning" | "voice-manage" | "default");
+		window.subAPI.onSubModeUpdate(({ mode, data }) => {
+			setMode(
+				mode as "numpad" | "scam-warning" | "card-warning" | "voice-manage" | "default" | "confirm"
+			);
 			if (mode === "numpad") {
 				setShowButton(true);
 			} else {
 				setShowButton(false);
 			}
+
+			if (mode === "confirm" && data?.label) {
+				setConfirmLabel(data.label);
+			} else {
+				setConfirmLabel("확인");
+			}
 		});
 	}, []);
+	console.log("Sub Window Rendered");
 
 	return (
 		<div className="w-screen h-screen flex flex-col">
@@ -68,6 +79,8 @@ export default function App(): JSX.Element {
 						onConfirm={() => window.subAPI.notifyButtonAction("confirm")}
 						onRestart={() => window.subAPI.notifyButtonAction("cancel")}
 					/>
+				) : mode === "confirm" ? (
+					<SubConfirm label={confirmLabel} />
 				) : (
 					<img src={logo} alt="logo" />
 				)}

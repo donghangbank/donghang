@@ -1,5 +1,4 @@
 import { useActionPlay } from "@renderer/hooks/ai/useActionPlay";
-import TestButton from "@renderer/components/common/senior/TestButton";
 import { useNavigate } from "react-router-dom";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
@@ -9,18 +8,18 @@ import { useSubMonitorListeners } from "@renderer/hooks/useSubMonitorListeners";
 import NumberPanel from "@renderer/components/common/senior/NumberPanel";
 import { formatPassword } from "@renderer/utils/formatters";
 import { SpecSheetContext } from "@renderer/contexts/SpecSheetContext";
+import inputPassword from "@renderer/assets/audios/input_password.mp3?url";
+import wrongPassword from "@renderer/assets/audios/wrong_password.mp3?url";
 
 interface CardPasswordProps {
 	cardNumber?: string;
 	isSender?: boolean;
-	prev: string;
 	link: string;
 }
 
 export default function CardPassword({
-	cardNumber = "1234567812345678",
+	cardNumber = "4656130001402888",
 	isSender = true,
-	prev,
 	link
 }: CardPasswordProps): JSX.Element {
 	const navigate = useNavigate();
@@ -34,12 +33,14 @@ export default function CardPassword({
 	} = useContext(SpecSheetContext);
 
 	useActionPlay({
+		audioFile: inputPassword,
 		dialogue: "비밀번호 4자리를 입력해주세요!",
 		shouldActivate: true,
 		avatarState: "idle"
 	});
 
 	useActionPlay({
+		audioFile: wrongPassword,
 		dialogue: "비밀번호가 틀렸습니다! 비밀번호 4자리를 다시 입력해주세요!",
 		shouldActivate: passwordNotMatch,
 		avatarState: "idle",
@@ -102,7 +103,6 @@ export default function CardPassword({
 					<NumberPanel inputValue={password} format={formatPassword} hasError={passwordNotMatch} />
 				</div>
 			</div>
-			<TestButton prevRoute={prev} nextRoute={link} />
 		</div>
 	);
 }

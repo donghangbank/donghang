@@ -1,5 +1,4 @@
 import { useActionPlay } from "@renderer/hooks/ai/useActionPlay";
-import TestButton from "@renderer/components/common/senior/TestButton";
 import method1 from "@renderer/assets/audios/method1.mp3";
 import method2 from "@renderer/assets/audios/method2.mp3";
 import { useContext, useEffect, useState } from "react";
@@ -32,12 +31,5 @@ export default function SeniorTransferOptionPage(): JSX.Element {
 		}
 	}, [construction, navigate]);
 
-	return (
-		<div className="w-full h-full flex justify-center items-center">
-			<TestButton
-				prevRoute="/senior/transfer/warning/card"
-				nextRoute="/senior/transfer/card/input"
-			/>
-		</div>
-	);
+	return <></>;
 }

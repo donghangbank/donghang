@@ -79,7 +79,7 @@ export const useActionPlay = ({
 				setIsAudioPlaying(false);
 				isPlayingRef.current = false;
 				if (onComplete) onComplete();
-			}, 1000);
+			}, 500);
 		};
 
 		const handleError = (): void => {

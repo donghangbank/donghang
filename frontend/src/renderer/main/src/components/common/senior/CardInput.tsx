@@ -1,14 +1,12 @@
 import { useActionPlay } from "@renderer/hooks/ai/useActionPlay";
-import TestButton from "@renderer/components/common/senior/TestButton";
 import card_input from "@renderer/assets/audios/card_input.mp3?url";
 import { useNavigate } from "react-router-dom";
 
 interface CardAuthProps {
-	prev: string;
 	link: string;
 }
 
-export default function CardAuth({ prev, link }: CardAuthProps): JSX.Element {
+export default function CardAuth({ link }: CardAuthProps): JSX.Element {
 	const navigate = useNavigate();
 
 	useActionPlay({
@@ -21,9 +19,5 @@ export default function CardAuth({ prev, link }: CardAuthProps): JSX.Element {
 		}
 	});
 
-	return (
-		<div className="w-full h-full flex justify-center items-center">
-			<TestButton prevRoute={prev} nextRoute={link} />
-		</div>
-	);
+	return <></>;
 }

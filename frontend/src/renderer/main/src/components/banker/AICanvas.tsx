@@ -7,13 +7,11 @@ import {
 	DepthOfField,
 	EffectComposer
 } from "@react-three/postprocessing";
-import { UserContext } from "@renderer/contexts/UserContext";
 import { useContext } from "react";
 import { AIContext } from "@renderer/contexts/AIContext";
 import Dialogue from "./Dialogue";
 
 export default function AICanvas(): JSX.Element {
-	const { isElderly, isUsingPhone, userMsg, isTalking } = useContext(UserContext);
 	const { dialogue } = useContext(AIContext);
 
 	return (
@@ -55,16 +53,6 @@ export default function AICanvas(): JSX.Element {
 					{/* <BrightnessContrast brightness={0} contrast={-0.1} /> */}
 				</EffectComposer>
 			</Canvas>
-			<div className="fixed left-4 bottom-32">
-				<div className="flex flex-col gap-4">
-					<span className="text-2xl text-black">{isElderly === 2 ? "노인" : "노인이 아님"}</span>
-					<span className="text-2xl text-black">
-						{isUsingPhone ? "휴대폰 사용 중" : "휴대폰 사용 중 아님"}
-					</span>
-					<span>{isTalking ? "사용자 말하는 중..." : "말하지 않는 중"}</span>
-					<span>{"사용자 음성: " + userMsg}</span>
-				</div>
-			</div>
 		</div>
 	);
 }
