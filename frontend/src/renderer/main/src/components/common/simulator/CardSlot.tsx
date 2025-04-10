@@ -6,14 +6,17 @@ export const CardSlot = (): JSX.Element | null => {
 	const location = useLocation();
 	const [showCard, setShowCard] = useState(false);
 	const [isInserted, setIsInserted] = useState(false);
+	const [isLightOn, setIsLightOn] = useState(false);
 	const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
 	useEffect(() => {
 		if (location.pathname.includes("/card/input")) {
 			setShowCard(true);
 			setIsInserted(true);
+			setIsLightOn(true);
 			intervalRef.current = setInterval(() => {
 				setIsInserted((prev) => !prev);
+				setIsLightOn((prev) => !prev);
 			}, 500);
 		} else {
 			setShowCard(false);
@@ -28,11 +31,15 @@ export const CardSlot = (): JSX.Element | null => {
 	}, [location.pathname]);
 
 	return (
-		<div className="relative h-full w-full bg-gray-300 flex items-center justify-center">
+		<div
+			className={`relative h-full w-full flex items-center justify-center ${
+				showCard ? (isLightOn ? "bg-gray-100" : "bg-gray-300") : "bg-gray-300"
+			} transition-colors`}
+		>
 			<div className="relative flex flex-col items-center">
 				<span className="absolute -top-6 text-sm font-bold text-black z-10">카드 투입구</span>
-				<div className="w-36 h-6 p-2 bg-gray-500 rounded-2xl">
-					<div className="w-full h-full bg-gray-700 rounded-xl"></div>
+				<div className="w-36 h-6 p-2 bg-slate-500 rounded-2xl">
+					<div className="w-full h-full bg-slate-700 rounded-xl"></div>
 				</div>
 			</div>
 			{showCard && (

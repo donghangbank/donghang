@@ -128,8 +128,10 @@ app.whenReady().then(() => {
 		if (mainWindow && !mainWindow.isDestroyed()) {
 			if (action === "confirm") {
 				mainWindow.webContents.send("call-confirm");
-			} else {
+			} else if (action === "cancel") {
 				mainWindow.webContents.send("call-cancel");
+			} else {
+				console.log("Invalid action:", action);
 			}
 		}
 	});
@@ -151,7 +153,7 @@ app.whenReady().then(() => {
 
 		(
 			event,
-			mode: "numpad" | "scam-warning" | "card-warning" | "voice-manage" | "confirm",
+			mode: "numpad" | "scam-warning" | "card-warning" | "confirm",
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			data?: any
 		) => {

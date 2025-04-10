@@ -29,6 +29,9 @@ export const AIContext = createContext<{
 	setConstruction: (value: Construction) => void;
 	audioStop: boolean;
 	setAudioStop: (value: boolean) => void;
+	recommendAccount: string;
+	setRecommendAccount: (value: string) => void;
+	resetAIContext: () => void;
 }>({
 	avatarState: "idle",
 	setAvatarState: () => {},
@@ -37,5 +40,8 @@ export const AIContext = createContext<{
 	construction: "etc",
 	setConstruction: () => {},
 	audioStop: false,
-	setAudioStop: () => {}
+	setAudioStop: () => {},
+	recommendAccount: "",
+	setRecommendAccount: () => {},
+	resetAIContext: () => {}
 });

@@ -23,6 +23,20 @@ export default function SeniorTransferInfoAccountPage(): JSX.Element {
 	const { setCurrentJob } = useContext(PageContext);
 	const navigate = useNavigate();
 
+	const reset = useCallback((): void => {
+		setAccountNotMatch(false);
+		setFirstInput(true);
+		setOwnerConfirmedTrigger(false);
+		setConstructionTrigger(false);
+		setDisabled(false);
+	}, [
+		setAccountNotMatch,
+		setFirstInput,
+		setOwnerConfirmedTrigger,
+		setConstructionTrigger,
+		setDisabled
+	]);
+
 	const { mutate: accountOwnerCheck, data } = useMutation({
 		mutationFn: () => accountOwnerCheckAPI({ receivingAccountNumber }),
 		onSuccess: () => {
@@ -34,6 +48,7 @@ export default function SeniorTransferInfoAccountPage(): JSX.Element {
 		}
 	});
 
+	// 12 자리 계좌번호 입력 시, 계좌주 확인 API 호출
 	const handleConfirm = useCallback((): void => {
 		if (receivingAccountNumber.length !== 12) {
 			setDisabled(false);
@@ -42,12 +57,14 @@ export default function SeniorTransferInfoAccountPage(): JSX.Element {
 		accountOwnerCheck();
 	}, [receivingAccountNumber, setDisabled, accountOwnerCheck]);
 
+	// 서브 모니터 이벤트 리스너 등록
 	useSubMonitorListeners(
 		(newVal) => setReceivingAccountNumber(newVal),
 		handleConfirm,
 		() => navigate("/senior/final")
 	);
 
+	// 계좌번호 초기화
 	const numberClear = useCallback((): void => {
 		setReceivingAccountNumber((prev) => {
 			if (prev.length === 0) return prev;
@@ -58,12 +75,17 @@ export default function SeniorTransferInfoAccountPage(): JSX.Element {
 		});
 	}, [setReceivingAccountNumber]);
 
+	// 계좌번호 입력 시, 계좌주 확인 API 호출
 	useEffect(() => {
 		if (!isAccountNotMatch && data?.ownerName) {
 			setOwnerConfirmedTrigger(false);
-			setTimeout(() => setOwnerConfirmedTrigger(true), 100);
+			setTimeout(() => {
+				setOwnerConfirmedTrigger(true);
+				setConstruction("etc");
+			}, 200);
 		}
-	}, [data?.ownerName, isAccountNotMatch]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [data?.ownerName]);
 
 	useActionPlay({
 		audioFile: receiver_input,
@@ -102,9 +124,17 @@ export default function SeniorTransferInfoAccountPage(): JSX.Element {
 			navigate("/senior/transfer/info/amount");
 		} else if (construction === "부정") {
 			numberClear();
-			setFirstInput(true);
+			reset();
 		}
-	}, [construction, setConstruction, navigate, setCurrentJob, numberClear, constructionTrigger]);
+	}, [
+		construction,
+		setConstruction,
+		navigate,
+		setCurrentJob,
+		numberClear,
+		constructionTrigger,
+		reset
+	]);
 
 	useEffect(() => {
 		setReceivingAccountNumber("");

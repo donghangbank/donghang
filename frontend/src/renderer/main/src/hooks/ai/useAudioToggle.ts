@@ -7,6 +7,7 @@ export function useAudioToggle(): {
 	reason: string;
 	start: () => void;
 	stop: (sendToServer?: boolean) => void;
+	reset: () => void;
 } {
 	const audioChunks = useRef<Blob[]>([]);
 	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -95,10 +96,16 @@ export function useAudioToggle(): {
 		};
 	}, []);
 
+	const reset = useCallback((): void => {
+		setRecommendedAccount("");
+		setReason("");
+	}, []);
+
 	return {
 		recommended_account,
 		reason,
 		start: startRecording,
-		stop: stopRecording
+		stop: stopRecording,
+		reset
 	};
 }

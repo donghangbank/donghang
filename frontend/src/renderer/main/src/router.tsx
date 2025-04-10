@@ -108,6 +108,8 @@ import DemandProductResidentAuthPage from "./pages/general/demands/DemandProduct
 import DemandProductInfoPasswordPage from "./pages/general/demands/DemandProductInfoPasswordPage";
 import DemandProductInfoSpecSheetPage from "./pages/general/demands/DemandProductInfoSpecSheetPage";
 import SeniorDepositProductCardWarningPage from "./pages/senior/products/deposit/SeniorDepositProductCardWarning";
+import SeniorDepositProductProductQuestionPage from "./pages/senior/products/deposit/SeniorDepositProductProductQuestionPage";
+import SeniorDepositProductRecommendationDetailPage from "./pages/senior/products/deposit/SeniorDepositProductRecommendationDetailPage";
 import DepositAccountInputPage from "./pages/general/deposit/DepositAccountInputPage";
 import DepositAccountPasswordPage from "./pages/general/deposit/DepositAccountPasswordPage";
 import WithDrawalAccountInputPage from "./pages/general/withdrawal/WithDrawalAccountInputPage";
@@ -789,8 +791,29 @@ const router = createHashRouter([
 								element: <SeniorDepositProductCheckPage />
 							},
 							{
+								path: "question",
+								element: <SeniorDepositProductProductQuestionPage />
+							},
+							{
 								path: "recommendation",
-								element: <SeniorDepositProductRecommendationPage />
+								children: [
+									{
+										path: "question",
+										element: <SeniorDepositProductProductQuestionPage />
+									},
+									{
+										path: "feature",
+										element: <SeniorDepositProductRecommendationPage />
+									},
+									{
+										path: "detail",
+										element: <SeniorDepositProductRecommendationDetailPage />
+									},
+									{
+										path: "specsheet",
+										element: <SeniorDepositSpecSheetPage />
+									}
+								]
 							},
 							{
 								path: "dicision",
