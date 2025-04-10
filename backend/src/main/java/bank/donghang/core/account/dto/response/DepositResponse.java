@@ -2,6 +2,8 @@ package bank.donghang.core.account.dto.response;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import bank.donghang.core.account.domain.Account;
 import bank.donghang.core.account.domain.Transaction;
 import bank.donghang.core.account.domain.enums.TransactionType;
@@ -14,6 +16,7 @@ public record DepositResponse(
 	Long amount,
 	Long balance,
 	TransactionType transactionType,
+	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
 	LocalDateTime transactionTime
 ) {
 	public static DepositResponse of(

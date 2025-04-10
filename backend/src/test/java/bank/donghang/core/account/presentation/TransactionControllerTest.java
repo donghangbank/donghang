@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
@@ -161,7 +162,7 @@ class TransactionControllerTest extends ControllerTest {
 		List<TransactionHistoryResponse> expectedTransactions = List.of(
 			new TransactionHistoryResponse(
 				1L,
-				LocalDateTime.now().minusHours(2),
+				LocalDateTime.now().minusHours(2).truncatedTo(ChronoUnit.SECONDS),
 				TransactionType.DEPOSIT,
 				"Salary deposit",
 				1000L,
@@ -169,7 +170,7 @@ class TransactionControllerTest extends ControllerTest {
 			),
 			new TransactionHistoryResponse(
 				2L,
-				LocalDateTime.now().minusHours(1),
+				LocalDateTime.now().minusHours(1).truncatedTo(ChronoUnit.SECONDS),
 				TransactionType.WITHDRAWAL,
 				"ATM withdrawal",
 				500L,
