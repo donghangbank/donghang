@@ -58,12 +58,18 @@ export default function VoiceFishingDetector(): JSX.Element {
 					>
 						<div className="w-full h-full flex justify-center items-center">
 							<div className="bg-white rounded-3xl shadow-custom flex flex-col items-center text-4xl font-bold gap-8 p-6">
-								<div className="text-red">보이스 피싱이 의심됩니다!</div>
+								<div className="text-black">보이스피싱이 의심됩니다!</div>
+								<div className="text-black">
+									공공기관과 금융기관을 사칭한 금융사기가 자주 발생하고 있습니다.
+								</div>
+								<div className="text-black">
+									보이스피싱이 의심되면 가까운 직원에게 문의해보세요.
+								</div>
 								<div className="w-full flex gap-4">
-									<button className="flex-1" onClick={handleConfirm}>
+									<button className="flex-1 text-green" onClick={handleConfirm}>
 										거래 취소
 									</button>
-									<button onClick={handleCancel} className="flex-1">
+									<button onClick={handleCancel} className="flex-1 text-red">
 										거래 계속
 									</button>
 								</div>

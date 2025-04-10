@@ -19,6 +19,7 @@ export default function SeniorTransferInfoAmountPage(): JSX.Element {
 	const { sendingAccountNumber, receivingAccountNumber, amount, setAmount, disabled, setDisabled } =
 		useContext(InputContext);
 	const [isAmountConfirmed, setIsAmountConfirmed] = useState(false);
+	const [trigger, setTrigger] = useState(false);
 	const {
 		setAmount: setSpecSheetAmount,
 		setReceivingAccountNumber: setSpecSheetReceivingAccountNumber,
@@ -26,7 +27,7 @@ export default function SeniorTransferInfoAmountPage(): JSX.Element {
 		setSendingAccountBalance,
 		setTransactionTime
 	} = useContext(SpecSheetContext);
-	const { construction } = useContext(AIContext);
+	const { construction, setConstruction } = useContext(AIContext);
 	const { setCurrentJob } = useContext(PageContext);
 	const navigate = useNavigate();
 	const description = "이체";
@@ -74,7 +75,8 @@ export default function SeniorTransferInfoAmountPage(): JSX.Element {
 		}
 		accountOwnerCheck();
 		setAmount(parsedAmount);
-	}, [amount, setAmount, setDisabled, accountOwnerCheck]);
+		setConstruction("etc");
+	}, [amount, accountOwnerCheck, setAmount, setConstruction, setDisabled]);
 
 	useEffect(() => {
 		if (data?.ownerName) {
@@ -120,11 +122,15 @@ export default function SeniorTransferInfoAmountPage(): JSX.Element {
 	useActionPlay({
 		dialogue: `${data?.ownerName} 님께 ${amount} 원 보내겠습니다. 맞나요?`,
 		shouldActivate: !!data?.ownerName && isAmountConfirmed,
-		avatarState: "idle"
+		avatarState: "idle",
+		onComplete: () => {
+			setConstruction("etc");
+			setTrigger(true);
+		}
 	});
 
 	useEffect(() => {
-		if (!(!!data?.ownerName && isAmountConfirmed)) return;
+		if (!trigger) return;
 		if (construction === "긍정") {
 			transfer();
 			navigate("/senior/transfer/info/specsheet");
@@ -141,8 +147,8 @@ export default function SeniorTransferInfoAmountPage(): JSX.Element {
 		numberClear,
 		transfer,
 		setDisabled,
-		data?.ownerName,
-		isAmountConfirmed
+		isAmountConfirmed,
+		trigger
 	]);
 
 	useEffect(() => {

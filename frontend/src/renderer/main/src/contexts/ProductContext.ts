@@ -12,6 +12,8 @@ export interface ProductContextProps {
 	minAmount: number;
 	maxAmount: number;
 	productName: string;
+	productDescription: string;
+	period: number;
 	accountNumber: string;
 	accountBalance: number;
 	interestRate: number;
@@ -27,6 +29,8 @@ export interface ProductContextProps {
 	setMinAmount: Dispatch<SetStateAction<number>>;
 	setMaxAmount: Dispatch<SetStateAction<number>>;
 	setProductName: Dispatch<SetStateAction<string>>;
+	setProductDescription: Dispatch<SetStateAction<string>>;
+	setPeriod: Dispatch<SetStateAction<number>>;
 	setAccountNumber: Dispatch<SetStateAction<string>>;
 	setAccountBalance: Dispatch<SetStateAction<number>>;
 	setInterestRate: Dispatch<SetStateAction<number>>;
@@ -46,6 +50,8 @@ export const ProductContext = createContext<ProductContextProps>({
 	minAmount: 0,
 	maxAmount: 0,
 	productName: "",
+	productDescription: "",
+	period: 0,
 	accountNumber: "",
 	accountBalance: 0,
 	interestRate: 0,
@@ -61,6 +67,8 @@ export const ProductContext = createContext<ProductContextProps>({
 	setMinAmount: () => {},
 	setMaxAmount: () => {},
 	setProductName: () => {},
+	setProductDescription: () => {},
+	setPeriod: () => {},
 	setAccountNumber: () => {},
 	setAccountBalance: () => {},
 	setInterestRate: () => {},

@@ -7,11 +7,15 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import thank from "@renderer/assets/audios/thank.mp3?url";
+import { UserContext } from "@renderer/contexts/UserContext";
+import { AIContext } from "@renderer/contexts/AIContext";
 
 export const FinalPage = (): JSX.Element => {
 	const navigate = useNavigate();
 	const { resetAll } = useContext(InputContext);
 	const { resetAll: productResetAll } = useContext(ProductContext);
+	const { resetAll: userResetAll } = useContext(UserContext);
+	const { resetAIContext } = useContext(AIContext);
 	const { resetSpecSheet } = useContext(SpecSheetContext);
 	const { resetContext } = useContextReset();
 	const queryClient = useQueryClient();
@@ -22,6 +26,8 @@ export const FinalPage = (): JSX.Element => {
 		productResetAll();
 		resetSpecSheet();
 		resetContext();
+		userResetAll();
+		resetAIContext();
 
 		// 2. 서브 윈도우 초기화
 		window.mainAPI.updateSubState(false); // 서브 윈도우 로고 표시
@@ -32,8 +38,16 @@ export const FinalPage = (): JSX.Element => {
 		// 3. 쿼리 클라이언트 초기화
 		queryClient.clear(); // 모든 쿼리 무효화
 
+		const forceReload = (): void => {
+			window.location.href = "index.html";
+			window.location.reload();
+		};
+
 		// 4. 2초 후 홈으로 이동
-		const timer = setTimeout(() => navigate("/"), 2000);
+		const timer = setTimeout(() => {
+			navigate("/");
+			forceReload();
+		}, 2000);
 
 		return (): void => clearTimeout(timer);
 		// eslint-disable-next-line react-hooks/exhaustive-deps

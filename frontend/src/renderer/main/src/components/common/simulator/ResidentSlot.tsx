@@ -31,8 +31,8 @@ export const ResidentSlot = (): JSX.Element | null => {
 		<div className="relative h-full w-full bg-gray-300 flex items-center justify-center">
 			<div className="relative flex flex-col items-center">
 				<span className="absolute -top-6 text-sm font-bold text-black z-10">신분증 투입구</span>
-				<div className="w-40 h-6 p-2 bg-gray-500 rounded-2xl">
-					<div className="w-full h-full bg-gray-700 rounded-xl"></div>
+				<div className="w-40 h-6 p-2 bg-slate-500 rounded-2xl">
+					<div className="w-full h-full bg-slate-700 rounded-xl"></div>
 				</div>
 			</div>
 			{showResident && (

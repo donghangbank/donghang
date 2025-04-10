@@ -2,16 +2,12 @@ import { motion } from "framer-motion";
 
 interface SubConfirmProps {
 	label?: string;
-	onClick?: () => void;
 }
 
-export default function SubConfirm({ label = "확인", onClick }: SubConfirmProps): JSX.Element {
+export default function SubConfirm({ label = "확인" }: SubConfirmProps): JSX.Element {
 	const handleConfirmClick = (): void => {
-		if (onClick) {
-			onClick();
-		} else {
-			window.subAPI.notifyButtonAction("confirm");
-		}
+		console.log("Confirm button clicked");
+		window.subAPI.notifyButtonAction("confirm");
 	};
 
 	return (

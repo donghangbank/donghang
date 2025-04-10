@@ -40,6 +40,7 @@ export const MainLayout = (): JSX.Element => {
 	useEffect(() => {
 		if (window.mainAPI) {
 			const path = location.pathname;
+			console.log("Pathname:", path);
 			if (
 				path.includes("password") ||
 				path.includes("account") ||

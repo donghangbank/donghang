@@ -1,5 +1,4 @@
 import logo from "@renderer/assets/logo.png";
-import AudioManagePanel from "@renderer/components/common/AudioManagePanel";
 import SubCardWarning from "@renderer/components/common/SubCardWarning";
 import SubConfirm from "@renderer/components/common/SubConfirm";
 import { SubNumberPad } from "@renderer/components/common/SubNumberPad";
@@ -60,7 +59,6 @@ export default function App(): JSX.Element {
 		});
 	}, []);
 	console.log("Sub Window Rendered");
-
 	return (
 		<div className="w-screen h-screen flex flex-col">
 			<div className="w-full h-full flex items-center justify-center bg-gray-200">
@@ -74,11 +72,6 @@ export default function App(): JSX.Element {
 					<SubScamWarning />
 				) : mode === "card-warning" ? (
 					<SubCardWarning />
-				) : mode === "voice-manage" ? (
-					<AudioManagePanel
-						onConfirm={() => window.subAPI.notifyButtonAction("confirm")}
-						onRestart={() => window.subAPI.notifyButtonAction("cancel")}
-					/>
 				) : mode === "confirm" ? (
 					<SubConfirm label={confirmLabel} />
 				) : (

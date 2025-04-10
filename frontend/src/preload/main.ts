@@ -21,6 +21,7 @@ contextBridge.exposeInMainWorld("mainAPI", {
 	},
 
 	onCallConfirm: (callback: () => void) => {
+		console.log("onCallConfirm called");
 		const handler = (): void => callback();
 		ipcRenderer.on("call-confirm", handler);
 		return (): void => {

@@ -6,6 +6,15 @@ export function AIProvider({ children }: { children: React.ReactNode }): JSX.Ele
 	const [dialogue, setDialogue] = useState<string>("");
 	const [construction, setConstruction] = useState<Construction>("etc");
 	const [audioStop, setAudioStop] = useState<boolean>(false);
+	const [recommendAccount, setRecommendAccount] = useState<string>("");
+
+	const resetAIContext = (): void => {
+		setAvatarState("idle");
+		setDialogue("");
+		setConstruction("etc");
+		setAudioStop(false);
+		setRecommendAccount("");
+	};
 
 	return (
 		<AIContext.Provider
@@ -17,7 +26,10 @@ export function AIProvider({ children }: { children: React.ReactNode }): JSX.Ele
 				construction,
 				setConstruction,
 				audioStop,
-				setAudioStop
+				setAudioStop,
+				recommendAccount,
+				setRecommendAccount,
+				resetAIContext
 			}}
 		>
 			{children}

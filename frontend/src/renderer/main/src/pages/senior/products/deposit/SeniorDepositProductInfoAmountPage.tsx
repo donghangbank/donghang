@@ -11,6 +11,7 @@ import { AxiosError } from "axios";
 import { InputContext } from "@renderer/contexts/InputContext";
 import { motion } from "framer-motion";
 import { useActionPlay } from "@renderer/hooks/ai/useActionPlay";
+import input_deposit_amount from "@renderer/assets/audios/input_deposit_amount.mp3?url";
 
 export default function SeniorDepositProductInfoAmountPage(): JSX.Element {
 	const {
@@ -136,6 +137,7 @@ export default function SeniorDepositProductInfoAmountPage(): JSX.Element {
 	}, [disabled]);
 
 	useActionPlay({
+		audioFile: input_deposit_amount,
 		dialogue: "예치금의 금액을 입력해주세요!",
 		shouldActivate: true,
 		avatarState: "idle"
