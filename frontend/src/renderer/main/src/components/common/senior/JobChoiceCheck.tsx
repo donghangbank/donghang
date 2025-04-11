@@ -11,7 +11,7 @@ interface JobCheckProps {
 }
 
 export default function JobChoiceCheck({ job, audioFile, link }: JobCheckProps): JSX.Element {
-	const { construction } = useContext(AIContext);
+	const { construction, setConstruction } = useContext(AIContext);
 	const { setCurrentJob } = useContext(PageContext);
 	const navigate = useNavigate();
 	const [voiceEnd, setVoiceEnd] = useState(false);
@@ -32,9 +32,11 @@ export default function JobChoiceCheck({ job, audioFile, link }: JobCheckProps):
 			setCurrentJob(job);
 			navigate(link);
 		} else if (construction === "부정" || construction === "홈") {
-			navigate("/senior/final");
+			setCurrentJob("");
+			setConstruction("etc");
+			navigate("/senior");
 		}
-	}, [construction, navigate, setCurrentJob, job, link, voiceEnd]);
+	}, [construction, navigate, setCurrentJob, job, link, voiceEnd, setConstruction]);
 
 	useEffect(() => {
 		setCurrentJob(job);
