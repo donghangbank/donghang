@@ -6,6 +6,7 @@ import { useActionPlay } from "@renderer/hooks/ai/useActionPlay";
 import { useQuery } from "@tanstack/react-query";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import this_deposit_making from "@renderer/assets/audios/this_deposit_making.mp3?url";
 
 interface ProductData {
 	bankId: number;
@@ -87,7 +88,8 @@ export default function SeniorDepositProductRecommendationDetailPage(): JSX.Elem
 	]);
 
 	useActionPlay({
-		dialogue: `${recommendAccount} 상품의 세부 정보 입니다! 만드시겠어요?`,
+		audioFile: this_deposit_making,
+		dialogue: `${recommendAccount} 상품의 세부 정보 입니다! 해당 상품으로 예금 통장 만드시겠어요?`,
 		shouldActivate: !!recommendAccount,
 		avatarState: "idle",
 		onComplete: () => {

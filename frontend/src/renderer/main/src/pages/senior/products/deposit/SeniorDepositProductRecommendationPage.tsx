@@ -5,12 +5,15 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useSubMonitorListeners } from "@renderer/hooks/useSubMonitorListeners";
+//import want_option from "@renderer/assets/audios/want_option.mp3?url";
+import want_detail from "@renderer/assets/audios/want_detail.mp3?url";
 
 export default function SeniorDepositProductRecommendationPage(): JSX.Element {
 	const { recommended_account, reason, start, stop } = useAudioToggle();
 	const [recommended, setRecommended] = useState(false);
 	const { setRecommendAccount } = useContext(AIContext);
 	const { setAudioStop, construction, setConstruction } = useContext(AIContext);
+	const [trigger, setTrigger] = useState(false);
 	const navigate = useNavigate();
 	const resetAll = useCallback((): void => {
 		setRecommended(false);
@@ -20,6 +23,7 @@ export default function SeniorDepositProductRecommendationPage(): JSX.Element {
 
 	// 1.
 	useActionPlay({
+		//audioFile: want_option,
 		dialogue: "원하시는 조건 말씀하시고 다 말씀하셨으면 아래 확인 버튼을 눌러주세요!",
 		shouldActivate: true,
 		avatarState: "focusBottom",
@@ -29,6 +33,7 @@ export default function SeniorDepositProductRecommendationPage(): JSX.Element {
 			start();
 			setAudioStop(true);
 			stop(false);
+			setTrigger(true);
 		}
 	});
 
@@ -52,8 +57,9 @@ export default function SeniorDepositProductRecommendationPage(): JSX.Element {
 
 	// 2.
 	useActionPlay({
+		audioFile: want_detail,
 		dialogue: `${recommended_account} 추천드립니다! 더 자세한 정보 원하시나요?`,
-		shouldActivate: !!recommended_account && !!reason,
+		shouldActivate: !!recommended_account && !!reason && trigger,
 		avatarState: "idle",
 		onComplete: () => {
 			setConstruction("etc");
